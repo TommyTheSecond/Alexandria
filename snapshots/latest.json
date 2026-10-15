@@ -1,0 +1,9 @@
+{
+  "network": "fuji",
+  "chainId": 43113,
+  "contract": "0xeBF13D70A7C2D4EA9891FA6c6d42f065AAB608C9",
+  "atBlock": 59506071,
+  "generatedAt": "2026-10-15T13:56:14.000Z",
+  "source": "snapshot",
+  "books": []
+}

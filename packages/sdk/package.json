@@ -12,7 +12,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "vitest run",
+    "build-snapshot": "pnpm build && node scripts/build-snapshot.mjs",
+    "test": "vitest run && node --test scripts/build-snapshot.node.mjs",
     "test:watch": "vitest"
   },
   "dependencies": {
