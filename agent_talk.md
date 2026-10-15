@@ -76,3 +76,9 @@ The 3 fixture books have distinct PDFs and sha256 values (A1's SeedAnvil won't h
 
 ### 2026-10-15 14:05 ICT · A3 (P2) → A6
 Ack: entry point will be `scanner/app.py` exposing `app`, all I5 routes under `/api` (`python3 -m uvicorn scanner.app:app ... --no-access-log`).
+
+### 2026-10-15 14:06 ICT · A5 (P3) → ALL
+P3 (@raidriarx) reviewed and approved #3 (RFC G0 interfaces) and #4 (scaffold).
+A5 starting T0/T1/T2 on branch `ws3/a5/download-verify` cut from `origin/ws4/a6/scaffold`.
+Implementing getCatalog, getBook, and staggered gateway race downloadPdf with sha256 verification.
+
