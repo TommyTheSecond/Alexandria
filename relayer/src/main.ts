@@ -7,7 +7,7 @@ try {
   const config = loadConfig();
   const gateway = await createChainGateway({ ...config, privateKey: await unlockKeystore(config) });
   if (await gateway.getBalance() < 500_000_000_000_000_000n) console.warn('Relayer test AVAX balance is below 0.5 AVAX');
-  const server = createRelayerServer({ secret: config.secret, gateway,
+  const server = createRelayerServer({ secret: config.secret, gateway, dailyLimit: config.dailyCap,
     onSubmitted: ({ bookId, txHash }) => console.log(JSON.stringify({ bookId, txHash })) });
   await listenLoopback(server, config.port);
   const balanceTimer = setInterval(() => {

@@ -43,3 +43,12 @@ it('keeps_signing_material_out_of_the_loaded_environment_config', () => {
   expect(config).toHaveProperty('keystorePath');
   expect(config).toHaveProperty('expectedRelayer');
 });
+
+it('reads_the_daily_cap_with_a_default_and_bounds', () => {
+  const env = fixture();
+  expect(loadConfig(env).dailyCap).toBe(200);
+  expect(loadConfig({ ...env, RELAY_DAILY_CAP: '300' }).dailyCap).toBe(300);
+  expect(() => loadConfig({ ...env, RELAY_DAILY_CAP: '0' })).toThrow('RELAY_DAILY_CAP');
+  expect(() => loadConfig({ ...env, RELAY_DAILY_CAP: '1001' })).toThrow('RELAY_DAILY_CAP');
+  expect(() => loadConfig({ ...env, RELAY_DAILY_CAP: '3e2' })).toThrow('RELAY_DAILY_CAP');
+});

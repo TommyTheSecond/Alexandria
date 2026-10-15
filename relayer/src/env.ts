@@ -3,8 +3,9 @@ import { dirname, resolve } from 'node:path';
 import { getAddress, type Abi } from 'viem';
 import type { ChainConfig } from './chain.js';
 import type { KeystoreConfig } from './keystore.js';
+import { MAX_DAILY_LIMIT } from './cap.js';
 
-export interface RelayerConfig extends Omit<ChainConfig, 'privateKey'>, KeystoreConfig { secret: string; port: number }
+export interface RelayerConfig extends Omit<ChainConfig, 'privateKey'>, KeystoreConfig { secret: string; port: number; dailyCap: number }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): RelayerConfig {
   if (!env.RELAY_SECRET || env.RELAY_SECRET.length < 32) throw new Error('RELAY_SECRET must contain at least 32 characters');
@@ -17,6 +18,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): RelayerConfig 
   if (env.PORT && !/^\d+$/.test(env.PORT)) throw new Error('PORT must be a valid TCP port');
   const port = Number(env.PORT || 8787);
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('PORT must be a valid TCP port');
+  // Submissions per UTC day (I6 DAILY_CAP). Default 200.
+  if (env.RELAY_DAILY_CAP && !/^\d+$/.test(env.RELAY_DAILY_CAP)) throw new Error(`RELAY_DAILY_CAP must be 1–${MAX_DAILY_LIMIT}`);
+  const dailyCap = Number(env.RELAY_DAILY_CAP || 200);
+  if (dailyCap < 1 || dailyCap > MAX_DAILY_LIMIT) throw new Error(`RELAY_DAILY_CAP must be 1–${MAX_DAILY_LIMIT}`);
   const path = resolve(env.DEPLOYMENT || '../deployments/fuji.json');
   let record: { chainId?: unknown; address?: unknown; abi?: unknown; relayer?: unknown };
   try { record = JSON.parse(readFileSync(path, 'utf8')) as typeof record; }
@@ -32,5 +37,5 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): RelayerConfig 
   return { rpcUrl: env.RPC_URL, keystorePath: resolve(env.RELAYER_KEYSTORE),
     passwordFile: env.RELAYER_PASSWORD_FILE ? resolve(env.RELAYER_PASSWORD_FILE) : undefined,
     expectedRelayer: getAddress(record.relayer), contract: getAddress(record.address),
-    chainId: record.chainId, abi, secret: env.RELAY_SECRET, port };
+    chainId: record.chainId, abi, secret: env.RELAY_SECRET, port, dailyCap };
 }
