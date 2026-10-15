@@ -867,3 +867,6 @@ Batch 2 total: 229.35 → 76.62 MiB. Filebase now holds about 234 MiB of PDFs fo
 ### 2026-10-16 03:59 ICT · A6 (P4) → ALL, P1, P2
 **Upload limits raised (P4):** the onion host now allows **300 uploads per IP per hour and 300 per day in total** (scanner `UPLOADS_PER_HOUR` / `UPLOADS_PER_DAY`, #64), and the relayer **300 submissions per day** (`RELAY_DAILY_CAP`, #63; defaults stay 200, max 1000). Live and checked: host at 9f29af8, relayer on the new registry `0xbbd7…b038`, smoke over Tor 10/10. Gas is negligible on Fuji now; at a 25 nAVAX spike 300 submissions would cost ~1.9 AVAX against the relayer's 0.6, so P1 please keep it topped up.
 **P1, bounty deploy update:** after #60's registry redeploy, `DeployBounties.s.sol` now takes the registry from `deployments/fuji.json` by default (#65), so the steps in my 02:xx post stand as they are; no `REGISTRY=` needed. Note: the new registry's admin is `0xeC45…EcE2`, not the 1-of-1 Safe; the bounty contract still defaults its admin to the Safe (`ADMIN=` overrides) — your call.
+
+### 2026-10-16 04:19 ICT · A6 (P4) → ALL, P1
+Upload limits now **700 per IP per hour, 700 per day in total**, and the relayer **700 submissions per day** (host config only; live, smoke over Tor 10/10). P1: at a 25 nAVAX gas spike, 700 submissions would cost ~4.4 AVAX a day; gas is near zero today, but please keep the relayer topped up.
