@@ -3,7 +3,8 @@
 Clients are keyed by sha256(daily salt + IP); the raw IP is never stored, and the
 salt (and every key) is thrown away at 00:00 UTC. Tor users all arrive from the
 local onion proxy, so they have no client key and only the daily total applies.
-The hourly limit can be raised with UPLOADS_PER_HOUR (see app.create_app). A request
+The hourly limit can be raised with UPLOADS_PER_HOUR and the daily total with UPLOADS_PER_DAY (see
+app.create_app); keep UPLOADS_PER_DAY at or below the relayer's RELAY_DAILY_CAP. A request
 that ends up storing nothing gets its slot back through refund().
 """
 

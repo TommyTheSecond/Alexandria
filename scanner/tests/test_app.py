@@ -149,3 +149,10 @@ def test_submit_hourly_limit_from_env(tmp_path, monkeypatch):
     monkeypatch.setenv("UPLOADS_PER_HOUR", "20")
     client = TestClient(create_app(data_dir=tmp_path, submit_service=FakeService()))
     assert [_post_submit(client).status_code for _ in range(21)] == [200] * 20 + [429]
+
+
+def test_submit_daily_limit_from_env(tmp_path, monkeypatch):
+    monkeypatch.setenv("UPLOADS_PER_HOUR", "50")
+    monkeypatch.setenv("UPLOADS_PER_DAY", "7")
+    client = TestClient(create_app(data_dir=tmp_path, submit_service=FakeService()))
+    assert [_post_submit(client).status_code for _ in range(8)] == [200] * 7 + [429]
