@@ -112,7 +112,8 @@ def create_app(data_dir: Optional[Path] = None, *, lookup_id: LookupId = None, s
     if submit_service is _UNSET:
         submit_service, env_lookup = service_from_env(data_dir)
         lookup_id = lookup_id or env_lookup
-    limiter = limiter or RateLimiter(per_client_hour=int(settings.get("UPLOADS_PER_HOUR", "5")))
+    limiter = limiter or RateLimiter(per_client_hour=int(settings.get("UPLOADS_PER_HOUR", "5")),
+                                     global_day=int(settings.get("UPLOADS_PER_DAY", "200")))
     if bounty_check is _UNSET:  # None unless deployments/fuji-bounties.json exists (I9)
         bounty_check = bounty_check_from_env(settings.get, settings.REPO_ROOT)
     app = FastAPI(title="Alexandria scanner", version=__version__, docs_url=None, redoc_url=None, openapi_url=None)
