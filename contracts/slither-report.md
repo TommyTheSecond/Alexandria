@@ -28,12 +28,12 @@
 1. **Reentrancy Protection:** All state changes (book status update, flag counting, pending counts) occur before external event emission. No arbitrary external calls are made.
 2. **Access Control:**
    - `review` strictly enforces `onlyRole(CURATOR_ROLE)`.
-   - `submit` strictly enforces `onlyRole(RELAYER_ROLE)`.
-   - Role management delegates to OpenZeppelin `AccessControlEnumerable` with Safe as `DEFAULT_ADMIN_ROLE`.
-3. **Integer Arithmetic:** Compiler version is `^0.8.24` with native checked arithmetic.
+   - `submit` allows public submissions, while exempting `RELAYER_ROLE` from the pending submissions limit.
+   - Role management delegates to OpenZeppelin `AccessControl` with Safe as `DEFAULT_ADMIN_ROLE`.
+3. **Integer Arithmetic:** Compiler version is pinned to `0.8.24` with native checked arithmetic.
 4. **Duplicate Resistance:** Double-mapping check (`idBySha256[pdfSha256]`) guards against collisions and replay attacks.
 5. **Denial of Service (DoS):**
-   - Submissions enforce `MAX_PENDING_PER_SUBMITTER = 10`.
+   - Submissions enforce `MAX_PENDING_PER_SUBMITTER = 5` for non-relayer submitters.
    - Flag threshold is fixed (`FLAG_THRESHOLD = 3`) with double-flagging prevention (`flaggedBy[id][msg.sender]`).
 
 ---
