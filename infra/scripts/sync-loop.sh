@@ -37,5 +37,11 @@ while true; do
     fi
     node "${ENV[@]}" infra/scripts/close-epoch.mjs || echo "close-epoch failed; retrying next round"
   fi
+
+  # Phase 2: book bounties (I9). Proposes payouts for U-Bot-matched uploads and executes them after the
+  # dispute window. Only once the bounty contract is deployed; a failure never affects the steps above.
+  if [ -f "$ROOT/deployments/fuji-bounties.json" ]; then
+    node "${ENV[@]}" infra/scripts/bounty-resolver.mjs || echo "bounty-resolver failed; retrying next round"
+  fi
   sleep "$INTERVAL"
 done
