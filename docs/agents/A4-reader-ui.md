@@ -59,12 +59,20 @@ Read `AGENTS.md`, `README.md` (sections 3, 7, 10, 11 and 12) and `docs/INTERFACE
     - `UNREACHABLE`: "No gateway reachable. Try the onion mirror: <address>."
   - On-chain panel: status, submitter, submitted date, `getSubmitTx` link to `https://testnet.snowtrace.io/tx/<hash>`.
   - Flag button: a dialog asks for a reason. `connectWallet()` runs **only on click**, then `flag()`. Show `TX_REVERTED` errors in plain words (for example "You already flagged this book").
+  - **Connect dialog** (shared by Flag and `#/curate`, see README section 3.4) has two buttons:
+    - **Browser wallet:** `connectWallet('injected')`. Hide it when `window.ethereum` is missing.
+    - **WalletConnect (QR / mobile):** `connectWallet('walletconnect')`. Hide it when `walletConnectProjectId` is empty.
+    - If neither is available, say so and point to the about page.
+    - `NO_WALLET` with `detail: 'cancelled'` closes the dialog quietly.
+    - Once connected, show the short address and a **Disconnect** button that calls `disconnect()`.
   - A flagged book keeps its Download button (README Review focus 5).
   - *Done when:* Playwright tests pass:
     - `download_saves_pdf_with_expected_name` (check the Playwright download event and the file name)
     - `download_corrupt_gateway_falls_back` (mock gateway returns HTML 200 first)
     - `flagged_book_still_downloadable`
     - `cjk_title_renders` (the Chinese-title fixture)
+    - `no_walletconnect_requests_before_click`: record network requests on `#/` and `#/book/1`; none may go to a WalletConnect host or load the WalletConnect chunk until the user clicks "Connect with WalletConnect"
+    - `connect_dialog_hides_walletconnect_without_project_id`
 
 - [ ] **T4 Upload page `#/upload` (H+11 – H+13)**
   - Form for `BookMetaInput`, with repeatable groups for authors, translators and bans, and `deathYear` allowed to be unknown.

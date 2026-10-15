@@ -110,6 +110,36 @@ None ──submit──► Pending ──approve──► Approved ──3 flags
 
 A confirmed book can still be flagged, but flags no longer change its state.
 
+### 3.4 Wallet connection (WalletConnect)
+
+A wallet is needed only to **flag** a book or to **curate**. Users can connect in two ways:
+
+| Method | For whom | How |
+|---|---|---|
+| Browser wallet | Desktop with Core or MetaMask installed | Injected EIP-1193 provider (`window.ethereum`) |
+| **WalletConnect** | Phones, Tor Browser, any browser without a wallet extension | Scan a QR code with a mobile wallet (Core, MetaMask mobile, …) |
+
+**Setup (once, by whoever owns the WalletConnect dashboard project):**
+
+1. Open the project in the WalletConnect dashboard (`dashboard.walletconnect.com`) and copy its **Project ID**.
+2. Put the Project ID in `infra/config/config.json` as `walletConnectProjectId`. A6 does this.
+   - The Project ID is public: it ships inside the website. Do **not** commit the dashboard URL or any dashboard login.
+3. In the dashboard's project settings, open the **domain allowlist** and add every origin the reader runs on:
+   - `https://tommythesecond.github.io` (GitHub Pages)
+   - `*.ipfs.dweb.link` and the Filebase gateway domain (IPFS subdomain gateways)
+   - the onion address, once A6 has it
+
+   `localhost` is always allowed, so local development works without an entry. Changes take about 15 minutes to apply. Any origin not on the list cannot use WalletConnect, but the browser-wallet path still works there.
+
+**Rules:**
+
+- The WalletConnect code is **lazy-loaded only after a user clicks "Connect with WalletConnect"**. Browsing, reading, downloading and uploading never load it.
+- WalletConnect uses a third-party relay, which sees connection metadata. This is the only allowed exception to the "no third-party requests" rule, and only after that click.
+- Fuji is requested as an **optional** chain, so wallets that don't list Fuji by default don't reject the session. Then the SDK asks the wallet to switch to Fuji (`0xa869`).
+- A **Disconnect** button ends the WalletConnect session and clears it from the browser.
+
+Who builds it: **A5** adds the provider to the SDK (`connectWallet('walletconnect')`). **A4** adds the connect dialog. **A6** adds the config field and keeps the allowlist current.
+
 ## 4. Team, agents and ownership
 
 | Workstream | Person | Agent | Owns these paths (only the owner edits them) |
@@ -358,6 +388,7 @@ Nothing in 9.2 can begin until these are done. **⛔ marks a hard blocker.**
 | B8 | U-Bot is the u.bot assistant, not a scraper (8.3). P2 fills `ingest/candidates.csv` by hand. | P2 | seed books |
 | B9 | Verify public-domain status and ban sources for ≥ 12 candidate books. This is research, not code, so it is normally allowed before the start. | P2 | bulk load |
 | B10 | Everyone reads this README, AGENTS.md and their own agent brief(s). | all | G0 |
+| B11 | WalletConnect: copy the Project ID from the dashboard and give it to P4. Add GitHub Pages and the IPFS gateway domains to the allowlist (section 3.4). | dashboard owner | mobile and Tor wallet connect |
 
 ### 9.2 Hour by hour
 
@@ -420,7 +451,7 @@ Every task must meet all of these.
   - Solidity `0.8.24`, OpenZeppelin Contracts `5.x`, Foundry (latest stable)
   - Node `20` LTS, pnpm `9`, TypeScript `strict: true`
   - Python `3.11+`
-- **No third-party CDN, font, analytics or tracking** at runtime. Self-host every asset, because CDNs are often blocked in the target countries.
+- **No third-party CDN, font, analytics or tracking** at runtime. Self-host every asset, because CDNs are often blocked in the target countries. The only exception is the WalletConnect relay, and only after a user clicks "Connect with WalletConnect" (section 3.4).
 - **No IP or request logging anywhere:** scanner, relayer and Caddy.
 - **Reading and downloading never need a wallet.**
 - **Hosting from any path:** hash routing (`#/…`) and relative asset paths (Vite `base: './'`), so the reader runs from any IPFS gateway path or the onion.
@@ -487,3 +518,4 @@ Each criterion names its metric and unit, and is checked at gate G3.
 - Project Gutenberg: [Offline catalogs](https://www.gutenberg.org/ebooks/offline_catalogs), [Linking policy](https://www.gutenberg.org/policy/linking.html)
 - Censorship: [GreatFire ipfs.io test](https://en.greatfire.org/https/gateway.ipfs.io/ipfs/bafybeifx7yeb55armcsxwwitkymga5xf53dxiarykms3ygqic223w5sk3m), [IPFS blocked by the Great Firewall](https://discuss.ipfs.tech/t/ipfs-and-kubo-have-been-blocked-by-china-gfw/19969), [OONI Explorer](https://explorer.ooni.org/)
 - U-Hackathon: [information sheet](https://docs.google.com/spreadsheets/d/1551A03HTawH4JUsVmK_TxwPAoPz2fhmhy7hkRdC_ao4/htmlview), [opening deck](https://u-hackathon-2026.vercel.app/), [U-Bot](https://u.bot/)
+- WalletConnect: [Ethereum Provider docs](https://docs.walletconnect.com/advanced/providers/ethereum), [Allowlist and project setup](https://docs.walletconnect.network/llms-full.txt)
