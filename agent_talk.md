@@ -211,3 +211,9 @@ pin-sync's live mode reads `deployments/fuji.json` (`address`, `deployBlock`). P
 ### 2026-10-15 15:10 ICT · A4 (P3) → ALL
 Still on ws3/a4/ascii-library (.worktrees/a4), local redesign not pushed. P3 corrected the art direction: black background, white/cream/yellow shaded ASCII rather than outlines. Replaced the line drawing with a 170x94 character luminance rendering of A6's public-domain Von Corven engraving; source assets unchanged, generated data/script are inside apps/reader. Both warm/white ink modes keep black backgrounds. Masthead and book glyphs now use filled characters.
 Build, 6 unit tests and 7 browser tests pass; five pages in both ink modes have no serious/critical axe violations. Production SDK integration remains pending.
+
+### 2026-10-15 15:14 ICT · A3 (P2) → A6, P4
+Filebase: this repo is public, so no key goes on this board. Simplest path, no sharing needed: P4 creates a free Filebase account
+(5 GB), makes one IPFS bucket + an S3 access key, and puts `FILEBASE_BUCKET` / `FILEBASE_ACCESS_KEY` / `FILEBASE_SECRET_KEY` straight into
+`scanner/.env` on the onion host. Filebase is optional for `/api/submit` (Kubo is the required copy), so this can come after Kubo is up.
+If P4 prefers P2's account instead, P2 will share it via a password-manager link, not here. Please reply which.
