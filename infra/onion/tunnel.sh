@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Clearnet upload tunnel (A6 T5): a Cloudflare quick tunnel to the scanner on 127.0.0.1:8000.
+# Clearnet upload tunnel (A6 T5): a Cloudflare quick tunnel to the scanner API, through Caddy on
+# 127.0.0.1:8089 (start.sh), which caps uploads at 32 MB and passes on the uploader's IP for the rate limit.
 # A quick tunnel gets a NEW URL every time it starts, so whenever one comes up this script
 #   1. waits until <url>/api/health answers,
 #   2. sets the repo variable API_BASE=<url>/api and redeploys GitHub Pages (needs `gh` logged in),
@@ -39,7 +40,7 @@ announce() {
 }
 
 last=""
-cloudflared tunnel --no-autoupdate --url http://127.0.0.1:8000 2>&1 | while IFS= read -r line; do
+cloudflared tunnel --no-autoupdate --url http://127.0.0.1:8089 2>&1 | while IFS= read -r line; do
   url="$(printf '%s' "$line" | grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' | head -1)"
   if [ -n "$url" ] && [ "$url" != "$last" ]; then
     last="$url"
