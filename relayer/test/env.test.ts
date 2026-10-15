@@ -3,7 +3,7 @@ import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, expect, it } from 'vitest';
-import { generatePrivateKey } from 'viem/accounts';
+import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { loadConfig } from '../src/env.js';
 
 const directories: string[] = [];
@@ -14,8 +14,9 @@ function fixture(chainId = 31337): NodeJS.ProcessEnv {
   directories.push(directory);
   const deployment = join(directory, 'deployment.json');
   writeFileSync(join(directory, 'abi.json'), '[]');
-  writeFileSync(deployment, JSON.stringify({ chainId, address: '0x0000000000000000000000000000000000000001', abi: 'abi.json' }));
-  return { RPC_URL: 'http://127.0.0.1:8545', RELAYER_PRIVATE_KEY: generatePrivateKey(),
+  const relayer = privateKeyToAccount(generatePrivateKey()).address;
+  writeFileSync(deployment, JSON.stringify({ chainId, address: '0x0000000000000000000000000000000000000001', abi: 'abi.json', relayer }));
+  return { RPC_URL: 'http://127.0.0.1:8545', RELAYER_KEYSTORE: join(directory, 'relayer-keystore'),
     RELAY_SECRET: randomBytes(32).toString('hex'), DEPLOYMENT: deployment };
 }
 
@@ -28,8 +29,17 @@ it('loads_only_supported_testnet_deployments', () => {
 it('rejects_invalid_secrets_keys_ports_and_rpc_without_echoing_values', () => {
   const env = fixture();
   expect(() => loadConfig({ ...env, RELAY_SECRET: '' })).toThrow('RELAY_SECRET');
-  expect(() => loadConfig({ ...env, RELAYER_PRIVATE_KEY: '' })).toThrow('RELAYER_PRIVATE_KEY');
+  expect(() => loadConfig({ ...env, RELAYER_KEYSTORE: '' })).toThrow('RELAYER_KEYSTORE');
+  expect(() => loadConfig({ ...env, RELAYER_PRIVATE_KEY: generatePrivateKey() })).toThrow('no longer accepted');
   expect(() => loadConfig({ ...env, PORT: '8787extra' })).toThrow('PORT');
   expect(() => loadConfig({ ...env, PORT: '0' })).toThrow('PORT');
   expect(() => loadConfig({ ...env, RPC_URL: 'file:///tmp' })).toThrow('HTTP(S)');
+});
+
+it('keeps_signing_material_out_of_the_loaded_environment_config', () => {
+  const config = loadConfig(fixture());
+  expect(config).not.toHaveProperty('privateKey');
+  expect(config).not.toHaveProperty('password');
+  expect(config).toHaveProperty('keystorePath');
+  expect(config).toHaveProperty('expectedRelayer');
 });

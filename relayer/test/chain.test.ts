@@ -1,15 +1,18 @@
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import { randomBytes, createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { createServer as reservePort, type Server } from 'node:net';
 import type { Server as HttpServer } from 'node:http';
-import { resolve } from 'node:path';
+import { resolve, join } from 'node:path';
+import { encryptKeystoreJson } from 'ethers';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createPublicClient, createTestClient, createWalletClient, http, type Abi, type Hex } from 'viem';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { foundry } from 'viem/chains';
 import { createChainGateway, type ChainConfig } from '../src/chain.js';
 import { createRelayerServer, listenLoopback } from '../src/server.js';
+import { unlockKeystore } from '../src/keystore.js';
 
 const artifactPath = resolve('../contracts/out/Alexandria.sol/Alexandria.json');
 const anvilAvailable = spawnSync('anvil', ['--version'], { stdio: 'ignore' }).status === 0;
@@ -19,6 +22,7 @@ describe.skipIf(!anvilAvailable || !existsSync(artifactPath))('real Anvil integr
   let server: HttpServer;
   let config: ChainConfig;
   let base: string;
+  let walletDirectory: string;
   const secret = randomBytes(32).toString('hex');
   const cid = 'bafkreiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
   const request = (n: number) => fetch(`${base}/relay`, {
@@ -52,7 +56,15 @@ describe.skipIf(!anvilAvailable || !existsSync(artifactPath))('real Anvil integr
       args: [account.address, [account.address], account.address] });
     const receipt = await publicClient.waitForTransactionReceipt({ hash });
     if (!receipt.contractAddress) throw new Error('Local deployment failed');
-    config = { rpcUrl, chainId: 31337, contract: receipt.contractAddress, privateKey,
+    walletDirectory = mkdtempSync(join(tmpdir(), 'alexandria-anvil-wallet-'));
+    const password = randomBytes(24).toString('hex');
+    const keystorePath = join(walletDirectory, 'relayer');
+    writeFileSync(keystorePath, await encryptKeystoreJson({ address: account.address, privateKey }, password,
+      { scrypt: { N: 1024, r: 8, p: 1 } }), { mode: 0o600 });
+    const passwordFile = join(walletDirectory, 'unlock');
+    writeFileSync(passwordFile, password, { mode: 0o600 });
+    const unlocked = await unlockKeystore({ keystorePath, passwordFile, expectedRelayer: account.address });
+    config = { rpcUrl, chainId: 31337, contract: receipt.contractAddress, privateKey: unlocked,
       abi: JSON.parse(readFileSync('../deployments/abi/IAlexandria.json', 'utf8')) as Abi };
     const gateway = await createChainGateway(config);
     server = createRelayerServer({ secret, gateway });
@@ -68,6 +80,7 @@ describe.skipIf(!anvilAvailable || !existsSync(artifactPath))('real Anvil integr
       await new Promise<void>(resolve => server.close(() => resolve()));
     }
     process?.kill();
+    if (walletDirectory) rmSync(walletDirectory, { recursive: true, force: true });
   });
 
   it('rejects_a_mismatched_rpc_chain_before_listening', async () => {
