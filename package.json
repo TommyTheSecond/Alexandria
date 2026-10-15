@@ -7,7 +7,7 @@
   },
   "scripts": {
     "test": "pnpm -r test",
-    "test:infra": "node --test infra/scripts/",
+    "test:infra": "node --test infra/",
     "check-paths": "node infra/scripts/check-paths.mjs"
   }
 }
