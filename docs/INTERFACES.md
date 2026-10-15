@@ -306,12 +306,18 @@ export interface ClientConfig {
   snapshotUrls: string[];        // tried in order, e.g. ["./catalog.json"]
   deployBlock: number;           // from deployments/fuji.json; start block for getLogs
   gatewayTimeoutMs?: number;     // default 15000
+  walletConnectProjectId?: string; // public Project ID from the WalletConnect dashboard; WalletConnect is off when empty
 }
+
+export type WalletMethod = 'injected' | 'walletconnect';
 
 /** Write actions. Only created by connectWallet(); reading never needs them. */
 export interface WalletActions {
   account: Address;
+  method: WalletMethod;
   isCurator(): Promise<boolean>;
+  /** Ends the session. For WalletConnect it also clears the stored session from the browser. */
+  disconnect(): Promise<void>;
   /** CURATOR_ROLE only. Resolves with tx hash after 1 confirmation. Throws TX_REVERTED. */
   review(id: number, approve: boolean, reason: string): Promise<Hex32>;
   /** Anyone. Resolves with tx hash after 1 confirmation. Throws TX_REVERTED (e.g. AlreadyFlagged). */
@@ -333,9 +339,13 @@ export interface AlexandriaClient {
   submit(pdf: File, meta: BookMetaInput): Promise<SubmitResult>;
   /** Tx hash of BookSubmitted for a book (getLogs by indexed id from deployBlock). null if not found. */
   getSubmitTx(id: number): Promise<Hex32 | null>;
-  /** EIP-1193 injected wallet: request accounts, switch to Fuji (0xa869), add the chain if missing (error 4902).
-   *  Throws NO_WALLET or WRONG_CHAIN. Call only after a user click. */
-  connectWallet(): Promise<WalletActions>;
+  /** Call only after a user click. Default method: 'injected'.
+   *  'injected': window.ethereum; request accounts, switch to Fuji (0xa869), add the chain if missing (error 4902).
+   *  'walletconnect': dynamic import() of @walletconnect/ethereum-provider, init with
+   *     { projectId: walletConnectProjectId, optionalChains: [43113], rpcMap: { 43113: rpcUrls[0] }, showQrModal: true },
+   *     connect (QR modal), then switch to Fuji.
+   *  Throws NO_WALLET (no window.ethereum, no Project ID, or the user closed the QR modal) or WRONG_CHAIN. */
+  connectWallet(method?: WalletMethod): Promise<WalletActions>;
 }
 
 export declare function createClient(config: ClientConfig): AlexandriaClient;

@@ -76,8 +76,10 @@ Read `AGENTS.md`, `README.md` (all of it: P4 is the integration lead) and `docs/
   - `infra/gateways.json`: P2's Filebase dedicated gateway (from B5), `https://dweb.link`, `https://ipfs.io`, and any others that pass. Check each by fetching `good.pdf`'s CID and comparing SHA-256. **Do not list `cloudflare-ipfs.com`; it was shut down.** Put `""` (same origin) first in the onion config.
   - `infra/config/config.json` (runtime, copied into each deploy):
     ```json
-    { "apiBase": "", "onion": "", "siteCid": "" }
+    { "apiBase": "", "onion": "", "siteCid": "", "walletConnectProjectId": "" }
     ```
+    `walletConnectProjectId` is the **public** Project ID from README blocker B11. Never put the dashboard URL or login in the repo.
+  - **WalletConnect allowlist:** whenever a new origin goes live (GitHub Pages, a new IPFS gateway, the onion address), ask the dashboard owner to add it (README section 3.4). Changes take about 15 minutes.
   - `infra/scripts/check-endpoints.mjs` re-checks every RPC and gateway and prints a pass/fail table. Run it at H+14 and H+22.
 
 - [ ] **T3 ASCII hero art (H+5 – H+8)** with `infra/art/generate.py` (Pillow).
