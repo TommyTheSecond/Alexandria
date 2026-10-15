@@ -1,8 +1,10 @@
+boto3==1.43.114
 datasketch==2.0.0
 fastapi==0.143.1
 httpx2==2.13.1
 jsonschema==4.26.0
 pikepdf==10.17.0
+pycryptodome==4.0.0
 pymupdf==1.28.2
 pytest==9.1.1
 python-multipart==0.0.32

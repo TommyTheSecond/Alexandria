@@ -45,6 +45,11 @@ def pdf_parse(data: bytes) -> ScanCheck:
     return ok("pdf.parse", "reject", f"{pages} pages")
 
 
+def page_count(data: bytes) -> int:
+    with pikepdf.open(io.BytesIO(data)) as pdf:
+        return len(pdf.pages)
+
+
 def _find_active(obj: pikepdf.Object, depth: int = 0) -> str | None:
     """Search one object and its direct (non-indirect) children for active content."""
     if depth > MAX_DEPTH:
