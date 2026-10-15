@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { parseListObjects, usageSummary, filebaseConfig, bucketUsage, uploadCar } from './filebase.mjs';
+import { parseListObjects, usageSummary, filebaseConfig, bucketUsage, uploadCar, removeCids } from './filebase.mjs';
 
 const page = (truncated, token) => `<?xml version="1.0" encoding="UTF-8"?>
 <ListBucketResult><Name>b</Name><KeyCount>2</KeyCount><IsTruncated>${truncated}</IsTruncated>
@@ -86,4 +86,19 @@ test('an S3 error surfaces the HTTP status', async () => {
   });
   await assert.rejects(bucketUsage(s3.cfg), /HTTP 403/);
   s3.close();
+});
+
+test('removeCids deletes only the objects whose CID is in the set', async () => {
+  const cidOf = { 'a.pdf': 'bafyrejected', 'b.json': 'bafykeep' };
+  const s3 = await fakeS3((req, res) => {
+    const key = decodeURIComponent(new URL(req.url, 'http://x').pathname.replace('/b/', ''));
+    if (req.method === 'GET') return res.end(page('false'));
+    if (req.method === 'HEAD') { res.setHeader('x-amz-meta-cid', cidOf[key] ?? ''); return res.end(); }
+    if (req.method === 'DELETE') { res.statusCode = 204; return res.end(); }
+    res.statusCode = 400; res.end();
+  });
+  const deleted = await removeCids(s3.cfg, ['bafyrejected']);
+  s3.close();
+  assert.deepEqual(deleted, ['a.pdf']);
+  assert.deepEqual(s3.seen.filter((r) => r.method === 'DELETE').map((r) => r.url), ['/b/a.pdf']);
 });
