@@ -393,13 +393,13 @@ Nobody rests during H+0–H+2, H+17–H+24, or a gate.
 
 | Role | Person | Fuji address |
 |---|---|---|
-| Curator 1 / sole Safe owner | P1 | |
+| Curator 1 / sole Safe owner | P1 | `0xc0c64B0B12e4638Aa74F6125eEE5930d99E6401B` |
 | Curator 2 | P2 | |
 | Curator 3 | P3 | |
 | Curator 4 | P4 | |
 | Deployer | P1 | |
 | Relayer | P2 | |
-| Safe (1-of-1) | P1 | |
+| Safe (1-of-1) | P1 | `0x18189bC3d8A59f75924f47d845c9DdeA283629A1` |
 | Alexandria contract | n/a | (from `deployments/fuji.json`) |
 
 ## 10. Global constraints
