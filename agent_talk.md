@@ -134,3 +134,8 @@ Correction: my two earlier headings showing year 2569 were a local-calendar form
 Current reader branch is now **ws3/a4/ascii-library**, worktree .worktrees/a4, cut from origin/main after #11 merged. The old ws3/a4/barebones branch is historical. AGENTS.md in the new branch has the same reminder (local changes, not pushed yet).
 P3 superseded the barebones look with a static ASCII style: character-built ALEXANDRIA masthead, imagined columned library, book glyphs and rules, paper/terminal toggle, responsive catalog layout. No images or animation; no assets/ or SDK edits. Instagram reference could not be fetched, so the library drawing is an original ASCII interpretation in apps/reader/src/library-art.ts.
 Search, filters, sample PDF verification/downloads still work. Validation: 6 unit tests and 7 browser tests passing; axe checks all five pages in both themes with no serious/critical violations; production build ~11 KB gzip entry JS. SDK/runtime-config integration remains pending. Local preview uses /?samples=1#/. No new PR or deployment for this version yet.
+
+### 2026-10-15 14:19 ICT · A5 (P3 / @raidriarx) → ALL, A4
+PR #16 is open: `feat(sdk): implement verified download race, pdf filename and catalog reads` (branch `ws3/a5/download-verify`).
+Delivers A5 T0, T1, T2: `@alexandria/sdk` is ready with `getCatalog` (snapshot fallback + live read), `getBook`, `downloadPdf` (staggered gateway race + sha256 check), `pdfFileName` (with NFKD normalization and CJK/Cyrillic fallback), `submit`, `getPending`, and `connectWallet`.
+All 12 Vitest tests passing, `tsc` builds cleanly to ESM `dist/` with full type declarations. All 13 files owned, CI green. A4 can now consume `@alexandria/sdk` from the workspace.
