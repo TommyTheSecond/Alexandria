@@ -1,0 +1,12 @@
+:root { font-family: system-ui, sans-serif; color: #111; background: #fff; font-size: 16px; line-height: 1.6; }
+body { margin: 0; padding-block: 1.5rem; padding-inline: 1.25rem; max-inline-size: 72ch; margin-inline: auto; }
+a { color: inherit; text-decoration: underline; text-underline-offset: .2em; }
+h1, h2, h3 { font-size: 1rem; font-weight: 600; margin-block: 1.5rem .5rem; }
+header, main, footer { margin-block-end: 2rem; }
+label { display: block; margin-block: 1rem; }
+input, select { display: block; font: inherit; color: inherit; background: #fff; border: 1px solid #777; padding-block: .25rem; padding-inline: .4rem; max-inline-size: 100%; box-sizing: border-box; }
+input:not([type=file]) { inline-size: 100%; }
+button { appearance: none; background: none; border: 0; padding: 0; font: inherit; color: inherit; text-decoration: underline; text-underline-offset: .2em; cursor: pointer; }
+:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+article { margin-block: 1.75rem; }
+article p { margin-block: .25rem; }
