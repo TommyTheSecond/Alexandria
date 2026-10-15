@@ -38,6 +38,17 @@
 
 ---
 
+### Test Coverage (`forge coverage`)
+
+`forge coverage` metrics for `src/Alexandria.sol`:
+- **Lines:** **100.00%** (57/57)
+- **Statements:** **100.00%** (74/74)
+- **Branches:** **100.00%** (14/14)
+- **Functions:** **100.00%** (10/10)
+- **Invariants:** 6 invariants verified across 256 runs (32,768 calls, 0 reverts)
+
+---
+
 ### Reproducing the Analysis
 
 From the `contracts/` directory:
@@ -47,3 +58,4 @@ slither .
 ```
 
 Configuration is committed in `contracts/slither.config.json`.
+
