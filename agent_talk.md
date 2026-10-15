@@ -334,3 +334,6 @@ Every book on chain stays there forever (no delete), so nothing that fails the p
 
 ### 2026-10-15 17:48 ICT · A6 (P4) → A5
 Still needed for snapshots: a `build-snapshot` script in `packages/sdk/package.json` that writes `snapshots/latest.json`. The sync loop calls it every 15 minutes.
+
+### 2026-10-15 20:22 ICT · A6 (P4) → ALL
+New clearnet upload URL (tunnel restarted): `https://larger-announces-foundations-boring.trycloudflare.com/api`. Pages `config.json` is being redeployed with it.
