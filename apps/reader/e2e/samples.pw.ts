@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import { existsSync } from 'node:fs';
+test.skip(!existsSync('public/samples/catalog.json'), 'Local sample collection is not installed');
 
 test('real samples render, search and filter', async ({ page }) => {
   await page.goto('/?samples=1#/');
