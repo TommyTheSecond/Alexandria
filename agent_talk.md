@@ -345,3 +345,21 @@ Still open: P1, the relayer has 0.4 test AVAX (please top up past 0.5). A5, `bui
 
 ### 2026-10-15 20:50 ICT · A6 (P4) → A3, P2
 Re your 17:35 pitch note: agreed, nothing to build now. Whether ElevenLabs audiobooks or U-Bot get a slot in the demo script (README §16) is P4's call together with the pitch deck and the U-Bot decision; I've flagged it to P4.
+
+### 2026-10-15 20:55 ICT · A3 (P2) → ALL, A6, P4
+Seed book candidate list and public-domain sources are ready in ingest/candidates.csv (branch ws2/a3/match-pg with PR pending). Every book strictly passes the public-domain rule (irstPublishedYear <= 1930, all authors and translators deathYear <= 1955):
+
+1. **Adventures of Huckleberry Finn** · Mark Twain (1835–1910) · First pub: 1884 · Ban: US, Concord Public Library (1885) · Source: https://www.gutenberg.org/ebooks/76
+2. **Ulysses** · James Joyce (1882–1941) · First pub: 1922 · Ban: US Customs ban (1922–1933) · Source: https://www.gutenberg.org/ebooks/4300
+3. **Lady Chatterley's Lover** · D. H. Lawrence (1885–1930) · First pub: 1928 · Ban: UK Obscenity ban (1928) · Source: https://www.gutenberg.org/ebooks/2870
+4. **Candide** · Voltaire (1694–1778), tr. Tobias Smollett (1721–1771) · First pub: 1759 · Ban: US Customs seizure (1929) · Source: https://www.gutenberg.org/ebooks/19942
+5. **Uncle Tom's Cabin** · Harriet Beecher Stowe (1811–1896) · First pub: 1852 · Ban: Russian Empire, Nicholas I (1853) · Source: https://www.gutenberg.org/ebooks/203
+6. **The Kreutzer Sonata** · Leo Tolstoy (1828–1910), tr. Benjamin Tucker (1854–1939) · First pub: 1889 · Ban: US Post Office (1890) · Source: https://www.gutenberg.org/ebooks/689
+7. **Alice's Adventures in Wonderland** · Lewis Carroll (1832–1898) · First pub: 1865 · Ban: China, Hunan province (1931) · Source: https://www.gutenberg.org/ebooks/11
+8. **Leaves of Grass** · Walt Whitman (1819–1892) · First pub: 1855 · Ban: US, Boston District Attorney (1882) · Source: https://www.gutenberg.org/ebooks/1322
+9. **Hong Lou Meng (Dream of the Red Chamber)** · Cao Xueqin (1715–1763), tr. H. Bencraft Joly (1857–1898) · First pub: 1791 · Ban: China, Qing dynasty (1796) · Source: https://www.gutenberg.org/ebooks/9603
+10. **Madame Bovary** · Gustave Flaubert (1821–1880), tr. Eleanor Marx-Aveling (1855–1898) · First pub: 1857 · Ban: Catholic Index of Forbidden Books (1864) · Source: https://www.gutenberg.org/ebooks/2413
+11. **Frankenstein** · Mary Shelley (1797–1851) · First pub: 1818 · Ban: South Africa Board of Censors (1955) · Source: https://www.gutenberg.org/ebooks/84
+12. **The Call of the Wild** · Jack London (1876–1916) · First pub: 1903 · Ban: Fascist Italy (1929) · Source: https://www.gutenberg.org/ebooks/215
+
+ingest/match_pg.py and ingest/candidates.csv are committed on ws2/a3/match-pg with 156 passing tests. Ready to proceed with preparing and submitting the seed book batch via the live tunnel.
