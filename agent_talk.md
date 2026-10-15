@@ -769,3 +769,29 @@ Show an open bounty "Candide (Smollett translation), 2 test AVAX". Upload the PD
 3. **Naming:** D1–D4 on the board (decided).
 4. **U-Bot access (pending, P4 is getting it from the organizers):** D2 builds the matcher against a mock until then. Needed: from the organizers we need the API endpoint, how to authenticate (the key itself goes only into `scanner/.env` on the host, never in chat or git), whether it can return strict JSON, its input size limit, rate limits and typical response time. A link to their docs is enough.
 5. **Dispute window:** 10 minutes on the demo deployment, 1 hour in the docs.
+
+### 2026-10-15 23:51 ICT · A6 (P4) → P1, P2, P3, ALL
+**Human tasks, reassigned by P4: all wallet work → P1; the rest split evenly across P2–P4.** These come on top of your D-items from the 23:31 plan. Reply here when you've taken them.
+
+**P1: everything that needs a wallet**
+1. **Team node payout wallet** (replaces plan section 9.1): create a Fuji address for the onion host's operator share. Once the fund is deployed, register the onion host as node #1 from `#/nodes` with that wallet (`registerOperator` pays `msg.sender`, so the payout wallet itself must sign), and use it for the **Claim** step in the demo.
+2. **Host signer wallet** (the fund's attester + the bounty resolver, D1-4): one dedicated encrypted keystore, funded with test AVAX, handed to P4 **privately** with its password. Never via the board, git, a PR or chat.
+3. Keep the relayer (0.6 now) and the host signer above 0.5 test AVAX until the demo is over.
+4. **Demo wallets in Core**: curator (done), 3 flaggers (done), plus a **donor** wallet and a **bounty-requester** wallet, funded. On stage you run every wallet step: approve, 3 flags, donate, create the bounty, claim.
+5. Any Safe action if a role grant turns out to be needed.
+
+**P2**
+1. **U-Bot access from the organizers**: endpoint, how to authenticate, strict-JSON support, input size limit, rate limit, response time. Post the non-secret details here; give the key to P4 privately (it goes only into `scanner/.env` on the host).
+2. **Demo data**: a junk PDF (shows a reject), a fresh public-domain PDF for the live upload, and the bounty demo book (e.g. Candide, Smollett translation) with its metadata. Dry-run each through `/api/scan`.
+3. **Pitch deck: business-model slides**: donations split 50/50, paid nodes, bounties with the 5 % fee (your 17:35 idea).
+
+**P3**
+1. **Pitch deck**: the overall deck (design, architecture slide from README 3, screenshots), shared as "anyone with the link can view"; send P4 the link.
+2. **Fallback screen recording** of the full demo (README §16), including Tor Browser with Snowflake on the onion.
+3. **Screenshots** for the submission page.
+
+**P4**
+1. **Register the team on hub.team1.network** (tonight).
+2. Keep the onion host (P4's Mac) on power and awake; run the H+22 checks (endpoints, smoke over Tor).
+3. Final README + demo script with the new steps; lead both rehearsals when the hall opens at 10:00.
+4. **Submit by 14:00 Fri**: public repo + demo site + deck link.
