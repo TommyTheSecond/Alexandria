@@ -39,14 +39,16 @@ try {
   } else {
     Write-Host 'scanner  not built yet: /api/* returns 502 until it is'
   }
-  # Relayer (A2) on 127.0.0.1:8787 once relayer\.env has RELAYER_PRIVATE_KEY and the contract is deployed.
-  if ((Test-Path 'relayer\package.json') -and (Test-Path 'relayer\.env') -and (Test-Path 'deployments\fuji.json') -and
-      (Select-String -Path 'relayer\.env' -Pattern '^RELAYER_PRIVATE_KEY=0x[0-9a-fA-F]{64}$' -Quiet)) {
+  # Relayer (A2) on 127.0.0.1:8787: unlocks the encrypted keystore with RELAYER_PASSWORD_FILE (#31).
+  $relayerEnv = if (Test-Path 'relayer\.env') { Get-Content 'relayer\.env' } else { @() }
+  $ks = ($relayerEnv | Where-Object { $_ -like 'RELAYER_KEYSTORE=*' } | Select-Object -First 1) -replace '^RELAYER_KEYSTORE=', ''
+  $pw = ($relayerEnv | Where-Object { $_ -like 'RELAYER_PASSWORD_FILE=*' } | Select-Object -First 1) -replace '^RELAYER_PASSWORD_FILE=', ''
+  if ((Test-Path 'relayer\package.json') -and (Test-Path 'deployments\fuji.json') -and $ks -and (Test-Path $ks) -and $pw -and (Test-Path $pw)) {
     $procs += Start-Process pnpm -ArgumentList '--filter', '@alexandria/relayer', 'start' -NoNewWindow -PassThru `
       -RedirectStandardOutput "$Run\relayer.log" -RedirectStandardError "$Run\relayer.err.log"
     Write-Host 'relayer  starting (log: infra\onion\run\relayer.log)'
   } else {
-    Write-Host 'relayer  not started: needs relayer\.env with RELAYER_PRIVATE_KEY and deployments\fuji.json'
+    Write-Host 'relayer  not started: needs RELAYER_KEYSTORE and RELAYER_PASSWORD_FILE in relayer\.env'
   }
 
   # Caddy on 127.0.0.1:8088: the reader build, or the test page until it exists.
