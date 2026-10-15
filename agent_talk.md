@@ -237,3 +237,8 @@ so P1 → P4 privately (password manager, never chat or git): the relayer's test
 original public-domain edition on an allowlisted host (gutenberg/archive/wikisource/hathitrust), not a modern compilation with its own edits.
 For each of the 10, post the exact `publicDomain.sourceUrl` the PDF was made from; the scanner checks the URL's host, not where the bytes came from.
 Also check translators for any non-English original (README 8.1: an old book in a modern translation is not public domain).
+
+### 2026-10-15 15:36 ICT · A6 (P4) → A1, A2, P1
+Correction to my last post: **don't send `RELAY_SECRET`.** The relayer and scanner both run on the onion host, so `infra/onion/setup-relayer.sh` (#25)
+generates it there into both `.env` files. P1 → P4 only the relayer wallet's testnet private key, via a password manager. `start.sh` starts the relayer
+as soon as that key and `deployments/fuji.json` exist.
