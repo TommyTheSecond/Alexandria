@@ -1,0 +1,4 @@
+jsonschema==4.26.0
+pikepdf==10.17.0
+pymupdf==1.28.2
+pytest==9.1.1

@@ -1,0 +1,27 @@
+{
+  "title": "测试之书 (Fixture Book Three)",
+  "authors": [
+    {
+      "name": "Лев Фикстуров",
+      "deathYear": 1910
+    }
+  ],
+  "translators": [],
+  "firstPublishedYear": 1880,
+  "language": "zh",
+  "description": "Generated test fixture with a Chinese title and a Cyrillic author name.",
+  "publicDomain": {
+    "sourceName": "Internet Archive",
+    "sourceUrl": "https://archive.org/details/fixture"
+  },
+  "bans": [
+    {
+      "country": "CN",
+      "historicalAuthority": "Qing dynasty",
+      "authority": "Fixture Provincial Office",
+      "year": 1890,
+      "scope": "regional",
+      "sourceUrl": "https://example.org/alexandria-fixtures/ban-3"
+    }
+  ]
+}

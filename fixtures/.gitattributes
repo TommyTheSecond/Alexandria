@@ -1,0 +1,2 @@
+# Fixture bytes are hashed (sha256, CIDs): never convert line endings.
+* -text
