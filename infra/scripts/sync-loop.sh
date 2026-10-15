@@ -25,5 +25,17 @@ while true; do
   else
     echo "publish-snapshot failed (see above); retrying next round"
   fi
+
+  # Phase 1: Paid nodes check and epoch closing (skipped if fund not deployed)
+  if [ -f "$ROOT/deployments/fuji-fund.json" ]; then
+    NODECHECK_STATE="$ROOT/infra/onion/run/nodecheck"
+    TARGETS_FILE="$NODECHECK_STATE/targets.json"
+
+    node "${ENV[@]}" infra/scripts/node-targets.mjs || echo "node-targets failed; retrying next round"
+    if [ -f "$TARGETS_FILE" ]; then
+      python -m scanner.nodecheck probe --targets "$TARGETS_FILE" --state "$NODECHECK_STATE" || echo "nodecheck probe failed; retrying next round"
+    fi
+    node "${ENV[@]}" infra/scripts/close-epoch.mjs || echo "close-epoch failed; retrying next round"
+  fi
   sleep "$INTERVAL"
 done

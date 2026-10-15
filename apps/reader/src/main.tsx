@@ -9,6 +9,14 @@ import { AlexandriaError, type AlexandriaClient, type Book, type BookMetaInput, 
 import { connectReader } from './reader-client';
 import { sortPendingByScore } from './reader-config';
 import { PendingCard } from './PendingCard';
+import { DonatePage } from './DonatePage';
+import { NodesPage } from './NodesPage';
+import rpcConfig from '../../../infra/rpcs.json';
+
+const fujiDeployments = ((import.meta as any).glob?.('../../../deployments/fuji-*.json', { eager: true }) ?? {}) as Record<string, any>;
+const fundEntry = Object.entries(fujiDeployments).find(([path]) => path.endsWith('fuji-fund.json'))?.[1];
+const fundDeployment = (fundEntry?.default ?? fundEntry ?? null) as { address?: `0x${string}`; deployBlock?: number } | null;
+
 const politicalMode = new URLSearchParams(location.search).get('collection') === 'political';
 const sampleMode = politicalMode || new URLSearchParams(location.search).get('samples') === '1';
 
@@ -228,7 +236,7 @@ function App() {
       <div className="topline"><span>AN INDEPENDENT LIBRARY OF BANNED BOOKS</span><span>EST. 2026 / VOL. 001</span></div>
       <HeaderArt />
       <div className="navline"><nav aria-label="Main navigation">
-        {[['/', '01', 'Catalog'], ['/upload', '02', 'Upload'], ['/curate', '03', 'Curate'], ['/about', '04', 'About']].map(([path, number, label]) => <a key={path} href={`#${path}`} aria-current={route === path ? 'page' : undefined}><span aria-hidden="true">[ {number} </span>{label}<span aria-hidden="true"> ]</span></a>)}
+        {[['/', '01', 'Catalog'], ['/upload', '02', 'Upload'], ['/curate', '03', 'Curate'], ['/donate', '04', 'Donate'], ['/nodes', '05', 'Nodes'], ['/about', '06', 'About']].map(([path, number, label]) => <a key={path} href={`#${path}`} aria-current={route === path ? 'page' : undefined}><span aria-hidden="true">[ {number} </span>{label}<span aria-hidden="true"> ]</span></a>)}
       </nav><button className="theme-button" aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>[ {theme === 'light' ? '*' : ':'} {theme === 'light' ? 'DARK MODE' : 'LIGHT MODE'} ]</button></div>
       <div className="ascii-rule" aria-hidden="true">{'='.repeat(180)}</div>
     </header>
@@ -251,7 +259,19 @@ function App() {
         <h2>Upload a book</h2><p>Only public-domain PDFs. First published in 1930 or earlier, with every author and translator deceased by 1955. Unknown years require curator review.</p>
         {!uploadEnabled && <p>Uploads are not available from this mirror yet. Reading and downloads still work.</p>}
         <form onSubmit={checkUpload}><label>PDF (up to 30 MB)<input type="file" accept="application/pdf,.pdf" required onChange={e => setFile(e.currentTarget.files?.[0])} /></label><label>Title<input name="title" required maxLength={300} /></label><label>Author<input name="authors" required /></label><label>Author death year, if known<input name="authorDeath" type="number" max="2026" /></label><label>Translator, if any<input name="translators" /></label><label>Translator death year, if known<input name="translatorDeath" type="number" max="2026" /></label><label>First publication year<input name="year" type="number" min="-3000" max="2026" required /></label><label>Language code<input name="language" defaultValue="en" pattern="[a-z]{2,3}(-[A-Za-z0-9]{2,8})*" required /></label><label>Description<input name="description" maxLength={1000} /></label><label>Public-domain source name<input name="sourceName" required /></label><label>Public-domain source URL<input name="source" type="url" required /></label><label>Ban country (two-letter code)<input name="country" pattern="[A-Za-z]{2}" required /></label><label>Ban authority<input name="authority" required /></label><label>Ban year<input name="banYear" type="number" min="-3000" max="2026" required /></label><label>Ban scope<select name="scope" required>{['national','regional','import','postal','library','school','religious'].map(s => <option key={s}>{s}</option>)}</select></label><label>Ban source URL<input name="banSource" type="url" required /></label><button type="submit" disabled={busy || !uploadEnabled}>Submit for review</button></form>{scanReport && <section aria-label="Scan report"><h3>Scan report: {scanReport.verdict}</h3><table><thead><tr><th>Check</th><th>Result</th><th>Detail</th></tr></thead><tbody>{(scanReport.checks ?? []).map(check => <tr key={check.id}><th scope="row">{check.id}</th><td>{check.passed ? 'Pass' : check.severity === 'reject' ? 'Reject' : 'Review'}</td><td>{check.detail}</td></tr>)}</tbody></table></section>}{duplicateId && <p><a href={`#/book/${duplicateId}`}>Open existing book #{duplicateId}</a></p>}
-      </> : route === '/curate' ? <><h2>Curate submissions</h2><p>Curators approve or reject books after reviewing the scan report and public-domain sources.</p><button type="button" disabled={busy || !client} onClick={connectCurator}>Connect curator wallet</button>{isCurator && <><p>{pending.length} pending books</p>{pending.map(item => <PendingCard key={item.id} item={item} report={reports[item.id]} reportUrl={reportUrl} busy={busy} onDownload={() => downloadBook(item, true)} onReview={reviewBook} />)}</>}</> : route === '/about' ? <><h2>About Alexandria</h2><p>A library of banned books in the public domain, named after the Library of Alexandria.</p><p>Reading and downloading do not require an account or wallet. PDFs are checked against their on-chain SHA-256 hash before saving.</p><p>The registry uses Avalanche Fuji testnet; files use IPFS. {onionUrl && <>Onion mirror: <a href={onionUrl}>{onionUrl}</a>.</>}</p><p>Unaudited · Fuji testnet only.</p></> : <><h2>Page not found</h2><a href="#/">Return to catalog</a></>}
+      </> : route === '/curate' ? <><h2>Curate submissions</h2><p>Curators approve or reject books after reviewing the scan report and public-domain sources.</p><button type="button" disabled={busy || !client} onClick={connectCurator}>Connect curator wallet</button>{isCurator && <><p>{pending.length} pending books</p>{pending.map(item => <PendingCard key={item.id} item={item} report={reports[item.id]} reportUrl={reportUrl} busy={busy} onDownload={() => downloadBook(item, true)} onReview={reviewBook} />)}</>}</> : route === '/donate' ? <>
+        <DonatePage
+          fundAddress={fundDeployment?.address}
+          deployBlock={fundDeployment?.deployBlock}
+          rpcUrls={location.hostname.endsWith('.onion') ? rpcConfig.onion : rpcConfig.clearnet}
+        />
+      </> : route === '/nodes' ? <>
+        <NodesPage
+          fundAddress={fundDeployment?.address}
+          deployBlock={fundDeployment?.deployBlock}
+          rpcUrls={location.hostname.endsWith('.onion') ? rpcConfig.onion : rpcConfig.clearnet}
+        />
+      </> : route === '/about' ? <><h2>About Alexandria</h2><p>A library of banned books in the public domain, named after the Library of Alexandria.</p><p>Reading and downloading do not require an account or wallet. PDFs are checked against their on-chain SHA-256 hash before saving.</p><p>The registry uses Avalanche Fuji testnet; files use IPFS. {onionUrl && <>Onion mirror: <a href={onionUrl}>{onionUrl}</a>.</>}</p><h3>Trust model</h3><p>The host signer is one checker run by the team. Every report is public on IPFS, its CID is on chain, and anyone can re-run the checks. The Safe can replace the attester. Sybil nodes behind different hostnames on the same machine aren't fully stopped; that's a documented limit.</p><p>Unaudited · Fuji testnet only.</p></> : <><h2>Page not found</h2><a href="#/">Return to catalog</a></>}
       {message && <p role="status">{message}{submissionTx && <> <a href={`https://testnet.snowtrace.io/tx/${submissionTx}`}>View submission on Snowtrace</a></>}</p>}
     </main><footer><div className="ascii-rule" aria-hidden="true">{'='.repeat(180)}</div><div className="footer-grid"><p>ALEXANDRIA<br /><span>A home for words that would not disappear.</span></p><p>PUBLIC DOMAIN / OPEN ACCESS<br />Unaudited · Fuji testnet only</p></div><p className="footer-colophon">SET IN CHARACTERS. HELD IN COMMON. <span aria-hidden="true">[ EOF ]</span></p></footer>
   </>;

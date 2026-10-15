@@ -480,7 +480,21 @@ Each criterion names its metric and unit, and is checked at gate G3.
 | A book turns out not to be public domain | Curators reject it. Filebase and Kubo unpin it. The on-chain record stays, but the file is gone. |
 | Free-tier quota runs out (Filebase 5 GB) | Keep the corpus under 1 GB. A6 monitors usage. |
 
-## 15. Sources
+## 15. Donations and paid nodes
+
+### Flow and 50/50 Split
+Donations directly support the long-term decentralization and persistence of the library:
+- **Donation:** Donors contribute test AVAX via Web3 wallet on `#/donate` or via plain transfer to `AlexandriaFund` (Tor-friendly).
+- **Split:** Every donation is divided 50/50 on-chain:
+  - **50% to the Operator Pool:** Distributed equally to active community nodes every epoch.
+  - **50% to the Storage Fund:** Reserved for Filebase pinning and IPFS persistence bills, managed transparently by the Safe multisig.
+- **Node Operation:** Community operators run the starter kit (`infra/node/start-node.sh`), pinning approved books via Kubo and serving them through Tor onion services or HTTPS.
+- **Node Verification & Payouts:** Every sync round, the host checker probes random approved books across operator gateways, verifying SHA-256 hashes against on-chain records. Nodes passing $\ge 80\%$ of probes in an epoch earn equal shares of the operator pool and can pull their earnings via `claim()`.
+
+### Trust Model and Limits
+The host signer acts as an attester run by the team. Every epoch report is pinned publicly on IPFS, its CID is recorded on-chain, and anyone can independently verify the checks. The Safe multisig can replace the attester if compromised. Sybil nodes using different hostnames on the same machine cannot be completely eliminated on testnet; that is a documented limit.
+
+## 16. Sources
 
 - Avalanche: [C-Chain or L1](https://build.avax.network/docs/dapps/c-chain-or-avalanche-l1), [Etna changes](https://academy.avax.network/guide/etna-changes), [Fuji workflow (RPC, chainId)](https://docs.avax.network/build/dapp/fuji-workflow)
 - Safe on Fuji: [Avalanche Academy: Safe/Ash wallet](https://build.avax.network/academy/avalanche-l1/permissioned-l1s/06-multisig-setup/03-create-safe-wallet)
@@ -489,7 +503,7 @@ Each criterion names its metric and unit, and is checked at gate G3.
 - Censorship: [GreatFire ipfs.io test](https://en.greatfire.org/https/gateway.ipfs.io/ipfs/bafybeifx7yeb55armcsxwwitkymga5xf53dxiarykms3ygqic223w5sk3m), [IPFS blocked by the Great Firewall](https://discuss.ipfs.tech/t/ipfs-and-kubo-have-been-blocked-by-china-gfw/19969), [OONI Explorer](https://explorer.ooni.org/)
 - U-Hackathon: [information sheet](https://docs.google.com/spreadsheets/d/1551A03HTawH4JUsVmK_TxwPAoPz2fhmhy7hkRdC_ao4/htmlview), [opening deck](https://u-hackathon-2026.vercel.app/), [U-Bot](https://u.bot/)
 
-## 16. Demo script (draft, P4)
+## 17. Demo script (draft, P4)
 
 Live demos are on Fri 16 Oct at 20:00, if we make the top 3 of the Web3 track. Judges score **execution 40%, practicality 40%,
 usability 10%, partners 5%, U-Bot 5%** (see 9.0), so show working features on real infrastructure, not slides. Target: 3 minutes. Rehearse it twice (9.2).
@@ -503,8 +517,9 @@ usability 10%, partners 5%, U-Bot 5%** (see 9.0), so show working features on re
 | 1:25 | Upload a junk PDF, then a real public-domain PDF, no wallet | "Anyone can upload without a wallet. The scanner rejects junk and hidden JavaScript before anything is stored; a clean book goes on chain through our relayer." Show the scan report, then the Pending tx on Snowtrace. |
 | 2:00 | `#/curate`: a curator approves it | "A human curator approves every book. Approved books appear in the catalog and the next snapshot." |
 | 2:20 | A book flagged by 3 wallets | "Flags never hide a book. It says 'under review' and stays downloadable, so nobody can censor it with sock puppets." |
-| 2:40 | Architecture slide (README 3) | "Registry on Avalanche Fuji with a Safe as admin, files on IPFS + Filebase, four access paths." U-Bot: **TBD** (team decision). |
-| 2:55 | Close | "Unaudited, testnet only, and it works today." |
+| 2:35 | **Donations & paid nodes** (`#/donate` and `#/nodes`) | "Anyone can donate AVAX. The contract automatically splits it 50/50: half pays nodes pinning the books, half funds storage. Nodes prove they serve valid PDFs and claim their rewards." |
+| 2:50 | Architecture slide (README 3) | "Registry on Avalanche Fuji with a Safe as admin, files on IPFS + Filebase, four access paths." U-Bot: **TBD** (team decision). |
+| 3:00 | Close | "Unaudited, testnet only, and it works today." |
 
 **Before going on stage** (P4 checks, H+22):
 
