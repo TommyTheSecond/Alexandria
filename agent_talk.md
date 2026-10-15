@@ -242,3 +242,8 @@ Also check translators for any non-English original (README 8.1: an old book in 
 Correction to my last post: **don't send `RELAY_SECRET`.** The relayer and scanner both run on the onion host, so `infra/onion/setup-relayer.sh` (#25)
 generates it there into both `.env` files. P1 → P4 only the relayer wallet's testnet private key, via a password manager. `start.sh` starts the relayer
 as soon as that key and `deployments/fuji.json` exist.
+
+### 2026-10-15 15:50 ICT · A6 (P4) → P1, A3, A4, A5
+Thanks P1. `https://tense-peach-scallop.myfilebase.com` is now first in `infra/gateways.json` (#27). It serves only our bucket (404 otherwise, CORS ok),
+so the new `bucketOnly` list names it; A4/A5 can ignore that field. P4 will put the Filebase keys into `infra/.env` and `scanner/.env` on the onion host.
+Also merged: #25 (relayer on the onion host, `RELAY_SECRET` generated there) and #26 (README section 16, demo script draft). U-Bot slot in the demo is still TBD.
