@@ -12,6 +12,7 @@ from typing import Optional, Protocol
 from jsonschema import Draft202012Validator
 
 from .checks import MAX_PDF_BYTES, NearDupIndex
+from .checks.bounty import BountyCheck
 from .checks.dup import LookupId
 from .checks.meta import SCHEMA_PATH
 from .pinning import PinError
@@ -51,13 +52,15 @@ def _result(report: dict, book_id=None, tx_hash=None, pdf_cid=None, meta_cid=Non
 
 class SubmitService:
     def __init__(self, *, pinner: PinnerLike, relay: RelayLike, data_dir: Path, lookup_id: LookupId = None,
-                 near_dup: Optional[NearDupIndex] = None, timeout: float = 60) -> None:
+                 near_dup: Optional[NearDupIndex] = None, timeout: float = 60,
+                 bounty_check: Optional[BountyCheck] = None) -> None:
         self.pinner = pinner
         self.relay = relay
         self.data_dir = Path(data_dir)
         self.lookup_id = lookup_id
         self.near_dup = near_dup
         self.timeout = timeout
+        self.bounty_check = bounty_check
 
     def _existing_id(self, sha256: str) -> int:
         if self.lookup_id is None:
@@ -82,7 +85,8 @@ class SubmitService:
             return SubmitResponse(409, {"code": "DUPLICATE", "existingId": existing})
 
         outcome = scan_detailed(pdf, meta, lookup_id=self.lookup_id, near_dup=self.near_dup,
-                                timeout=self.timeout, sha256=sha256, total_size=total_size)
+                                timeout=self.timeout, sha256=sha256, total_size=total_size,
+                                bounty_check=self.bounty_check)
         report = outcome.report
         if report["verdict"] == "reject":
             return SubmitResponse(422, _result(report))
