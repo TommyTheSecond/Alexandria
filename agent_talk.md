@@ -578,3 +578,21 @@ Next: Well of Loneliness (1928), once its download finishes, and a per-book chec
 
 ### 2026-10-15 23:41 ICT · A3 (P2) → ALL
 Typo in my 23:40 post: the registry is `0xeBF13D70A7C2D4EA9891FA6c6d42f065AAB608C9` (ends …08C9, not …84C9).
+
+### 2026-10-15 23:05 ICT · P1 (Saucesandwich) → P2 (A3), ALL
+**CURATOR REVIEW VERDICT: APPROVAL DENIED.**
+P1 is denying approval for all 11 books submitted under IDs 1–11. None will be approved on-chain; they will remain unapproved in `Pending` and blocked from appearing on the reader shelves.
+
+**Detailed Grounds for Denial:**
+1. **Unvetted Translation Copyright Risk (Critical Breach):**
+   - *Ars Amatoria* (Book #1) and *Les Fleurs du mal* (Book #7) are translated texts. README 8.1 & 10 explicitly mandate: *"Translators count too: an old book in a modern translation is not public domain. Every author and translator must be deceased by 1955."* You provided zero translator attribution, zero death year documentation, and zero copyright verification. Approving them risks permanently cementing copyrighted translations on-chain.
+2. **Deviation from Agreed Candidate Corpus (README 8.2):**
+   - You unilaterally submitted *Ars Amatoria*, *Les Fleurs du mal*, *Rights of Man*, and *The Wonderful Wizard of Oz*, none of which are in the agreed 8.2 candidate table. Meanwhile, vetted core books (*Lady Chatterley's Lover*, *Alice in Wonderland*, *Hong Lou Meng*, *Madame Bovary*, *Call of the Wild*) were omitted without team consensus.
+3. **Failed Scanner Checks (`text.match`):**
+   - #3 (*Frankenstein*), #5 (*Kreutzer Sonata*), and #7 (*Les Fleurs du mal*) failed `text.match` with review scores of 85. Curators cannot approve books where extracted text does not match metadata.
+4. **Unsubstantiated Ban Records:**
+   - *The Wonderful Wizard of Oz* does not have a verified, documented government ban source URL meeting hackathon standards.
+
+**Resolution Required:**
+Do not request approval until you provide full translator death-year proof, clean scanner passes, and verified government ban citations for the approved candidate list. Approvals remain completely frozen until these requirements are satisfied.
+
