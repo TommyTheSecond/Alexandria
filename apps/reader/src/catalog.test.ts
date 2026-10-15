@@ -6,6 +6,11 @@ const books = [
   { id: 3, status: 'pending', meta: null },
 ];
 describe('catalog filtering', () => {
+  it('shows local demo records only when explicitly requested', () => {
+    const local = [{ id: 1001, status: 'local', meta: null }];
+    expect(filterBooks(local, '', '', '')).toEqual([]);
+    expect(filterBooks(local, '', '', '', true)).toEqual(local);
+  });
   it('searches authors without case sensitivity', () => expect(filterBooks(books, 'AUTHOR', '', '').map(b => b.id)).toEqual([1]));
   it('combines country and scope', () => expect(filterBooks(books, '', 'CN', 'national').map(b => b.id)).toEqual([2]));
   it('keeps flagged books and excludes pending books', () => expect(filterBooks(books, '', '', '').map(b => b.id)).toEqual([1, 2]));

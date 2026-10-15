@@ -1,17 +1,36 @@
-# Barebones reader
+# Alexandria reader
 
-Run `npm install`, then `npm run dev`. Run `npm test` and `npm run build` for checks.
+Preact, Vite 5, strict TypeScript. Run `npm install`, then `npm run dev`.
 
-This A4 prototype uses Preact, Vite 5 and strict TypeScript. It deliberately has no decorative theme. Buttons remain semantic buttons styled as text.
+## Current design
 
-The catalog loads `public/catalog.json`; the checked-in snapshot is empty because content fixtures have not landed on main. Replace it with the real snapshot when available. Search and country/scope filters work on approved and flagged books. Metadata is rendered as text.
+- Light cream `#F1E0C5` and black modes, with a saved preference.
+- Shaded ASCII title; the library model beside it rotates with page scrolling.
+- A static grayscale ASCII rendering of Raphael's *The School of Athens* below. The source is P3's linked Wikipedia file; see `scripts/reference/CREDITS.md`.
+- Text controls and open-book catalog icons. Search and country/scope filters work on approved and flagged catalog records.
+- Reduced-motion or model-loading failures retain a static library view. All runtime assets are local.
 
-Upload currently validates PDF magic and size locally. It does not send files. SDK downloads, submission, wallet actions and curator queue are explicitly marked as not connected. No shared SDK interfaces are created or edited.
+Rebuild the header model views with `node scripts/build-turntable.mjs`. Rebuild the painting with `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-athens.ps1`. Build the title with `scripts/build-header.ps1` and the static library fallback with `node scripts/build-exterior.mjs`. Visitors receive ASCII text/data, with no 3D runtime.
 
-## Local samples
+## Local sample books
 
-Run `node scripts/prepare-samples.mjs` and visit `http://127.0.0.1:5173/?samples=1#/`. This downloads two historical Internet Archive scans: Alice (1890 edition; Carroll died 1898, illustrator Tenniel died 1914) and Huckleberry Finn (1885 edition; Twain died 1910, illustrator E. W. Kemble died 1933). Both original works and these editions predate 1931. No modern translation is used. The script records source links and computes SHA-256. Downloads and their manifest stay gitignored; default catalog behavior is unchanged.
+Run `node scripts/prepare-samples.mjs` and open `http://127.0.0.1:5173/?samples=1#/`.
 
-The sample catalog uses test approval/flagged states, not real chain records or curator decisions. Alice's reported Hunan ban has historical uncertainty and is labeled for curator review. P2 must verify content and ban metadata before real ingestion. Samples have not passed the scanner. The sample-only download helper verifies against a local hash, not an on-chain hash; production gateway downloads remain A5's responsibility.
+Samples are historical Internet Archive scans of Alice (1890 edition) and Huckleberry Finn (1885 edition), with local SHA-256 verification. Test statuses are not on-chain records or curator approvals. P2 must verify/scan books before ingestion. Alice's reported Hunan ban is labeled as needing historical review. PDFs and the generated sample catalog are gitignored.
 
-With the dev server running, run `npx playwright install chromium`, then `npx playwright test` for browser checks of search, country filtering, actual downloads, hash mismatch rejection, and mobile overflow. Run `npm test` for unit tests.
+Production SDK downloads, scanner submission and wallet/curator actions remain unconnected. The default catalog is empty until a real snapshot is supplied. No shared SDK interfaces are modified.
+
+## Checks
+
+- `npm test`: unit tests.
+- `npm run build`: strict TypeScript and production build.
+- With the dev server running: `npx playwright install chromium`, then `npx playwright test`.
+
+Browser checks cover header rotation/reversal, reduced motion, both themes, mobile layout, accessible readable UI, search/filter behavior and verified sample downloads. Decorative ASCII graphics have descriptions; their shading is excluded from text-contrast checks.
+## Political demo handoff (2026-10-15)
+
+Open http://127.0.0.1:5173/?collection=political#/ for the presentation. Collection paused at the user's request: 11 historical political scans (about 160 MiB), with search, detail pages, source links and SHA-256-checked PDF downloads. A questionable Cambridge text was excluded because its edition date was unclear. All entries remain local and need source/edition, scanner and curator review; no ban claims or on-chain approvals are implied.
+
+The downloaded PDFs and generated catalog remain gitignored. `scripts/political-demo-sources.json` records the 11 source records for handoff. `scripts/collect-political.mjs` is an optional bulk research tool; do not restart it during the presentation. It targets 50, which has not been completed. These are separate from P2's seed ingestion.
+
+Working branch: `ws3/a4/ascii-library`, worktree `.worktrees/a4`. SDK, scanner submission and wallet actions are still unconnected in this reader.
