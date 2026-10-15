@@ -39,11 +39,15 @@ echo "kubo     starting (log: infra/onion/run/kubo.log)"
 # ClamAV is required on the server: a missing scanner rejects uploads instead of skipping (A3).
 export ALEXANDRIA_REQUIRE_CLAMAV=1
 PY="python3"; [ -x "$ROOT/.venv/bin/python" ] && PY="$ROOT/.venv/bin/python"
+SCANNER_CMD_OVERRIDE="${SCANNER_CMD:-}"
 SCANNER_CMD="${SCANNER_CMD:-}"
 if [ -z "$SCANNER_CMD" ] && [ -f scanner/app.py ]; then
   SCANNER_CMD="$PY -m uvicorn scanner.app:app --host 127.0.0.1 --port 8000 --no-access-log"
 fi
-if [ -n "$SCANNER_CMD" ]; then
+if [ -n "$SCANNER_CMD" ] && [ -z "${SCANNER_CMD_OVERRIDE:-}" ] && ! "$PY" -c "import scanner.app" >/dev/null 2>&1; then
+  echo "scanner  NOT started: its Python packages are missing or outdated."
+  echo "         Fix: infra/onion/setup-scanner.sh, then restart this script."
+elif [ -n "$SCANNER_CMD" ]; then
   $SCANNER_CMD >"$RUN/scanner.log" 2>&1 & pids+=($!)
   echo "scanner  starting (log: infra/onion/run/scanner.log)"
 else
