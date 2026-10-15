@@ -1,0 +1,20 @@
+{
+  "chainId": 43113,
+  "clearnet": [
+    "https://api.avax-test.network/ext/bc/C/rpc",
+    "https://avalanche-fuji-c-chain-rpc.publicnode.com",
+    "https://avalanche-fuji.drpc.org"
+  ],
+  "onion": [
+    "/rpc",
+    "https://api.avax-test.network/ext/bc/C/rpc",
+    "https://avalanche-fuji-c-chain-rpc.publicnode.com",
+    "https://avalanche-fuji.drpc.org"
+  ],
+  "excluded": {
+    "https://ava-testnet.public.blastapi.io/ext/bc/C/rpc": "returns a -32000 error (checked 2026-10-15)",
+    "https://rpc.ankr.com/avalanche_fuji": "needs an API key",
+    "https://avalanche-fuji.blockpi.network/v1/rpc/public": "needs an API key",
+    "https://endpoints.omniatech.io/v1/avax/fuji/public": "HTTP 521"
+  }
+}

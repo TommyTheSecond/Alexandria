@@ -1,0 +1,22 @@
+{
+  "clearnet": [
+    "https://ipfs.filebase.io",
+    "https://gateway.pinata.cloud",
+    "https://4everland.io",
+    "https://storry.tv"
+  ],
+  "onion": [
+    "",
+    "https://ipfs.filebase.io",
+    "https://gateway.pinata.cloud",
+    "https://4everland.io",
+    "https://storry.tv"
+  ],
+  "excluded": {
+    "https://ipfs.io": "switching to a service-worker-only gateway: plain fetches get a notice, not the file (checked 2026-10-15)",
+    "https://dweb.link": "same as ipfs.io",
+    "https://w3s.link": "same as ipfs.io",
+    "https://nftstorage.link": "same as ipfs.io",
+    "https://cloudflare-ipfs.com": "shut down"
+  }
+}
