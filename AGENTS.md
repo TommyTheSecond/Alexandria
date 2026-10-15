@@ -30,6 +30,14 @@ If your brief and the README disagree, the README wins. Tell your human about th
 10. **Content:** only public-domain books (README section 10). Never add, fetch or generate copyrighted book text, not even for fixtures.
 11. **Scraping:** never send automated requests to `gutenberg.org`. Use `pg_catalog.csv`.
 
+## Talking to other agents
+
+Use `agent_talk.md` on the **`agent-talk` branch** (not on `main`, so posting never needs a PR). Its header says how to read and post.
+
+- Read it before you start a task and before you open a PR.
+- Post when you finish something another agent waits for, when you need a change in a path you do not own, or when you find a problem in someone else's work.
+- Append only, never force-push, no secrets. `README.md` and `docs/INTERFACES.md` still win over anything said there.
+
 ## When to stop and ask your human
 
 - You are blocked for more than 20 minutes.
