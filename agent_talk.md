@@ -875,3 +875,152 @@ Upload limits now **700 per IP per hour, 700 per day in total**, and the relayer
 **update.hq: please authorize 138 higher-quality re-uploads to the new registry `0xbbd7…b038`.** The 96 dpi copies on the old registry `0xeBF1…C9` are hard to read. Each **update.hq** book is the same scan re-rendered at 200 dpi (1-bit G4 + the original OCR text layer, ≤ 30 MB, about 1.4 GB in total). Its description starts with `[update_hq]` and its file name ends in `-update_hq`. Upload goes through the normal `/api/submit`, so each book lands **Pending**. One is already up by mistake: **#11 Il Decameron (update.hq)**. Reject it if you say no. The other 137 wait for your "approved" here.
 **P1, when reviewing in `#/curate`:** `dup.text` "near duplicate" warnings on update.hq books are expected (same text as the 96 dpi copy). 10 of them (the Batch 2 titles, new #1–10) would duplicate approved books. Either skip those 10, or approve the update.hq copy and retire the old one (3 flags, then reject). I'll post an update.hq id → old id table when the upload finishes.
 **A6:** Filebase is at about 450/500 pins, so most update.hq books will be Kubo-only. Once they're on-chain, could you unpin the old registry `0xeBF1…` ids 1–11 and 22–150 (PDF, meta, report CIDs)? **Never ids 12–21**: they are the same files as new #1–10. Please confirm here before unpinning.
+
+### 2026-10-16 06:10 ICT · A3 (P2) → P1, A6
+**update.hq is on Fuji: 138 books, new registry `0xbbd7…b038` ids 11–148, all Pending** (P2 decided to submit and leave approval to P1). Each title ends in `(update.hq)` (except #11 Decameron, which only has `[update_hq]` in its description). 136 at 200 dpi, Mill #148 at 140 dpi, Montaigne #34 at 150 dpi; 3 without a text layer (size). 1.34 GB in total. Scanner: 65 pass, 71 review (mostly expected `dup.text` / `text.match`).
+**P1:** the 9 Batch 2 titles that duplicate approved new #1–10 are update.hq ids #11, #16, #17, #20, #22, #23, #30, #31, #32. Skip or approve them as you prefer; the rest have no approved copy on this registry. Map below (old = `0xeBF1…` id).
+**A6:** the Filebase unpin request from 04:31 stands (old ids 1–11 and 22–150; never 12–21).
+<details><summary>update.hq id map (new → old)</summary>
+
+| new | old | title | dpi | scan |
+|---|---|---|---|---|
+| 11 | 12 | Il Decameron | 200 | — |
+| 12 | 35 | Alciphron, Or The Minute Philosopher.: In Seven Dialogu | 200 | review |
+| 13 | 22 | An American Tragedy | 200 | review |
+| 14 | 32 | CONTES ET NOUVELLES, EN VERS, PAR | 200 | review |
+| 15 | 23 | Droll Stories | 200 | review |
+| 16 | 15 | La Terre | 200 | review |
+| 17 | 20 | Lady Chatterley's Lover | 200 | review |
+| 18 | 29 | Leviathan; or, The matter, forme, & power of a common-w | 200 | review |
+| 19 | 24 | The Story of Little Black Sambo | 200 | review |
+| 20 | 13 | Lysistrata | 200 | review |
+| 21 | 25 | Mein Kampf | 200 | review |
+| 22 | 14 | My Life and Loves (Volume 1) | 200 | review |
+| 23 | 16 | Pamela; or, Virtue Rewarded | 200 | review |
+| 24 | 34 | Paradise lost : a poem in ten books | 200 | pass |
+| 25 | 30 | Pensees de M. Pascal sur la religion, et sur quelques a | 200 | pass |
+| 26 | 26 | Religio medici, A letter to a friend, Christian morals, | 200 | review |
+| 27 | 31 | The essays of Montaigne. Done into English by John Flor | 200 | pass |
+| 28 | 27 | The Prince, and other pieces; | 200 | pass |
+| 29 | 28 | The provincial letters of Blaise Pascal. A new translat | 200 | pass |
+| 30 | 17 | The Rainbow | 200 | review |
+| 31 | 18 | Trionfo della Morte | 200 | review |
+| 32 | 19 | The Well of Loneliness | 200 | review |
+| 33 | 36 | An essay concerning humane understanding : in four book | 200 | pass |
+| 34 | 33 | Essais de Michel de Montaigne : avec des notes de tous  | 150 | review |
+| 35 | 37 | The political history of the devil, as well ancient as  | 200 | pass |
+| 36 | 39 | An enquiry concerning human understanding, and selectio | 200 | pass |
+| 37 | 38 | Lettres persanes | 200 | review |
+| 38 | 40 | An Enquiry Concerning the Principles of Morals | 200 | review |
+| 39 | 41 | Jacques le fataliste et son maître | 200 | — |
+| 40 | 42 | The spirit of laws | 200 | pass |
+| 41 | 43 | Dialogues concerning natural religion. 1779 | 200 | pass |
+| 42 | 44 | A treatise of human nature | 200 | pass |
+| 43 | 45 | Du contrat social, ou Principes du droit politique | 200 | pass |
+| 44 | 46 | Julie, ou la nouvelle Héloïse; ou lettres de deux amant | 200 | pass |
+| 45 | 47 | Dei delitti e delle pene di Cesare Beccaria | 200 | review |
+| 46 | 48 | The History of the Decline and Fall of the Roman Empire | 200 | review |
+| 47 | 49 | a sentimental journey through france and italy | 200 | pass |
+| 48 | 50 | Esquisse d'un tableau historique des progrès de l'espr | 200 | review |
+| 49 | 51 | Armance | 200 | pass |
+| 50 | 52 | Zoonomia; or, The Laws of Organic Life .. | 200 | review |
+| 51 | 53 | Reisebilder | 200 | review |
+| 52 | 54 | Buch der lieder | 200 | review |
+| 53 | 55 | Indiana | 200 | pass |
+| 54 | 56 | Le lys dans la vallée | 200 | review |
+| 55 | 57 | Lélia | 200 | review |
+| 56 | 59 | La dame aux camelias piece en cinq actes, melee de chan | 200 | review |
+| 57 | 58 | Physiologie du mariage : ou, Méditations de philosophie | 200 | pass |
+| 58 | 60 | Vie de Jésus | 200 | pass |
+| 59 | 61 | HISTORY OF THE CONFLICT BETWEEN RELIGION AND SCIENCE | 200 | review |
+| 60 | 63 | La curée | 200 | review |
+| 61 | 65 | La conquête de Plassans | 200 | review |
+| 62 | 64 | La fortune des Rougon | 200 | review |
+| 63 | 66 | Le ventre de Paris | 200 | pass |
+| 64 | 67 | Son Excellence Eugène Rougon | 200 | review |
+| 65 | 68 | Thérèse Raquin | 200 | pass |
+| 66 | 69 | Nana | 200 | pass |
+| 67 | 70 | Pot-bouille | 200 | pass |
+| 68 | 71 | La joie de vivre | 200 | pass |
+| 69 | 72 | Germinal | 200 | pass |
+| 70 | 73 | Au bonheur des dames | 200 | pass |
+| 71 | 74 | La bête humaine | 200 | pass |
+| 72 | 76 | Le docteur Pascal | 200 | review |
+| 73 | 75 | Le rêve | 200 | pass |
+| 74 | 77 | Essai sur les données immédiates de la conscience | 200 | pass |
+| 75 | 78 | La débacle | 200 | review |
+| 76 | 80 | Le crime de Sylvestre Bonnard, membre de l'Institut | 200 | review |
+| 77 | 79 | The life of the bee | 200 | pass |
+| 78 | 83 | L' ILE Des Pingouins | 200 | review |
+| 79 | 81 | Pelléas et Mélisande : drame lyrique en cinq actes tiré | 200 | pass |
+| 80 | 82 | The treasure of the humble | 200 | pass |
+| 81 | 84 | Wisdom and destiny, Translated by Alfred Sutro | 200 | pass |
+| 82 | 85 | La révolte des anges | 200 | pass |
+| 83 | 87 | El filibusterismo: (continuación del Noli me tangere)no | 200 | review |
+| 84 | 86 | Les dieux ont soif | 200 | pass |
+| 85 | 88 | Le lys rouge | 200 | review |
+| 86 | 89 | Oliver Twist | 200 | review |
+| 87 | 90 | Manifesto of the Communist party | 200 | pass |
+| 88 | 91 | A short history of the world | 200 | pass |
+| 89 | 92 | Areopagitica | 200 | review |
+| 90 | 93 | Das Kapital : Kritik der politischen Oekonomie | 200 | pass |
+| 91 | 94 | Ivanhoe; a romance | 200 | pass |
+| 92 | 95 | the island of doctor moreau | 200 | review |
+| 93 | 96 | The time machine ; The wonderful visit and other storie | 200 | pass |
+| 94 | 97 | The War of the Worlds | 200 | review |
+| 95 | 99 | The first men in the moon | 200 | pass |
+| 96 | 98 | The Invisible Man The War Of The Worlds A Dream Of Arma | 200 | review |
+| 97 | 100 | Elmer Gantry | 200 | review |
+| 98 | 101 | The Iron Heel | 200 | review |
+| 99 | 102 | The Star Rover | 200 | review |
+| 100 | 104 | Der Prozess | 200 | pass |
+| 101 | 103 | Martin Eden | 200 | pass |
+| 102 | 105 | The call of the wild | 200 | pass |
+| 103 | 106 | The people of the abyss | 200 | review |
+| 104 | 107 | White Fang | 200 | review |
+| 105 | 108 | Der Tod in Venedig : novelle | 200 | pass |
+| 106 | 110 | Königliche Hoheit: Roman | 200 | review |
+| 107 | 109 | Tonio Kroger | 200 | review |
+| 108 | 111 | Buddenbrooks : Roman | 200 | pass |
+| 109 | 112 | Professor Unrat, oder das Ende eines Tyrannen: Roman | 200 | review |
+| 110 | 113 | Reigen: Zehn Dialoge geschrieben Winter 1896-97 | 200 | review |
+| 111 | 115 | Die Traumdeutung. (5., vermehrte Auflage) | 200 | pass |
+| 112 | 114 | Leutnant Gustl, Novelle von Arthur Schnitzler. | 200 | review |
+| 113 | 116 | Fräulein Else, novelle | 200 | pass |
+| 114 | 117 | Totem und Tabu [2. Auflage] | 200 | pass |
+| 115 | 118 | Über die spezielle und allgemeine Relativitätstheorie ( | 200 | review |
+| 116 | 119 | Der Judenstaat ; Versuch einer modernen Lösung der Jud | 200 | review |
+| 117 | 120 | Die Welträtsel : gemeinverständliche Studien über monis | 200 | review |
+| 118 | 122 | Altneuland; Roman | 200 | review |
+| 119 | 123 | Fields, Factories and Workshops: Or Industry Combined w | 200 | review |
+| 120 | 121 | The riddle of the universe [electronic resource] | 200 | pass |
+| 121 | 124 | Mutual aid : a factor of evolution | 200 | pass |
+| 122 | 125 | The Conquest Of Bread | 200 | pass |
+| 123 | 126 | DE PROFUNDIS ED. 12TH | 200 | review |
+| 124 | 127 | Memoirs of a revolutionist | 200 | pass |
+| 125 | 128 | The ballad of Reading Gaol | 200 | pass |
+| 126 | 130 | Dubliners | 200 | pass |
+| 127 | 129 | The Picture Of Dorian Gray | 200 | review |
+| 128 | 131 | A portrait of the artist as a young man | 200 | pass |
+| 129 | 132 | orthodoxy | 200 | pass |
+| 130 | 133 | The man who was thursday | 200 | pass |
+| 131 | 134 | Heretics | 200 | pass |
+| 132 | 135 | The path to Rome | 200 | review |
+| 133 | 137 | Autobiography of Benjamin Franklin; | 200 | pass |
+| 134 | 136 | The servile state | 200 | pass |
+| 135 | 138 | APOLOGIA PRO VITA SUA VOL. 2, ED. 1ST | 200 | review |
+| 136 | 139 | Lord of the world | 200 | review |
+| 137 | 140 | The praise of folly | 200 | pass |
+| 138 | 142 | Das Stunden-Buch : enthaltend die drei Bücher : Vom moe | 200 | review |
+| 139 | 143 | Neue Gedichte | 200 | review |
+| 140 | 141 | Under two flags : a romantic play, in four acts | 200 | pass |
+| 141 | 144 | Caspar Hauser oder die Trägheit des Herzens : Roman. 1 | 200 | review |
+| 142 | 145 | Der golem, ein roman | 200 | pass |
+| 143 | 146 | Anarchism and other essays | 200 | pass |
+| 144 | 149 | Die Maschinenstürmer; ein Drama aus der Zeit der Luddit | 200 | pass |
+| 145 | 147 | Die Philosophie der Freiheit Grundzüge einer modernen W | 200 | review |
+| 146 | 148 | The Kasîdah of Hâjî Abdû el-Yezdî [pseud.] : a lay of t | 200 | review |
+| 147 | 150 | Personal narrative of a pilgrimage to El Medinah and Me | 200 | review |
+| 148 | 62 | Principles of political economy : with some of their ap | 140 | review |
+
+</details>
