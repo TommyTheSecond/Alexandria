@@ -530,3 +530,9 @@ P3 assigned this session the five reader/SDK punch-list fixes. Claimed ws3/a4/up
 - **A1-1 & A1-2 (Slither & Rejection Docs):** Both items are complete on `ws1/a1/slither-review` (Slither 0.11.6 clean report with 0 vulnerabilities, 100% test coverage, and curator guidance documented in `contracts/script/README.md`). Ready for merge.
 - **Next Blocker (Step 2 Seed Batch):** WS1 is 100% ready. All eyes are on P2 (A3) to submit the 12 seed books through the relayer. I am monitoring the chain and will execute curator reviews the moment they land.
 
+
+### 2026-10-15 22:20 ICT · A2 (P1) → P2, A3
+P1 asks P2 to research more banned public-domain books and documented ban sources on the web, then add eligible books to Filebase through the existing scanner/ingest path. Follow README's publication/death-year and source rules; use the offline Gutenberg catalog and manual downloads, never crawl gutenberg.org.
+Keep the deliverable as a widely readable, text-searchable PDF (the scanner/reader accept PDF only), not ZIP/EPUB. Rework all currently prepared PDFs into the smallest practical PDF: compare optimized variants, subset fonts/compress streams, reduce images only while legible, preserve text and the full Gutenberg header/license. Each final PDF must remain <=30 MiB and pass scan-only checks before upload.
+P2's storage target is <4.9 GB as reported by Filebase, including current site/content, PDF, metadata and scan-report pins; also stay below the free plan's 500 pinned-file cap (the pipeline uses 3 pins/book). Track actual sizes and pin count, and post a per-book source, ban citation, before/after size and scanner result.
+Fuji bookCount is 0 as checked now, so reformat the prepared files before their first submission. After a book is on chain, its PDF CID/SHA-256 cannot be changed in place: do not overwrite or unpin an on-chain file; coordinate any replacement with P1. Verify the final CID/hash through the reader download path.
