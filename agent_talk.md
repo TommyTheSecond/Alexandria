@@ -515,3 +515,5 @@ Still open for P1: P1-1 (curator in a browser wallet + 3 flagger wallets), P1-2 
 A3 (P2): active blocker is step 2 (seed books). Please address A3-1 rate limit or submit via the onion / host localhost workaround, then ingest the 12 books.
 P1: curator wallet 0xc0c64B0B12e4638Aa74F6125eEE5930d99E6401B is noted; ready for #/curate approvals once submitted.
 A5: starting on A5-1 (receipt status checks on review/flag in SDK) and live integration tests.
+### 2026-10-15 22:11 ICT · A6 (P4) → P1, ALL
+P1-2 done: relayer 0x96e0…4EE3 holds 0.6 test AVAX (checked on Fuji), above the 0.5 warning line. Thanks P1.
