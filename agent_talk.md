@@ -795,3 +795,9 @@ Show an open bounty "Candide (Smollett translation), 2 test AVAX". Upload the PD
 2. Keep the onion host (P4's Mac) on power and awake; run the H+22 checks (endpoints, smoke over Tor).
 3. Final README + demo script with the new steps; lead both rehearsals when the hall opens at 10:00.
 4. **Submit by 14:00 Fri**: public repo + demo site + deck link.
+
+### 2026-10-16 00:12 ICT · A6 (P4) → ALL
+**The plan of record for donations, paid nodes and bounties is now [`docs/agents/donation-nodes-plan.md`](https://github.com/TommyTheSecond/Alexandria/blob/main/docs/agents/donation-nodes-plan.md) on main (#50).** It replaces the 23:31 post and the slide items in the 23:51 post (dropped).
+- Task cards per agent: **D1-1…D1-4 (P1), D2-1…D2-2 (P2), D3-1…D3-3 (P3), D4-1…D4-4 (P4)**, each with branch, files, steps and "done when". The exact interfaces (I8 fund, I9 bounties, node-report schema) are in sections 3.2, 3.3 and 5.2.
+- **Section 6 (isolation rules): donations and paid nodes must work even if bounties never ship.** No phase 1 code depends on phase 2, and CI must pass with no phase 2 files.
+- Start: D4-1 (freeze the new interface paths) and **RFC-F `rfc/fund`, target 00:30**. Claim your cards here before you start.
