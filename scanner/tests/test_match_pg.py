@@ -92,3 +92,74 @@ def test_match_pg_approves_valid_pd_book(tmp_path: Path):
     row = reader[0]
     assert row["gutenberg_id"] == "76"
     assert row["pd_ok"].lower() in ("true", "1", "yes")
+
+
+def test_match_pg_flags_published_after_1930(tmp_path: Path):
+    candidates_csv = tmp_path / "candidates.csv"
+    catalog_csv = tmp_path / "pg_catalog.csv"
+    output_csv = tmp_path / "shortlist.csv"
+
+    candidates_csv.write_text(
+        "title,author,first_published_year,ban_country,ban_year,ban_authority,ban_scope,ban_source_url\n"
+        "Brave New World,Aldous Huxley,1932,IE,1932,Censorship Board,national,https://example.com/ban\n",
+        encoding="utf-8",
+    )
+    catalog_csv.write_text(
+        "Text#,Type,Issued,Title,Language,Authors,Subjects,LoCC,Bookshelves\n"
+        "99999,Text,2020-01-01,Brave New World,en,\"Huxley, Aldous, 1894-1963\",Dystopian,PR,\n",
+        encoding="utf-8",
+    )
+
+    match_catalog(candidates_csv, catalog_csv, output_csv)
+
+    with output_csv.open("r", encoding="utf-8") as f:
+        reader = list(csv.DictReader(f))
+    assert reader[0]["pd_ok"] == "false"
+    assert "1930" in reader[0]["pd_reason"] or "1963" in reader[0]["pd_reason"]
+
+
+def test_match_pg_non_latin_and_special_names():
+    # Non-Latin / Chinese author and title transliteration
+    entries = parse_authors("Cao, Xueqin, 1715?-1763; Joly, H. Bencraft, -1898, translator")
+    assert len(entries) == 2
+    assert entries[0]["death_year"] == 1763
+    assert entries[1]["death_year"] == 1898
+    assert entries[1]["is_translator"] is True
+
+    # Russian author with title/epithet
+    tolstoy = parse_authors("Tolstoy, Leo, graf, 1828-1910")
+    assert tolstoy[0]["name"] == "Leo Tolstoy"
+    assert tolstoy[0]["death_year"] == 1910
+
+
+def test_match_pg_cli(tmp_path: Path, monkeypatch, capsys):
+    from ingest.match_pg import main
+
+    cand = tmp_path / "cand.csv"
+    cat = tmp_path / "cat.csv"
+    out = tmp_path / "out.csv"
+
+    # Missing file returns 1
+    assert main([str(tmp_path / "nonexistent.csv"), str(cat), "--output", str(out)]) == 1
+    captured = capsys.readouterr()
+    assert "Candidates file not found" in captured.err
+
+    cand.write_text(
+        "title,author,first_published_year,ban_country,ban_year,ban_authority,ban_scope,ban_source_url\n"
+        "Candide,Voltaire,1759,US,1929,US Customs,import,https://example.com/ban\n",
+        encoding="utf-8",
+    )
+    assert main([str(cand), str(tmp_path / "nonexistent.csv"), "--output", str(out)]) == 1
+    captured = capsys.readouterr()
+    assert "Gutenberg catalog file not found" in captured.err
+
+    cat.write_text(
+        "Text#,Type,Issued,Title,Language,Authors,Subjects,LoCC,Bookshelves\n"
+        "19942,Text,2006-11-27,Candide,en,\"Voltaire, 1694-1778; Smollett, T. (Tobias), 1721-1771, translator\",Satire,PQ,\n",
+        encoding="utf-8",
+    )
+    assert main([str(cand), str(cat), "--output", str(out)]) == 0
+    assert out.is_file()
+    captured = capsys.readouterr()
+    assert "19942" in captured.out
+    assert "[OK]" in captured.out
