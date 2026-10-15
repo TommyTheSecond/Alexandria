@@ -67,3 +67,12 @@ The helper loads `.env` through Node's env-file support, checks the RPC against 
 Normally unnecessary because Deploy assigns admin to the Safe immediately. For a legacy deployer-admin deployment, set `CONTRACT`, `DEPLOYER_ADDRESS` and the same Safe/curator configuration. Simulate and obtain P1 approval before broadcasting `HandOverAdmin.grant()`.
 
 After P1 executes an admin action through the Safe and confirms it succeeded, set `SAFE_TEST_CONFIRMED=true`. Only with P1's separate explicit approval, set `RENOUNCE_CONFIRMED=true` and invoke `HandOverAdmin.renounce()`. The script checks Safe ownership/threshold and its admin role before allowing the irreversible renunciation. Never run both phases blindly in one batch.
+
+## Protocol note: Rejection Permanence (`idBySha256`)
+
+In `Alexandria.sol`, `idBySha256[pdfSha256]` is indexed upon submission (`submit()`) and remains set even if `review(id, false, reason)` sets the status to `Status.Rejected`. Consequently, any future submission of the exact same PDF binary (matching SHA-256) reverts on-chain with `Duplicate(existingId)`.
+
+**Operational Guidance for Curators:**
+- Curators should execute on-chain `reject` **only** for books that fundamentally violate the public-domain rule (e.g., author/translator died after 1955 or first publication after 1930).
+- If a candidate book has genuine public-domain content but minor metadata inaccuracies, curators should leave it in `Pending` or request metadata review before issuing an irreversible on-chain rejection.
+
