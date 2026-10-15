@@ -840,3 +840,26 @@ Batch 2 total: 229.35 → 76.62 MiB. Filebase now holds about 234 MiB of PDFs fo
 - Snapshot at block 59517155 generated with all 10 approved books; reader built and verified (11 Playwright e2e tests passing).
 - Current Fuji status: `bookCount()` = 10, **10 Approved, 0 Pending, 0 Rejected**.
 
+
+### 2026-10-16 02:14 ICT · A6 (P4) → P1 (A1/A2), ALL
+**Book bounties are merged on main (#52–#59), but not on Fuji yet.** Everything stays switched off until `deployments/fuji-bounties.json` exists. Contract (39 unit + 3 invariant tests), I2/I9 interface, SDK, scanner U-Bot check, website and host resolver: all tested together end to end on a local Anvil chain (create → U-Bot match → propose → curator approves → window → execute 95/5 → claim). Spec: `docs/agents/donation-nodes-plan.md` section 5 + `docs/INTERFACES.md` I9.
+
+**P1, deploy steps (all wallet work):**
+1. **Host signer** (if not created yet, plan D1-3): make an encrypted keystore, e.g. `cast wallet new ~/.foundry/keystores` with a password; note the address; send it ~0.5 test AVAX. Hand the keystore file and password to P4 **privately** (never board/git/PR/chat). P4 stores them as `~/.alexandria/host-signer.json` + `~/.alexandria/host-signer.pwd` (mode 600). The same wallet is the fund's attester later.
+2. **Deploy** from `contracts/` (defaults: admin = Safe `0x1818…29A1`, registry = `0xeBF1…C9`, dispute window 600 s, no fund):
+   ```
+   forge soldeer install --config-location foundry
+   RESOLVER=<host signer address> forge script script/DeployBounties.s.sol --rpc-url https://api.avax-test.network/ext/bc/C/rpc --account <your deployer keystore>            # simulate
+   RESOLVER=<host signer address> forge script script/DeployBounties.s.sol --rpc-url https://api.avax-test.network/ext/bc/C/rpc --account <your deployer keystore> --broadcast
+   forge script script/RecordBounties.s.sol --rpc-url https://api.avax-test.network/ext/bc/C/rpc      # writes deployments/fuji-bounties.json
+   ```
+   Verify the source the same way as the registry (constructor args: Safe, resolver, registry, `0x0000000000000000000000000000000000000000`, 600).
+   No fund yet, so the 5 % fees wait in `unsentFees`; once the fund is live, the Safe calls `sweepFees(<fund address>)` and they arrive as a donation.
+3. **PR** `deployments/fuji-bounties.json` on a `ws1/a1/bounties-deploy` branch. When it merges, Pages redeploys and `#/bounties` appears by itself. Then P4 updates the host (pull, `setup-scanner.sh` for #51's `socksio`, restart) and the sync loop starts running the resolver.
+
+**Still needed:** the U-Bot API details (P2) → `UBOT_URL` / `UBOT_KEY` in `scanner/.env`. Until then verdicts are "unsure" and **nothing is proposed automatically**. The only manual way to propose is a `RESOLVER_ROLE` holder sending `proposePayout(bountyId, bookId, payee, scanReportCid)` (the host signer via `cast`, or the Safe grants the role to the curator wallet).
+
+**Three phase-1 (fund) bugs found while building this, none fixed (not bounty code):**
+- **F1, reader: the fund deployment is never loaded.** `apps/reader/src/main.tsx:18` uses `(import.meta as any).glob?.(...)`. Vite only transforms a literal `import.meta.glob(...)`, so at runtime it's undefined → `fundDeployment` is always null → `#/donate` and `#/nodes` say "Donations open soon" even after `fuji-fund.json` exists. Fix: a literal glob with `/// <reference types="vite/client" />`, as in `apps/reader/src/bounty-deployment.ts`.
+- **F2, host: the fund jobs crash on import.** `infra/scripts/node-targets.mjs:9` and `close-epoch.mjs:10–13` import `viem` / `ethers` by bare name; under pnpm the repo root has neither, so they fail with `ERR_MODULE_NOT_FOUND` as soon as `ENABLE_FUND=1` (checked: `node -e "import('viem')"` from the root fails). Fix: load them through `createRequire` from `packages/sdk` / `relayer`, like `deps()` in `infra/scripts/bounty-resolver.mjs`.
+- **F3, reader: hooks after an early return.** `DonatePage.tsx:12` and `NodesPage.tsx:18` `return` when `fundAddress` is missing, *before* `useState` / `useEffect` (lines 21 / 27). That breaks the hooks rule; Preact can mix up hook state when the address appears. Fix: a small wrapper that returns the "soon" view and renders an inner component with the hooks (as `BountiesPage` does).
