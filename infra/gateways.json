@@ -3,16 +3,14 @@
     "https://tense-peach-scallop.myfilebase.com",
     "https://ipfs.filebase.io",
     "https://gateway.pinata.cloud",
-    "https://4everland.io",
-    "https://storry.tv"
+    "https://4everland.io"
   ],
   "onion": [
     "",
     "https://tense-peach-scallop.myfilebase.com",
     "https://ipfs.filebase.io",
     "https://gateway.pinata.cloud",
-    "https://4everland.io",
-    "https://storry.tv"
+    "https://4everland.io"
   ],
   "bucketOnly": [
     "https://tense-peach-scallop.myfilebase.com"
@@ -22,6 +20,7 @@
     "https://dweb.link": "same as ipfs.io",
     "https://w3s.link": "same as ipfs.io",
     "https://nftstorage.link": "same as ipfs.io",
-    "https://cloudflare-ipfs.com": "shut down"
+    "https://cloudflare-ipfs.com": "shut down",
+    "https://storry.tv": "HTTP 403 for our own pinned content (served only cached/popular CIDs; checked 2026-10-15)"
   }
 }
