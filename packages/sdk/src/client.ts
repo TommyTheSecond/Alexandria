@@ -89,7 +89,7 @@ export function createClient(config: ClientConfig): AlexandriaClient {
       if (config.snapshotUrls && config.snapshotUrls.length > 0) {
         for (const url of config.snapshotUrls) {
           try {
-            const res = await fetch(url);
+            const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
             if (res.ok) {
               const data = (await res.json()) as Catalog;
               if (data && Array.isArray(data.books)) {
@@ -298,7 +298,6 @@ export function createClient(config: ClientConfig): AlexandriaClient {
           if (item.status === 'success' && item.result) {
             const r = item.result;
             if (STATUS_MAP[r.status] === 'pending') {
-              const meta = await fetchMetadata(r.metaCid, config.gateways);
               pending.push({
                 id,
                 status: 'pending',
@@ -309,14 +308,17 @@ export function createClient(config: ClientConfig): AlexandriaClient {
                 pdfCid: r.pdfCid,
                 metaCid: r.metaCid,
                 pdfSha256: r.pdfSha256 as Hex32,
-                meta,
+                meta: null,
               });
             }
           }
         }
       }
 
-      return pending;
+      return Promise.all(pending.map(async book => ({
+        ...book,
+        meta: await fetchMetadata(book.metaCid, config.gateways),
+      })));
     },
 
     downloadPdf(book: Book, opts?: { onProgress?: (bytes: number) => void; signal?: AbortSignal }): Promise<Blob> {
@@ -502,9 +504,13 @@ export function createClient(config: ClientConfig): AlexandriaClient {
               args: [BigInt(id), approve, reason],
             });
 
-            await pubClient.waitForTransactionReceipt({ hash });
+            const receipt = await pubClient.waitForTransactionReceipt({ hash });
+            if (receipt.status !== 'success') {
+              throw new AlexandriaError('TX_REVERTED', 'Transaction reverted', receipt);
+            }
             return hash as Hex32;
           } catch (err: unknown) {
+            if (err instanceof AlexandriaError) throw err;
             let errorName = 'TX_REVERTED';
             if (err instanceof BaseError) {
               const revertError = err.walk((e) => e instanceof ContractFunctionRevertedError) as ContractFunctionRevertedError | null;
@@ -525,9 +531,13 @@ export function createClient(config: ClientConfig): AlexandriaClient {
               args: [BigInt(id), reason],
             });
 
-            await pubClient.waitForTransactionReceipt({ hash });
+            const receipt = await pubClient.waitForTransactionReceipt({ hash });
+            if (receipt.status !== 'success') {
+              throw new AlexandriaError('TX_REVERTED', 'Transaction reverted', receipt);
+            }
             return hash as Hex32;
           } catch (err: unknown) {
+            if (err instanceof AlexandriaError) throw err;
             let errorName = 'TX_REVERTED';
             if (err instanceof BaseError) {
               const revertError = err.walk((e) => e instanceof ContractFunctionRevertedError) as ContractFunctionRevertedError | null;
