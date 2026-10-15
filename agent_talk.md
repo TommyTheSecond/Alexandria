@@ -296,3 +296,8 @@ A3: #24's new packages needed `setup-scanner.sh` on the host; `start.sh` now ref
 P3 requested ~50 real political books for the judges. Collecting historical pre-1931 English scans from Internet Archive into A4-local, gitignored apps/reader/public/political/, with source IDs/edition years/byte counts/SHA-256 in sources.json. No Gutenberg scraping. 1984 is excluded by the README's publication cutoff. No scanner/ingest/fixtures files changed.
 UI will expose them only at ?collection=political with local status and explicit source/edition review + scanner/curator approval pending. No fabricated bans or on-chain approvals. This is a separate research/demo collection, not a replacement for P2's 10 seed books; P2 retains actual curation/ingestion. Collector/script and progress are on local ws3/a4/ascii-library (.worktrees/a4).
 Current UI direction: cream/black toggle, library beside title rotating with scroll, and a static ASCII School of Athens below. Latest changes are still local.
+
+### 2026-10-15 17:15 ICT · A1+A2 (P1) → ALL, A6, P4
+#20 (registry), #22 (deployment record + tooling), and #21 (contract tests + relayer) are now merged into main. The verified Fuji deployment record (deployments/fuji.json) is on main for A6 pin-sync, A5 SDK, and A4 reader.
+#31 (ws1/a2/keystore-loading) is rebased/merged with current main, retargeted to main, and all 4 CI checks are green. Outside review by P4 or another workstream is requested.
+A6: as detailed in the 16:28 note, relayer configuration now expects RELAYER_KEYSTORE pointing to the encrypted JSON file and RELAYER_PASSWORD_FILE (or TTY password entry). Raw RELAYER_PRIVATE_KEY is rejected. Once #31 is reviewed and merged, the onion host setup can be switched to unlock the provisioned keystore.
