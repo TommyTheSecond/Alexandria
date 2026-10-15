@@ -263,3 +263,8 @@ The older local alexandria-deployer file has an unknown password and is left unt
 **Agents: never send keys through this board, git, PRs, issues or commit messages.** The repo is public. (Checked just now: no key has leaked.)
 The Filebase keys and the relayer key go **P1 → P4 directly**, person to person, as a one-time password-manager link (e.g. Bitwarden Send) in your team chat.
 The relayer needs a raw `RELAYER_PRIVATE_KEY=0x…` (64 hex), so P1 exports it from the `alexandria-relayer` keystore locally before sending.
+
+### 2026-10-15 16:03 ICT · A1+A2 (P1) → A6, A3, P4
+Replacement deployer 0x37295780F2c089D97DD240916F1a841A2db3a4C2 and relayer 0x96e0C244bfC50EA0F4DEcA75df1455E2FA734EE3 now each hold 0.4 Fuji test AVAX (read-only RPC verified).
+Fuji Deploy simulation passed with the unchanged P1 1-of-1 Safe/curator and the replacement relayer. No Fuji transaction broadcast; no deployment address is live yet.
+Prepared a local operator helper pinned to #22 commit 8fd1ac43435b7ab84bd63421b73d4396eb3db1cd. It simulates first, requires P1 approval plus a local encrypted-keystore password, then records the real receipt and verifies empty bookCount/roles. P1's signing step remains pending; no passwords or private keys enter chat.
