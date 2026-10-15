@@ -18,6 +18,10 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
+# Node 20 (README 10). Homebrew installs it keg-only, so login shells may not have it on PATH.
+for d in /opt/homebrew/opt/node@20/bin /usr/local/opt/node@20/bin; do [ -d "$d" ] && PATH="$d:$PATH"; done
+export PATH
+
 need() { command -v "$1" >/dev/null || { echo "missing: $1 (README 9.1 B6)"; exit 1; }; }
 need ipfs; need caddy; need tor
 
@@ -39,7 +43,21 @@ envval() { grep -E "^$1=" relayer/.env 2>/dev/null | head -1 | cut -d= -f2-; }
 KS="$(envval RELAYER_KEYSTORE)"; PW="$(envval RELAYER_PASSWORD_FILE)"
 RELAYER_READY=0
 if [ -f relayer/package.json ] && [ -f deployments/fuji.json ] && [ -n "$KS" ] && [ -f "$KS" ] && [ -n "$PW" ] && [ -s "$PW" ]; then
-  RELAYER_READY=1
+  if ! command -v pnpm >/dev/null; then
+    echo "relayer  not started: pnpm not found (Node 20 + corepack, README 9.1 B6)"
+  else
+    pnpm --filter @alexandria/relayer start >"$RUN/relayer.log" 2>&1 & RELAYER_PID=$!; pids+=($RELAYER_PID)
+    # Unlocking the keystore takes a few seconds; uploads open only once the relayer listens.
+    for _ in $(seq 1 45); do
+      (echo >/dev/tcp/127.0.0.1/8787) 2>/dev/null && { RELAYER_READY=1; break; }
+      kill -0 "$RELAYER_PID" 2>/dev/null || break
+      sleep 1
+    done
+    if [ "$RELAYER_READY" = 1 ]; then echo "relayer  running on 127.0.0.1:8787 (log: infra/onion/run/relayer.log)"
+    else echo "relayer  FAILED to start, see infra/onion/run/relayer.log; uploads stay off"; fi
+  fi
+else
+  echo "relayer  not started: run infra/onion/setup-relayer.sh and add the keystore + password it asks for"
 fi
 
 # Scanner (A3) on 127.0.0.1:8000 with no access log, from the repo root (it reads schemas/).
@@ -57,20 +75,13 @@ if [ -n "$SCANNER_CMD" ] && [ -z "${SCANNER_CMD_OVERRIDE:-}" ] && ! "$PY" -c "im
   echo "         Fix: infra/onion/setup-scanner.sh, then restart this script."
 elif [ -n "$SCANNER_CMD" ] && [ "$RELAYER_READY" = 1 ]; then
   $SCANNER_CMD >"$RUN/scanner.log" 2>&1 & pids+=($!)
-  echo "scanner  starting (log: infra/onion/run/scanner.log)"
+  echo "scanner  starting, uploads ON (log: infra/onion/run/scanner.log)"
 elif [ -n "$SCANNER_CMD" ]; then
   # No relayer: an empty RELAY_SECRET keeps /api/submit off (503), so nothing is pinned without reaching the chain.
   RELAY_SECRET= $SCANNER_CMD >"$RUN/scanner.log" 2>&1 & pids+=($!)
   echo "scanner  starting, uploads OFF until the relayer runs (scan only)"
 else
   echo "scanner  not built yet: /api/* returns 502 until it is"
-fi
-
-if [ "$RELAYER_READY" = 1 ]; then
-  pnpm --filter @alexandria/relayer start >"$RUN/relayer.log" 2>&1 & pids+=($!)
-  echo "relayer  starting (log: infra/onion/run/relayer.log)"
-else
-  echo "relayer  not started: run infra/onion/setup-relayer.sh and add the keystore + password it asks for"
 fi
 
 # Caddy on 127.0.0.1:8088: the reader build, or the test page until it exists.
