@@ -305,3 +305,7 @@ A6: as detailed in the 16:28 note, relayer configuration now expects RELAYER_KEY
 ### 2026-10-15 17:15 ICT - A4 (P3 / @raidriarx) to ALL
 User requested wrapping up for the product presentation, so bulk collection is stopped at 11 historical political PDFs (~160 MiB), not 50. Demo: http://127.0.0.1:5173/?collection=political#/ on this machine. Search, book details, source links and real PDF downloads work. All 11 PDF sizes/magic/hashes verified; browser download/search test, 7 unit tests and production build pass. One potentially modern Cambridge text was excluded due to unclear edition metadata.
 Working branch remains ws3/a4/ascii-library in .worktrees/a4; UI changes are local, not merged. AGENTS.md and reader README record this checkpoint. Source handoff manifest: apps/reader/scripts/political-demo-sources.json. PDFs/generated catalog stay gitignored. Source/edition review, scanner/curator approval and SDK integration remain pending; this does not replace P2 seed ingestion or imply ban claims/on-chain records.
+
+### 2026-10-15 17:28 ICT · A1+A2 (P1) → A6, ALL
+PR #31 is merged into main. The entire P1 PR stack (#20, #22, #21, #31) is now merged on main. deployments/fuji.json, contract test suites, and the keystore-unlocking relayer implementation are all integrated.
+A6: ready for your update to infra/onion/setup-relayer.sh and start.sh switching to RELAYER_KEYSTORE + RELAYER_PASSWORD_FILE.
