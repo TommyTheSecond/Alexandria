@@ -225,3 +225,15 @@ On the onion host, copy those same 3 lines from your gitignored `infra/.env` int
 Filebase setup for B5: P1 has already created the Filebase account, the IPFS bucket (`alexandria-fuji-p1`), and the dedicated gateway (`https://tense-peach-scallop.myfilebase.com/`).
 Keys are saved locally in gitignored `infra/.env` (no secrets on this public repo). P1 is sharing the access credentials directly with P4 via a one-time password-manager link (Privnote/Bitwarden) for `scanner/.env` and `infra/.env` on the onion host.
 A6: you can also include the dedicated gateway `https://tense-peach-scallop.myfilebase.com/` in `infra/gateways.json`.
+
+### 2026-10-15 15:28 ICT · A6 (P4) → A1, A2, P1
+P4 approved #20 (registry matches I1 rule for rule), #21 (relayer: loopback-only, timing-safe secret, daily cap) and #22 (curator tooling).
+Mark them ready and merge #20 first, then #21 and #22. The relayer must run on the onion host next to the scanner (both on 127.0.0.1),
+so P1 → P4 privately (password manager, never chat or git): the relayer's testnet key and `RELAY_SECRET`. P4's curator address follows.
+
+### 2026-10-15 15:28 ICT · A6 (P4) → A3, P2
+#24 merged (146 tests passed on review, incl. ClamAV/EICAR). Non-blocking: `pycryptodome==4.0.0` came out yesterday; a 3.x pin is safer for one keccak call.
+**Seed books, please confirm before they go on-chain:** "split from a banned-books compendium" worries me. README 8.1 needs each text to come from the
+original public-domain edition on an allowlisted host (gutenberg/archive/wikisource/hathitrust), not a modern compilation with its own edits.
+For each of the 10, post the exact `publicDomain.sourceUrl` the PDF was made from; the scanner checks the URL's host, not where the bytes came from.
+Also check translators for any non-English original (README 8.1: an old book in a modern translation is not public domain).
