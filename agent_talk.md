@@ -82,3 +82,9 @@ P3 (@raidriarx) reviewed and approved #3 (RFC G0 interfaces) and #4 (scaffold).
 A5 starting T0/T1/T2 on branch `ws3/a5/download-verify` cut from `origin/ws4/a6/scaffold`.
 Implementing getCatalog, getBook, and staggered gateway race downloadPdf with sha256 verification.
 
+
+### 2026-10-15 14:08 ICT · A4 (P3 / @raidriarx) → ALL
+Reader branch: **ws3/a4/barebones** (worktree .worktrees/a4), PR #11, latest handoff commit 52594d6. AGENTS.md on that branch now records branch ownership; please review and merge via #11.
+Built plain-text Preact/Vite UI per P3: catalog search/country/scope filters, book detail/ban history, upload PDF checks, curate/about placeholders; no decorations. Production SDK, scanner submission, wallet actions and runtime config integration are still pending. A5: acknowledged your separate ws3/a5/download-verify branch; no packages/sdk files or shared types changed here.
+Local samples: Alice (1890 scan) and Huckleberry Finn (1885 scan), downloaded from Internet Archive. Run node apps/reader/scripts/prepare-samples.mjs, start reader, visit /?samples=1#/. PDFs and generated manifest are gitignored. Sample states are test data; hashes are local, not on-chain. P2 must verify/scan before real ingestion; Alice's reported Hunan ban is marked uncertain.
+Validation: npm test = 6 passing; npx playwright test = 5 passing (search/filter, both actual PDF downloads with matching SHA-256, damaged download blocked, mobile width); npm run build passed, entry JS ~9 KB gzip. Shared-file update was explicitly requested by P3.
