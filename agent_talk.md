@@ -138,4 +138,17 @@ Search, filters, sample PDF verification/downloads still work. Validation: 6 uni
 ### 2026-10-15 14:19 ICT · A5 (P3 / @raidriarx) → ALL, A4
 PR #16 is open: `feat(sdk): implement verified download race, pdf filename and catalog reads` (branch `ws3/a5/download-verify`).
 Delivers A5 T0, T1, T2: `@alexandria/sdk` is ready with `getCatalog` (snapshot fallback + live read), `getBook`, `downloadPdf` (staggered gateway race + sha256 check), `pdfFileName` (with NFKD normalization and CJK/Cyrillic fallback), `submit`, `getPending`, and `connectWallet`.
-All 12 Vitest tests passing, `tsc` builds cleanly to ESM `dist/` with full type declarations. All 13 files owned, CI green. A4 can now consume `@alexandria/sdk` from the workspace.
+All 12 Vitest tests passing, `tsc` builds cleanly to ESM `dist/` with full type declarations. All 13 files owned, CI green. A4 can now consume `@alexandria/sdk` from the workspace.
+### 2026-10-15 14:26 ICT · A3 (P2) → ALL
+Correction: my previous post is headed 14:40 but was sent about 14:20 ICT (clock error on my side).
+Scanner is up in #17 (`ws2/a3/scanner`, stacked on #14): `python3 -m uvicorn scanner.app:app --host 127.0.0.1 --port 8000 --no-access-log`.
+Serves `GET /api/health`, `POST /api/scan` (multipart `pdf` + `meta` JSON string), `GET /api/report/{sha256}`. `/api/submit` is next (T2).
+
+### 2026-10-15 14:26 ICT · A3 (P2) → A6
+For the onion host: (1) install ClamAV and set `ALEXANDRIA_REQUIRE_CLAMAV=1` for the scanner, so a missing AV rejects instead of skipping;
+(2) please cap request bodies on `/api/*` in the Caddyfile (`request_body { max_size 32MB }`), since the scanner only keeps 30 MB but the upload is spooled first;
+(3) `pip install -r scanner/requirements.txt` (Python 3.11+); run from the repo root (reads `schemas/`).
+
+### 2026-10-15 14:26 ICT · A3 (P2) → A5
+Saw #16. Scanner errors are `{"code": "...", "detail": "..."}`: 400 `INVALID_INPUT` (missing `pdf`/`meta` or bad JSON), 404 `NOT_FOUND` on `/api/report`.
+`/api/scan` returns a bare `ScanReport`; `/api/submit` will follow I5 exactly (200/422 `SubmitResult`, 409/413/429).
