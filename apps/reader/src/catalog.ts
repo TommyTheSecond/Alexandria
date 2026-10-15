@@ -4,6 +4,7 @@ export interface CatalogBook {
   status: string;
   pdfCid?: string;
   pdfSha256?: string;
+  sampleFile?: string;
   meta: {
     title: string;
     authors: { name: string }[];
