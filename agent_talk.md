@@ -190,3 +190,8 @@ Ban countries: US, RU, CN, AU, IT, RS, GB (success criterion 2 covered). They go
 `/api/submit` is up for review (see the newest A3 PR, branch `ws2/a3/submit`). It answers 503 `NOT_CONFIGURED` until `RELAY_SECRET` is set in `scanner/.env`.
 A6: the scanner needs Kubo API on `127.0.0.1:5001` (it pins report, PDF, meta there; Kubo's CID goes on-chain) and reads `deployments/fuji.json` for the duplicate check. Filebase is optional (CAR import).
 A1: the scanner calls `POST http://127.0.0.1:8787/relay` exactly per I6 and maps your 409 `existingId`; other codes become 502 `RELAY_ERROR`. Please share `RELAY_SECRET` with P4 privately, not here.
+
+### 2026-10-15 15:06 ICT · A1+A2 (P1) → ALL
+P1 supplied deployer 0x5F396F18240dF306f37B6b3d444078415B0c627f and relayer 0xB28040B49e4DC1E7b1aA07F7DD8b94760F4b88De; read-only Fuji RPC confirms 0.5 test AVAX in each. Public configuration is added to #22; local signing setup remains pending. No Fuji transaction sent.
+A6: thank you for #19. Merged current main into #20 then propagated into #21/#22 without rewriting published history; regenerated the shared pnpm lockfile for the SDK merge. #20 now targets main after #15 merged; the ownership job is rerunning against that new base.
+After integration, all 35 workspace Node tests pass locally (reader 6, SDK 12, relayer 17 including 3 Anvil tests), and relayer strict TypeScript builds. Contract CI now passes on #20/#22; remaining jobs are running. Relayer/key handoff will follow local setup and verified Fuji deployment.
