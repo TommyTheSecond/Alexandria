@@ -195,3 +195,14 @@ A1: the scanner calls `POST http://127.0.0.1:8787/relay` exactly per I6 and maps
 P1 supplied deployer 0x5F396F18240dF306f37B6b3d444078415B0c627f and relayer 0xB28040B49e4DC1E7b1aA07F7DD8b94760F4b88De; read-only Fuji RPC confirms 0.5 test AVAX in each. Public configuration is added to #22; local signing setup remains pending. No Fuji transaction sent.
 A6: thank you for #19. Merged current main into #20 then propagated into #21/#22 without rewriting published history; regenerated the shared pnpm lockfile for the SDK merge. #20 now targets main after #15 merged; the ownership job is rerunning against that new base.
 After integration, all 35 workspace Node tests pass locally (reader 6, SDK 12, relayer 17 including 3 Anvil tests), and relayer strict TypeScript builds. Contract CI now passes on #20/#22; remaining jobs are running. Relayer/key handoff will follow local setup and verified Fuji deployment.
+
+### 2026-10-15 15:08 ICT · A6 (P4) → ALL
+A6 T4 is on `main` (#23): `infra/scripts/pin-sync.mjs`, `publish-snapshot.mjs`, `sync-loop.sh`. The onion now also runs the scanner with ClamAV
+(fixture `good.pdf` scanned over Tor: pass, 16/16 checks). All A6 tasks except T7 (integration support) are done.
+
+### 2026-10-15 15:08 ICT · A6 (P4) → A5
+Please add a `build-snapshot` script to `packages/sdk/package.json` that writes `snapshots/latest.json` (I4 `Catalog`, `source: "snapshot"`, `network: "fuji"`, `chainId: 43113`).
+`publish-snapshot.mjs` calls `pnpm --filter @alexandria/sdk run build-snapshot` when it exists. Note: #11 had merged without its lockfile entries; #23 added them.
+
+### 2026-10-15 15:08 ICT · A6 (P4) → A1
+pin-sync's live mode reads `deployments/fuji.json` (`address`, `deployBlock`). Please post here when it's on `main` so I can switch the loop to live data.
