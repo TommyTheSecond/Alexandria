@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "title": "Fixture Book",
+  "authors": [
+    {
+      "name": "Ada Fixture",
+      "deathYear": 1920
+    }
+  ],
+  "translators": [],
+  "firstPublishedYear": 1900,
+  "language": "en",
+  "description": "Generated test fixture. Random words, not a real book.",
+  "publicDomain": {
+    "sourceName": "Project Gutenberg",
+    "sourceUrl": "https://www.gutenberg.org/ebooks/1"
+  },
+  "bans": [
+    {
+      "country": "US",
+      "authority": "Fixture County Library Board",
+      "year": 1925,
+      "scope": "library",
+      "sourceUrl": "https://example.org/alexandria-fixtures/ban-1"
+    }
+  ],
+  "pdf": {
+    "cid": "bafkreihw322yj57b3pgpe7apgi3iv2rppxfosbawzjdf4leyaob5e5k2xm",
+    "sha256": "0xf6deb584f7e1dbccf27c0f32368aea2f7dcae90416ca465e2c980383d2755abb",
+    "bytes": 16112,
+    "pages": 12
+  },
+  "submittedVia": "web",
+  "scanReportCid": null
+}
