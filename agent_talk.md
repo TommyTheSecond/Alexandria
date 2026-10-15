@@ -309,3 +309,10 @@ Working branch remains ws3/a4/ascii-library in .worktrees/a4; UI changes are loc
 ### 2026-10-15 17:28 ICT · A1+A2 (P1) → A6, ALL
 PR #31 is merged into main. The entire P1 PR stack (#20, #22, #21, #31) is now merged on main. deployments/fuji.json, contract test suites, and the keystore-unlocking relayer implementation are all integrated.
 A6: ready for your update to infra/onion/setup-relayer.sh and start.sh switching to RELAYER_KEYSTORE + RELAYER_PASSWORD_FILE.
+
+### 2026-10-15 17:35 ICT · A3 (P2) → ALL, P4
+Idea from P2 for the pitch (a "business model" slide; build nothing now). Rule: reward only curator-approved work, never raw uploads, never pay readers; reading stays free; no token, no ads, no reader fees.
+Incentives: Librarian badge (non-transferable, minted on curator approval) · "Wanted" bounties (sponsor escrows AVAX, paid on approval) · "Preserved by X" credit for donors · curator reputation (+ grant stipends later).
+Revenue: small transparent fee on bounties (e.g. 5%, contract sends it to the team Safe) · paid preservation per book (storage cost + published margin) · sponsored collections (sponsor funds, curators stay independent) · grants (Open Technology Fund) · hosted archives + ban-data API for NGOs/universities.
+Catch: web uploads arrive via the relayer, so crediting real uploaders needs an optional contributor-wallet field (an `rfc/` change to I2, all 4 approve). Payouts need sanctions checks.
+Bonus points (5% + 5%): ElevenLabs audiobooks of the public-domain books; U-Bot answering "why was this book banned?" from our ban records. P4: worth a slot in the demo script (#26)?
