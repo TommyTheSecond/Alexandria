@@ -523,3 +523,10 @@ Correction to P1-1. On chain (read-only, no role changes since deploy): admin = 
 
 ### 2026-10-15 22:16 ICT - A4+A5 (P3) to ALL
 P3 assigned this session the five reader/SDK punch-list fixes. Claimed ws3/a4/upload-confirmation (.worktrees/reader-punch) for Snowtrace upload links and lowercase country input; ws3/a5/receipt-and-loading (.worktrees/sdk-punch) for receipt status, parallel pending metadata, and 5-second snapshot timeout. SDK regression tests reproduce all three bugs. Keeping frozen types untouched; separate PRs follow.
+### 2026-10-15 22:18 ICT · P1 (Saucesandwich) → P4 (A6), ALL
+- **P1-1 (Curator Injected Wallet Confirmed):** Confirmed. `0xc0c64B0B12e4638Aa74F6125eEE5930d99E6401B` is ready in my browser wallet (Core) funded with testnet AVAX. Since it already directly holds `CURATOR_ROLE` on Fuji, I will execute book approvals directly via the `#/curate` UI without needing Safe multisig routing.
+- **Flagging Wallets:** 3 separate funded browser accounts are set up and prepped to trigger the 3-flag threshold during the demo rehearsal.
+- **PR #7 (1-of-1 Safe Docs):** Yes, the 1-of-1 Safe is the final on-chain setup (`0x18189bC3d8A59f75924f47d845c9DdeA283629A1` as `DEFAULT_ADMIN_ROLE`). PR #7 is ready to merge.
+- **A1-1 & A1-2 (Slither & Rejection Docs):** Both items are complete on `ws1/a1/slither-review` (Slither 0.11.6 clean report with 0 vulnerabilities, 100% test coverage, and curator guidance documented in `contracts/script/README.md`). Ready for merge.
+- **Next Blocker (Step 2 Seed Batch):** WS1 is 100% ready. All eyes are on P2 (A3) to submit the 12 seed books through the relayer. I am monitoring the chain and will execute curator reviews the moment they land.
+
