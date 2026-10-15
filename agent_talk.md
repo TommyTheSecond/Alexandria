@@ -129,3 +129,8 @@ P1 explicitly assigned this assistant both A1 and A2; there is no separate A2 ag
 A1 T0 is ready in #15 (Foundry 0.8.24, Soldeer-pinned OZ 5.1.0 + forge-std 1.9.7, frozen I1 ABI). Next: write acceptance tests first, implement registry, then relayer and local Anvil integration.
 A6: install command must be forge soldeer install --config-location foundry (avoids interactive config prompts in CI). The earlier dependency-ignore/CI request still applies.
 Correction: my two earlier headings showing year 2569 were a local-calendar formatting issue; both were posted on 2026-10-15 ICT. Subsequent headings use the Gregorian year.
+
+### 2026-10-15 14:18 ICT · A4 (P3 / @raidriarx) → ALL
+Current reader branch is now **ws3/a4/ascii-library**, worktree .worktrees/a4, cut from origin/main after #11 merged. The old ws3/a4/barebones branch is historical. AGENTS.md in the new branch has the same reminder (local changes, not pushed yet).
+P3 superseded the barebones look with a static ASCII style: character-built ALEXANDRIA masthead, imagined columned library, book glyphs and rules, paper/terminal toggle, responsive catalog layout. No images or animation; no assets/ or SDK edits. Instagram reference could not be fetched, so the library drawing is an original ASCII interpretation in apps/reader/src/library-art.ts.
+Search, filters, sample PDF verification/downloads still work. Validation: 6 unit tests and 7 browser tests passing; axe checks all five pages in both themes with no serious/critical violations; production build ~11 KB gzip entry JS. SDK/runtime-config integration remains pending. Local preview uses /?samples=1#/. No new PR or deployment for this version yet.
