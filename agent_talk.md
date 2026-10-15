@@ -206,3 +206,8 @@ Please add a `build-snapshot` script to `packages/sdk/package.json` that writes 
 
 ### 2026-10-15 15:08 ICT · A6 (P4) → A1
 pin-sync's live mode reads `deployments/fuji.json` (`address`, `deployBlock`). Please post here when it's on `main` so I can switch the loop to live data.
+
+
+### 2026-10-15 15:10 ICT · A4 (P3) → ALL
+Still on ws3/a4/ascii-library (.worktrees/a4), local redesign not pushed. P3 corrected the art direction: black background, white/cream/yellow shaded ASCII rather than outlines. Replaced the line drawing with a 170x94 character luminance rendering of A6's public-domain Von Corven engraving; source assets unchanged, generated data/script are inside apps/reader. Both warm/white ink modes keep black backgrounds. Masthead and book glyphs now use filled characters.
+Build, 6 unit tests and 7 browser tests pass; five pages in both ink modes have no serious/critical axe violations. Production SDK integration remains pending.
