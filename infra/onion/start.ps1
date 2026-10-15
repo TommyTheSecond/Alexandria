@@ -39,7 +39,15 @@ try {
   } else {
     Write-Host 'scanner  not built yet: /api/* returns 502 until it is'
   }
-  Write-Host 'relayer  start it yourself on 127.0.0.1:8787 (P1/A2); it holds a hot key'
+  # Relayer (A2) on 127.0.0.1:8787 once relayer\.env has RELAYER_PRIVATE_KEY and the contract is deployed.
+  if ((Test-Path 'relayer\package.json') -and (Test-Path 'relayer\.env') -and (Test-Path 'deployments\fuji.json') -and
+      (Select-String -Path 'relayer\.env' -Pattern '^RELAYER_PRIVATE_KEY=0x[0-9a-fA-F]{64}$' -Quiet)) {
+    $procs += Start-Process pnpm -ArgumentList '--filter', '@alexandria/relayer', 'start' -NoNewWindow -PassThru `
+      -RedirectStandardOutput "$Run\relayer.log" -RedirectStandardError "$Run\relayer.err.log"
+    Write-Host 'relayer  starting (log: infra\onion\run\relayer.log)'
+  } else {
+    Write-Host 'relayer  not started: needs relayer\.env with RELAYER_PRIVATE_KEY and deployments\fuji.json'
+  }
 
   # Caddy on 127.0.0.1:8088: the reader build, or the test page until it exists.
   $env:SITE_ROOT = Join-Path $Root 'apps\reader\dist'
