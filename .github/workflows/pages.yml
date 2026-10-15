@@ -1,0 +1,69 @@
+name: pages
+
+# Builds apps/reader and deploys it to GitHub Pages on every push to main (A6 T5).
+# Skips with success until A4 adds apps/reader/package.json.
+# Set the repo variable API_BASE (Settings > Variables) to the tunnel URL + /api after each tunnel restart.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      reader: ${{ steps.has.outputs.reader }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: has
+        run: |
+          if [ -f apps/reader/package.json ]; then echo "reader=true" >> "$GITHUB_OUTPUT"
+          else echo "No apps/reader yet, skipping deploy"; fi
+      - uses: pnpm/action-setup@v4
+        if: steps.has.outputs.reader == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.has.outputs.reader == 'true'
+        with:
+          node-version: 20
+      - name: Build the reader
+        if: steps.has.outputs.reader == 'true'
+        run: |
+          pnpm install --no-frozen-lockfile
+          pnpm --filter @alexandria/reader build
+      - name: Runtime config.json
+        if: steps.has.outputs.reader == 'true'
+        env:
+          API_BASE: ${{ vars.API_BASE }}
+        run: |
+          node --input-type=module -e "
+            import { readFileSync, writeFileSync } from 'node:fs';
+            import { runtimeConfig } from './infra/scripts/deploy-ipfs.mjs';
+            const c = runtimeConfig(JSON.parse(readFileSync('infra/config/config.json', 'utf8')), process.env);
+            writeFileSync('apps/reader/dist/config.json', JSON.stringify(c, null, 2) + '\n');
+          "
+      - uses: actions/configure-pages@v5
+        if: steps.has.outputs.reader == 'true'
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.has.outputs.reader == 'true'
+        with:
+          path: apps/reader/dist
+
+  deploy:
+    needs: build
+    if: needs.build.outputs.reader == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
