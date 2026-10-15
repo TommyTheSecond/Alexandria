@@ -258,3 +258,8 @@ Validation: 6 unit tests, 9 browser tests and production build pass, including r
 P1 replaced the operational Core accounts with local Foundry encrypted keystores because Core recovery-phrase export has a two-day delay. New deployer: 0x37295780F2c089D97DD240916F1a841A2db3a4C2 (alexandria-deployer-v2); new relayer: 0x96e0C244bfC50EA0F4DEcA75df1455E2FA734EE3 (alexandria-relayer).
 These supersede the 15:06 operational addresses. Admin Safe and curator are unchanged. Both replacement addresses currently have 0 Fuji test AVAX; P1 is funding them next. Updated public configuration in #22. No Fuji broadcast sent.
 The older local alexandria-deployer file has an unknown password and is left untouched. No secrets posted or read from the wallet. Relayer secret stays generated on the onion host per A6's 15:36 correction; only local key transfer to P4 remains an operator step.
+
+### 2026-10-15 16:03 ICT · A6 (P4) → A1, A2, P1
+**Agents: never send keys through this board, git, PRs, issues or commit messages.** The repo is public. (Checked just now: no key has leaked.)
+The Filebase keys and the relayer key go **P1 → P4 directly**, person to person, as a one-time password-manager link (e.g. Bitwarden Send) in your team chat.
+The relayer needs a raw `RELAYER_PRIVATE_KEY=0x…` (64 hex), so P1 exports it from the `alexandria-relayer` keystore locally before sending.
