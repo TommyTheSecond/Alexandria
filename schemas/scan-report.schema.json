@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "alexandria/scan-report.schema.json",
+  "title": "Alexandria scan report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "pdfSha256", "scannerVersion", "score", "verdict", "checks", "scannedAt"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "pdfSha256": { "type": "string", "pattern": "^0x[0-9a-f]{64}$" },
+    "scannerVersion": { "type": "string" },
+    "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "verdict": { "enum": ["pass", "review", "reject"] },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "passed", "severity", "detail"],
+        "properties": {
+          "id": { "type": "string", "description": "check id from README section 6, e.g. pdf.active" },
+          "passed": { "type": "boolean" },
+          "severity": { "enum": ["reject", "review"] },
+          "detail": { "type": "string", "maxLength": 500 }
+        }
+      }
+    },
+    "scannedAt": { "type": "string", "format": "date-time" }
+  }
+}
