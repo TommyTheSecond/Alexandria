@@ -41,14 +41,14 @@ test('production reader falls back to a snapshot and saves only a verified PDF',
 
 test('upload form sends complete metadata through the SDK scanner request', async ({ page }) => {
   const pdf = await readFile('../../fixtures/pdfs/good.pdf');
-  let sent: { title?: boolean; author?: boolean; pdf?: boolean } = {};
+  let sent: { title?: boolean; author?: boolean; pdf?: boolean; country?: boolean } = {};
   await page.route('**/config.json', route => route.fulfill({ json: { apiBase: 'https://scanner.example/api' } }));
   await page.route('https://scanner.example/api/submit', async route => {
     const request = route.request();
     const body = request.postData() ?? '';
-    sent = { title: body.includes('Fixture Book'), author: body.includes('Ada Fixture'),
+    sent = { title: body.includes('Fixture Book'), author: body.includes('Ada Fixture'), country: body.includes('"country":"US"'),
       pdf: body.includes('filename="good.pdf"') && (request.postDataBuffer()?.length ?? 0) > pdf.length };
-    await route.fulfill({ json: { report: { verdict: 'review' }, bookId: 7 }, headers: { 'access-control-allow-origin': '*' } });
+    await route.fulfill({ json: { report: { verdict: 'review' }, bookId: 7, txHash: `0x${'a'.repeat(64)}` }, headers: { 'access-control-allow-origin': '*' } });
   });
   await page.goto('/#/upload');
   await page.getByLabel('PDF (up to 30 MB)').setInputFiles({ name: 'good.pdf', mimeType: 'application/pdf', buffer: pdf });
@@ -58,13 +58,16 @@ test('upload form sends complete metadata through the SDK scanner request', asyn
   await page.getByLabel('First publication year').fill('1900');
   await page.getByLabel('Public-domain source name').fill('Project Gutenberg');
   await page.getByLabel('Public-domain source URL').fill('https://www.gutenberg.org/ebooks/1');
-  await page.getByLabel('Ban country (two-letter code)').fill('US');
+  await page.getByLabel('Ban country (two-letter code)').fill('us');
   await page.getByLabel('Ban authority').fill('Fixture County Library Board');
   await page.getByLabel('Ban year').fill('1925');
   await page.getByLabel('Ban source URL').fill('https://example.org/ban');
   await page.getByRole('button', { name: 'Submit for review' }).click();
   await expect(page.getByRole('status').last()).toContainText('Submitted as book #7');
-  expect(sent).toEqual({ title: true, author: true, pdf: true });
+  await expect(page.getByRole('link', {name:'View submission on Snowtrace'})).toHaveAttribute('href', `https://testnet.snowtrace.io/tx/0x${'a'.repeat(64)}`);
+  expect(sent).toEqual({ title: true, author: true, pdf: true, country: true });
+  await page.getByRole('link', {name:/About/}).click();
+  await expect(page.getByRole('link', {name:'View submission on Snowtrace'})).toHaveCount(0);
 });
 
 test('scanner rejection shows failed checks and does not claim submission', async ({ page }) => {
@@ -83,7 +86,7 @@ test('scanner rejection shows failed checks and does not claim submission', asyn
   await page.getByLabel('First publication year').fill('1900');
   await page.getByLabel('Public-domain source name').fill('Project Gutenberg');
   await page.getByLabel('Public-domain source URL').fill('https://www.gutenberg.org/ebooks/1');
-  await page.getByLabel('Ban country (two-letter code)').fill('US');
+  await page.getByLabel('Ban country (two-letter code)').fill('us');
   await page.getByLabel('Ban authority').fill('Fixture Board');
   await page.getByLabel('Ban year').fill('1925');
   await page.getByLabel('Ban source URL').fill('https://example.org/ban');
