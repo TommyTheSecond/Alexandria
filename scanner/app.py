@@ -110,7 +110,7 @@ def create_app(data_dir: Optional[Path] = None, *, lookup_id: LookupId = None, s
     if submit_service is _UNSET:
         submit_service, env_lookup = service_from_env(data_dir)
         lookup_id = lookup_id or env_lookup
-    limiter = limiter or RateLimiter()
+    limiter = limiter or RateLimiter(per_client_hour=int(settings.get("UPLOADS_PER_HOUR", "5")))
     app = FastAPI(title="Alexandria scanner", version=__version__, docs_url=None, redoc_url=None, openapi_url=None)
     app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False,
                        allow_methods=["GET", "POST"], allow_headers=["*"])
@@ -131,14 +131,18 @@ def create_app(data_dir: Optional[Path] = None, *, lookup_id: LookupId = None, s
     async def submit(request: Request):
         if submit_service is None:
             return _error(503, "NOT_CONFIGURED", "uploads are not enabled on this server yet")
-        retry = limiter.check(client_ip(request))
+        client = client_ip(request)
+        retry = limiter.check(client)
         if retry is not None:
             return _error(429, "RATE_LIMIT", "too many uploads; try later", retryAfterSec=retry)
         error, parsed = await _parse_upload(request)
         if error:
+            limiter.refund(client)
             return error
         data, meta, sha, total, via = parsed
         result = await run_in_threadpool(submit_service.submit, data, meta, via=via, sha256=sha, total_size=total)
+        if 400 <= result.status < 500:  # bad input, duplicate, too large or rejected scan: the slot goes back
+            limiter.refund(client)
         return JSONResponse(result.body, status_code=result.status)
 
     @app.get("/api/report/{sha256}")

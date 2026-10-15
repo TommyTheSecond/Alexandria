@@ -3,6 +3,8 @@
 Clients are keyed by sha256(daily salt + IP); the raw IP is never stored, and the
 salt (and every key) is thrown away at 00:00 UTC. Tor users all arrive from the
 local onion proxy, so they have no client key and only the daily total applies.
+The hourly limit can be raised with UPLOADS_PER_HOUR (see app.create_app). A request
+that ends up storing nothing gets its slot back through refund().
 """
 
 from __future__ import annotations
@@ -27,12 +29,14 @@ class RateLimiter:
         self._day = -1
         self._salt = b""
         self._today = 0
+        self._anonymous = 0
         self._hits: dict[str, deque] = {}
 
     def _rotate(self, now: float) -> None:
         day = int(now // DAY)
         if day != self._day:
             self._day, self._salt, self._today, self._hits = day, secrets.token_bytes(16), 0, {}
+            self._anonymous = 0
 
     def client_key(self, client: Optional[str]) -> Optional[str]:
         if not client:
@@ -54,5 +58,19 @@ class RateLimiter:
             if len(hits) >= self.per_client_hour:
                 return max(1, math.ceil(hits[0] + HOUR - now))
             hits.append(now)
+        else:
+            self._anonymous += 1
         self._today += 1
         return None
+
+    def refund(self, client: Optional[str]) -> None:
+        """Give back the slot check() took. Slots taken before 00:00 UTC are already gone."""
+        self._rotate(self._clock())
+        key = self.client_key(client)
+        if key is None:
+            if self._anonymous:
+                self._anonymous -= 1
+                self._today -= 1
+        elif self._hits.get(key):
+            self._hits[key].pop()
+            self._today -= 1
