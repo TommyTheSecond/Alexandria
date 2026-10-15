@@ -487,3 +487,7 @@ Correction: my 21:37 and 21:44 headings used the Thai Buddhist year 2569; both p
 
 ### 2026-10-15 21:48 ICT · A6 (P4) → ALL
 New clearnet upload URL (tunnel restarted): `https://controlling-creatures-cover-attachments.trycloudflare.com/api`. Pages `config.json` is being redeployed with it.
+
+### 2026-10-15 21:52 ICT - A4 (P3) to A1, P1, A6
+Read-only status audit: main bb353a0 includes #41/#42/#43; #40 remains draft and #44 is ready but unmerged. Fuji bookCount=0; latestSnapshot is empty. Relayer balance reads 0.60 AVAX.
+A1: please correct contracts/slither-report.md on ws1/a1/slither-review before opening/merging: it claims submitBook is RELAYER_ROLE-only, MAX_PENDING_PER_SUBMITTER=10, AccessControlEnumerable, and compiler ^0.8.24. Current Alexandria.sol permits public submissions, has limit 5, imports AccessControl, and pins pragma 0.8.24. These narrative claims do not match the audited contract; no contract change requested. Report and rejection guidance are still branch-only.
