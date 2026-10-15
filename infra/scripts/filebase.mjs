@@ -70,3 +70,30 @@ export async function uploadCar(cfg, key, car) {
   const res = await s3(cfg, 'PUT', `/${key}`, { headers: { 'x-amz-meta-import': 'car' }, body: car });
   return res.headers.get('x-amz-meta-cid');
 }
+
+async function listKeys(cfg) {
+  const keys = [];
+  let next = null;
+  do {
+    const query = { 'list-type': '2', ...(next ? { 'continuation-token': next } : {}) };
+    const xml = await (await s3(cfg, 'GET', '', { query })).text();
+    keys.push(...tag(xml, 'Key'));
+    next = parseListObjects(xml).next;
+  } while (next);
+  return keys;
+}
+
+/** Deletes every object whose Filebase CID is in `cids` (unpins it there). Returns the deleted keys. */
+export async function removeCids(cfg, cids) {
+  const unwanted = new Set(cids);
+  const deleted = [];
+  for (const key of await listKeys(cfg)) {
+    const path = `/${key.split('/').map(encodeURIComponent).join('/')}`;
+    const cid = (await s3(cfg, 'HEAD', path)).headers.get('x-amz-meta-cid');
+    if (unwanted.has(cid)) {
+      await s3(cfg, 'DELETE', path);
+      deleted.push(key);
+    }
+  }
+  return deleted;
+}

@@ -23,6 +23,7 @@ This README is the single source of truth for the 24-hour hackathon. All 4 peopl
 13. [Security and privacy rules](#13-security-and-privacy-rules)
 14. [Risks](#14-risks)
 15. [Sources](#15-sources)
+16. [Demo script](#16-demo-script-draft-p4)
 
 ---
 
@@ -487,3 +488,29 @@ Each criterion names its metric and unit, and is checked at gate G3.
 - Project Gutenberg: [Offline catalogs](https://www.gutenberg.org/ebooks/offline_catalogs), [Linking policy](https://www.gutenberg.org/policy/linking.html)
 - Censorship: [GreatFire ipfs.io test](https://en.greatfire.org/https/gateway.ipfs.io/ipfs/bafybeifx7yeb55armcsxwwitkymga5xf53dxiarykms3ygqic223w5sk3m), [IPFS blocked by the Great Firewall](https://discuss.ipfs.tech/t/ipfs-and-kubo-have-been-blocked-by-china-gfw/19969), [OONI Explorer](https://explorer.ooni.org/)
 - U-Hackathon: [information sheet](https://docs.google.com/spreadsheets/d/1551A03HTawH4JUsVmK_TxwPAoPz2fhmhy7hkRdC_ao4/htmlview), [opening deck](https://u-hackathon-2026.vercel.app/), [U-Bot](https://u.bot/)
+
+## 16. Demo script (draft, P4)
+
+Live demos are on Fri 16 Oct at 20:00, if we make the top 3 of the Web3 track. Judges score **execution 40%, practicality 40%,
+usability 10%, partners 5%, U-Bot 5%** (see 9.0), so show working features on real infrastructure, not slides. Target: 3 minutes. Rehearse it twice (9.2).
+
+| Time | Show | Say (one line) |
+|---|---|---|
+| 0:00 | Hero art on GitHub Pages | "The Library of Alexandria burned. This one is built so it cannot." |
+| 0:15 | Catalog, search, a book's ban timeline (`US · RU · CN`) | "Banned books, public domain only, each with sourced ban records." **User:** a reader in a censored country, or a student whose school pulled the book. |
+| 0:40 | **Download PDF**: progress, then saved file | "The browser checks every byte against the SHA-256 stored on Avalanche. A gateway that sends a damaged copy is skipped; nothing bad is ever saved." |
+| 1:00 | Same book in **Tor Browser** on the onion | "If the website, the gateways and the RPCs are all blocked, the onion mirror still serves the catalog, the PDFs and the chain." Use `docs/reachability.md`: Tor is ~97% interfered with in CN and RU, so use Snowflake bridges. |
+| 1:25 | Upload a junk PDF, then a real public-domain PDF, no wallet | "Anyone can upload without a wallet. The scanner rejects junk and hidden JavaScript before anything is stored; a clean book goes on chain through our relayer." Show the scan report, then the Pending tx on Snowtrace. |
+| 2:00 | `#/curate`: a curator approves it | "A human curator approves every book. Approved books appear in the catalog and the next snapshot." |
+| 2:20 | A book flagged by 3 wallets | "Flags never hide a book. It says 'under review' and stays downloadable, so nobody can censor it with sock puppets." |
+| 2:40 | Architecture slide (README 3) | "Registry on Avalanche Fuji with a Safe as admin, files on IPFS + Filebase, four access paths." U-Bot: **TBD** (team decision). |
+| 2:55 | Close | "Unaudited, testnet only, and it works today." |
+
+**Before going on stage** (P4 checks, H+22):
+
+- [ ] Onion host awake and on power; `infra/onion/start.sh` shows kubo, scanner, relayer, caddy and the onion address.
+- [ ] `infra/scripts/sync-loop.sh` running; the newest snapshot recorded on chain (`curate.sh snapshot …`).
+- [ ] `node infra/scripts/check-endpoints.mjs` all PASS; tunnel URL set as repo variable `API_BASE` and Pages redeployed.
+- [ ] Tor Browser (with Snowflake) has the onion open; a clean Chrome profile has GitHub Pages open.
+- [ ] Junk PDF and a fresh public-domain PDF ready on the desktop; a curator wallet unlocked on Fuji; 3 flagger wallets funded.
+- [ ] Fallback: a screen recording of the full run, in case the venue Wi-Fi fails.

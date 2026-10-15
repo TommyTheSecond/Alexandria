@@ -1,0 +1,14 @@
+{
+  "abi": "abi/IAlexandria.json",
+  "address": "0xeBF13D70A7C2D4EA9891FA6c6d42f065AAB608C9",
+  "admin": "0x18189bC3d8A59f75924f47d845c9DdeA283629A1",
+  "chainId": 43113,
+  "curators": [
+    "0xc0c64B0B12e4638Aa74F6125eEE5930d99E6401B"
+  ],
+  "deployBlock": 59493935,
+  "deployTx": "0xcaefa2f39a5185e586f2cca6f9f6f389665395d78dfaac8d831103bf8984f95e",
+  "explorer": "https://testnet.snowtrace.io/address/0xeBF13D70A7C2D4EA9891FA6c6d42f065AAB608C9",
+  "network": "fuji",
+  "relayer": "0x96e0C244bfC50EA0F4DEcA75df1455E2FA734EE3"
+}
