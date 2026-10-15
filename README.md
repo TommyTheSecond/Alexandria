@@ -308,9 +308,9 @@ Check the translator for every translated book (Tolstoy, Voltaire, Flaubert, Cao
 
 ### 8.3 U-bot
 
-We assume U-bot means **UBot Studio**, a paid Windows browser-automation tool. P2 runs it by hand. If nobody has a working licence, use the fallback in step 4.
+**Correction (kickoff):** U-Bot is **u.bot** (https://u.bot/), the AI assistant of the u-topia ecosystem and a hackathon sponsor, not UBot Studio. It is not a scraper, so P2 fills the CSV by hand (step 4), and may use U-Bot to help research candidates. **U-Bot integration is 5% of the judging score** (see 9.0); how Alexandria uses it in the product is an open decision for the team.
 
-1. U-bot collects candidate banned books and writes `ingest/candidates.csv` with these columns:
+1. P2 (with U-Bot or by hand) collects candidate banned books and writes `ingest/candidates.csv` with these columns:
    `title,author,first_published_year,ban_country,ban_year,ban_authority,ban_scope,ban_source_url`
 2. **Scraping rules:**
    - Prefer the MediaWiki API for Wikipedia lists.
@@ -324,7 +324,24 @@ We assume U-bot means **UBot Studio**, a paid Windows browser-automation tool. P
 
 ## 9. Timeline
 
-`H+n` means n hours after the hackathon starts. Write the real clock times here at the kickoff: H+0 = `__:__`.
+`H+n` means n hours after the hackathon starts. **H+0 = Thu 15 Oct 2026, 11:30 ICT (UTC+7).**
+
+### 9.0 Hackathon facts (U-Hackathon, Flow Summit, Avani Sukhumvit Bangkok)
+
+Source: the organisers' information sheet and opening deck. All times ICT.
+
+| What | When / rule |
+|---|---|
+| Build | Thu 15 Oct 11:30 (H+0) to **Fri 16 Oct 14:00 (H+26:30)**. Submissions close at 14:00 and can be updated until then. |
+| Hall | Thu closes 18:00 (H+6:30), Fri opens 10:00 (H+22:30). **No staying overnight**, so night work and the onion host run from home. |
+| Mentors | Office hours Thu 13:00–18:00, book at mentor-consultations.vercel.app |
+| Team | 1–4 people. Register on hub.team1.network on 15 Oct; organisers must approve the team before it can submit. |
+| Track | **Web3** (build anything deployable on-chain). |
+| Rules | AI tools allowed. **New builds only**: pre-research and planning were allowed before H+0; all code is written during the build. Teams keep IP; respect third-party licences. |
+| Submit | Public GitHub repo · demo website showing the **real product**, not a landing page · pitch deck link set to "Anyone with the link can view". Judges score exactly the submitted version. |
+| After | Fri 17:00 finalists (top 3 per track) · 20:00 live demos · 22:00 awards (judges + U-Center DAO vote). |
+
+**Judging:** App execution 40% (core features fully working, not mocked; no crashes) · Practicality 40% (clear user, real problem, deployable) · Usability & design 10% · Innovation & ecosystem 5% (meaningful use of a partner: Avalanche, Tokenomist or ElevenLabs) · U-Bot integration 5%.
 
 ### 9.1 BEFORE WORK CAN START (blockers)
 
@@ -332,13 +349,13 @@ Nothing in 9.2 can begin until these are done. **⛔ marks a hard blocker.**
 
 | # | Task | Owner | Blocks |
 |---|---|---|---|
-| ⛔ B1 | Read the hackathon rules. Is pre-written code allowed? Is there an Avalanche track with its own requirements? Must the code be open source? Yes If pre-written code is not allowed, make **no** code or interface files before H+0. No | P4 | everything |
+| ✅ B1 | Read the hackathon rules. **Done** (see 9.0): AI tools allowed; new builds only, so code starts at H+0; Web3 track; repo must be public. | P4 | everything |
 | ⛔ B2 | Each person creates a **new, testnet-only** EVM wallet (Core or MetaMask) and adds Fuji (chainId `43113`, RPC `https://api.avax-test.network/ext/bc/C/rpc`). Also create a deployer wallet (P1) and a relayer wallet (P2). That makes 6 addresses; write them in 9.4. | all | B3, B4 |
 | ⛔ B3 | Get test AVAX for all 6 addresses. Try the Builder Hub faucet first, then the Core faucet, then the QuickNode faucet. **Some faucets require a mainnet balance or a coupon.** If all fail, ask the hackathon organisers or Avalanche developer relations for a coupon. | P1 | deploy, Safe, relayer |
 | ⛔ B4 | Create the 3-of-4 Safe on Fuji at `wallet.ash.center` with the 4 curator wallets as owners. *Fallback:* the deployer holds admin until the Safe exists, then transfers it before the demo. | P1 | admin handover |
 | ⛔ B5 | Create a free Filebase account, an IPFS bucket and an S3 access key. Store the key in a password manager and share it with P4. Never paste it into chat or git. | P2 | scanner pinning |
 | ⛔ B6 | Install the tools for your role (versions in [section 10](#10-global-constraints)):<br>• **All:** Git, Node 20 + pnpm 9, your AI agent.<br>• **P1:** Foundry (on Windows, use WSL2).<br>• **P2:** Python 3.11+, ClamAV, Calibre.<br>• **P4:** Kubo, Tor, Caddy, cloudflared.<br>• **P3:** Chrome, Playwright. | all | own workstream |
-| B8 | Confirm U-bot runs on P2's machine. If it does not, choose the fallback in 8.3 now. | P2 | seed books |
+| B8 | U-Bot is the u.bot assistant, not a scraper (8.3). P2 fills `ingest/candidates.csv` by hand. | P2 | seed books |
 | B9 | Verify public-domain status and ban sources for ≥ 12 candidate books. This is research, not code, so it is normally allowed before the start. | P2 | bulk load |
 | B10 | Everyone reads this README, AGENTS.md and their own agent brief(s). | all | G0 |
 
@@ -356,7 +373,7 @@ Nothing in 9.2 can begin until these are done. **⛔ marks a hard blocker.**
 | **H+20** | **Gate G3, feature freeze** | End-to-end passes on both paths; success criteria 1–10 met. After this, bug fixes only. | | | |
 | H+20 – H+22 | P3 Demo | P1 checks the on-chain record | P2 demo data | P3 screenshots + video | P4 final README + demo script |
 | H+22 – H+23 | Rehearse | Two full demo runs: one in a clean Chrome profile, one in Tor Browser on the onion | | | |
-| H+23 – H+23:30 | **Submit** | P4 submits | | | |
+| H+23 – H+23:30 | **Submit** | P4 submits on hub.team1.network (repo, demo site, deck). The hard deadline is H+26:30 (Fri 14:00); the extra 3 hours are buffer. | | | |
 | H+23:30 – H+24 | Buffer | | | | |
 
 ### 9.3 Rest rota (suggested)
@@ -453,7 +470,7 @@ Each criterion names its metric and unit, and is checked at gate G3.
 | Risk | What we do |
 |---|---|
 | No faucet gives test AVAX without a mainnet balance | Settle it at B3, before H+0. Ask the organisers for a coupon. |
-| UBot Studio is unavailable or will not run | Fill in the CSV by hand (8.3, step 4). |
+| Seed books take too long to prepare by hand | Start B9 research early; 10 books is the target, not more. |
 | The Safe cannot be created on Fuji | The deployer keeps admin, and we explain this in the demo. |
 | A malicious PDF exploits the PDF parser | Subprocess sandbox, time and memory limits, no secrets in the parser process. |
 | Spam drains the relayer's test AVAX | Rate limits, the 200-per-day relayer cap, and `setSubmissionsOpen(false)` through the Safe. |
@@ -469,4 +486,4 @@ Each criterion names its metric and unit, and is checked at gate G3.
 - Storage: [Filebase free tier](https://filebase.com/free/), [Pinata free tier](https://agentdeals.dev/vendor/pinata-ipfs), [ar.io upload docs](https://docs.ar.io/build/upload/)
 - Project Gutenberg: [Offline catalogs](https://www.gutenberg.org/ebooks/offline_catalogs), [Linking policy](https://www.gutenberg.org/policy/linking.html)
 - Censorship: [GreatFire ipfs.io test](https://en.greatfire.org/https/gateway.ipfs.io/ipfs/bafybeifx7yeb55armcsxwwitkymga5xf53dxiarykms3ygqic223w5sk3m), [IPFS blocked by the Great Firewall](https://discuss.ipfs.tech/t/ipfs-and-kubo-have-been-blocked-by-china-gfw/19969), [OONI Explorer](https://explorer.ooni.org/)
-- U-bot: [UBot Studio](https://en.wikipedia.org/wiki/UBot_Studio)
+- U-Hackathon: [information sheet](https://docs.google.com/spreadsheets/d/1551A03HTawH4JUsVmK_TxwPAoPz2fhmhy7hkRdC_ao4/htmlview), [opening deck](https://u-hackathon-2026.vercel.app/), [U-Bot](https://u.bot/)
