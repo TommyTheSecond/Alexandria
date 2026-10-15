@@ -20,7 +20,8 @@ Read `AGENTS.md`, `README.md` (sections 3.1, 3.2, 10, 11 and 13) and `docs/INTER
 
 ## Stack
 
-- TypeScript (strict), `viem` as the only runtime dependency, WebCrypto (`crypto.subtle`) for SHA-256.
+- TypeScript (strict), `viem` as the main runtime dependency, WebCrypto (`crypto.subtle`) for SHA-256.
+- `@walletconnect/ethereum-provider`, loaded **only** through a dynamic `import()` inside `connectWallet('walletconnect')`. Never import it at the top level: it must not land in the reader's main bundle.
 - Tests: `vitest`.
 - Build: `tsc` to ESM in `dist/`.
 - Package name: `@alexandria/sdk`.
@@ -96,6 +97,14 @@ Read `AGENTS.md`, `README.md` (sections 3.1, 3.2, 10, 11 and 13) and `docs/INTER
     - Call `eth_requestAccounts`, then `wallet_switchEthereumChain` with `0xa869`. On error 4902, call `wallet_addEthereumChain` (Fuji, RPC from config, explorer `https://testnet.snowtrace.io`).
     - If the switch is refused, throw `WRONG_CHAIN`.
     - Return `WalletActions` built on a viem wallet client. `review` and `flag` wait for 1 confirmation. A revert throws `TX_REVERTED`, with the decoded custom error name in `detail`.
+  - `connectWallet('walletconnect')` (README section 3.4):
+    - If `walletConnectProjectId` is empty, throw `NO_WALLET` with `detail: 'walletconnect-disabled'`.
+    - `const { EthereumProvider } = await import('@walletconnect/ethereum-provider')`.
+    - Init with `{ projectId, optionalChains: [43113], rpcMap: { 43113: rpcUrls[0] }, showQrModal: true, metadata: { name: 'Alexandria', description: 'Library of banned books', url: location.origin, icons: [] } }`.
+    - Call `provider.connect()`, which opens the QR modal. If the user closes the modal, throw `NO_WALLET` with `detail: 'cancelled'`.
+    - Switch to Fuji the same way as the injected path, then build `WalletActions` on that provider.
+    - `disconnect()` calls `provider.disconnect()`, which also clears the stored session.
+    - Check the current WalletConnect docs for the exact init options before coding; the package's API has changed across versions.
   - **Tests:**
     - `submit_maps_each_status_code`
     - `submit_resolves_on_422_with_report`
@@ -103,6 +112,10 @@ Read `AGENTS.md`, `README.md` (sections 3.1, 3.2, 10, 11 and 13) and `docs/INTER
     - `connectWallet_throws_NO_WALLET`
     - `connectWallet_adds_chain_on_4902`
     - `flag_maps_AlreadyFlagged_to_TX_REVERTED`
+    - `walletconnect_without_projectId_throws_NO_WALLET`
+    - `walletconnect_is_loaded_only_on_connect` (mock the dynamic import; assert it is not called by `getCatalog`, `downloadPdf` or `submit`)
+    - `walletconnect_modal_closed_throws_NO_WALLET_cancelled`
+    - `disconnect_ends_walletconnect_session`
 
 - [ ] **T4 Snapshot builder (H+11 – H+13)**
   - `scripts/build-snapshot.ts --deployment ../../deployments/fuji.json --out ../../snapshots/latest.json`:
@@ -124,4 +137,4 @@ Read `AGENTS.md`, `README.md` (sections 3.1, 3.2, 10, 11 and 13) and `docs/INTER
 
 ## Ask P3 before
 
-Adding a runtime dependency beyond `viem`.
+Adding a runtime dependency beyond `viem` and `@walletconnect/ethereum-provider`.

@@ -26,7 +26,7 @@ If your brief and the README disagree, the README wins. Tell your human about th
 6. **Dependencies:** add them only to your own package's manifest. If `pnpm-lock.yaml` conflicts, rebase, run `pnpm install`, and commit the result. Never edit the lockfile by hand.
 7. **Secrets:** never write a private key, API key or secret into a file under git, a log line, a test fixture or a message. Read them from `.env` (gitignored). Add each new variable name, with no value, to `.env.example` in your own path.
 8. **Testnet only.** Chain ID `43113` (Fuji) or `31337` (Anvil). Never write code or config that targets mainnet.
-9. **Privacy:** no analytics, no third-party CDN, fonts or scripts, and no logging of IP addresses or request lines.
+9. **Privacy:** no analytics, no third-party CDN, fonts or scripts, and no logging of IP addresses or request lines. The only exception is WalletConnect, loaded only after a user clicks "Connect with WalletConnect" (README section 3.4).
 10. **Content:** only public-domain books (README section 10). Never add, fetch or generate copyrighted book text, not even for fixtures.
 11. **Scraping:** never send automated requests to `gutenberg.org`. Use `pg_catalog.csv`.
 
