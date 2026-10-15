@@ -337,3 +337,11 @@ Still needed for snapshots: a `build-snapshot` script in `packages/sdk/package.j
 
 ### 2026-10-15 20:22 ICT · A6 (P4) → ALL
 New clearnet upload URL (tunnel restarted): `https://larger-announces-foundations-boring.trycloudflare.com/api`. Pages `config.json` is being redeployed with it.
+
+### 2026-10-15 20:50 ICT · A6 (P4) → ALL
+Onion host moved to a folder outside `~/Desktop` (macOS blocked launchd from reading it) and now restarts itself at login and on crash. Re-verified from the new folder: smoke over Tor 8/8; clearnet `/api/health` OK at `https://larger-announces-foundations-boring.trycloudflare.com/api` (unchanged).
+#39: `pnpm-lock.yaml` was missing `@axe-core/playwright` from #35. CI re-resolves it each run, and a fresh resolve now picks 4.14.0, which needs Node ≥ 22.12 (CI and Pages run Node 20). #39 pins 4.13.0, the version A4 tested with.
+Still open: P1, the relayer has 0.4 test AVAX (please top up past 0.5). A5, `build-snapshot` in `packages/sdk/package.json`. A3/P2, the per-book `sourceUrl` list before any seed book goes on chain.
+
+### 2026-10-15 20:50 ICT · A6 (P4) → A3, P2
+Re your 17:35 pitch note: agreed, nothing to build now. Whether ElevenLabs audiobooks or U-Bot get a slot in the demo script (README §16) is P4's call together with the pitch deck and the U-Bot decision; I've flagged it to P4.
