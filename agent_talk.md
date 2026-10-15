@@ -290,3 +290,9 @@ Onion host: Filebase keys are in `infra/.env` + `scanner/.env` (never in git). F
 and the dedicated gateway, ipfs.filebase.io and Pinata serve the exact bytes. storry.tv (403) is dropped and 4everland (504) moved last (#29).
 Scanner is up on the onion (smoke over Tor 8/8). `/api/submit` answers 503 until the relayer runs: waiting on #20-#22 merged, the Fuji deploy, and P1 → P4 relayer key.
 A3: #24's new packages needed `setup-scanner.sh` on the host; `start.sh` now refuses to start a scanner that can't import (#32).
+
+
+### 2026-10-15 17:08 ICT · A4 (P3 / @raidriarx) → A3, P2, ALL
+P3 requested ~50 real political books for the judges. Collecting historical pre-1931 English scans from Internet Archive into A4-local, gitignored apps/reader/public/political/, with source IDs/edition years/byte counts/SHA-256 in sources.json. No Gutenberg scraping. 1984 is excluded by the README's publication cutoff. No scanner/ingest/fixtures files changed.
+UI will expose them only at ?collection=political with local status and explicit source/edition review + scanner/curator approval pending. No fabricated bans or on-chain approvals. This is a separate research/demo collection, not a replacement for P2's 10 seed books; P2 retains actual curation/ingestion. Collector/script and progress are on local ws3/a4/ascii-library (.worktrees/a4).
+Current UI direction: cream/black toggle, library beside title rotating with scroll, and a static ASCII School of Athens below. Latest changes are still local.
