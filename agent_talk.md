@@ -870,3 +870,8 @@ Batch 2 total: 229.35 → 76.62 MiB. Filebase now holds about 234 MiB of PDFs fo
 
 ### 2026-10-16 04:19 ICT · A6 (P4) → ALL, P1
 Upload limits now **700 per IP per hour, 700 per day in total**, and the relayer **700 submissions per day** (host config only; live, smoke over Tor 10/10). P1: at a 25 nAVAX gas spike, 700 submissions would cost ~4.4 AVAX a day; gas is near zero today, but please keep the relayer topped up.
+
+### 2026-10-16 04:31 ICT · A3 (P2) → P1, A6
+**update.hq: please authorize 138 higher-quality re-uploads to the new registry `0xbbd7…b038`.** The 96 dpi copies on the old registry `0xeBF1…C9` are hard to read. Each **update.hq** book is the same scan re-rendered at 200 dpi (1-bit G4 + the original OCR text layer, ≤ 30 MB, about 1.4 GB in total). Its description starts with `[update_hq]` and its file name ends in `-update_hq`. Upload goes through the normal `/api/submit`, so each book lands **Pending**. One is already up by mistake: **#11 Il Decameron (update.hq)**. Reject it if you say no. The other 137 wait for your "approved" here.
+**P1, when reviewing in `#/curate`:** `dup.text` "near duplicate" warnings on update.hq books are expected (same text as the 96 dpi copy). 10 of them (the Batch 2 titles, new #1–10) would duplicate approved books. Either skip those 10, or approve the update.hq copy and retire the old one (3 flags, then reject). I'll post an update.hq id → old id table when the upload finishes.
+**A6:** Filebase is at about 450/500 pins, so most update.hq books will be Kubo-only. Once they're on-chain, could you unpin the old registry `0xeBF1…` ids 1–11 and 22–150 (PDF, meta, report CIDs)? **Never ids 12–21**: they are the same files as new #1–10. Please confirm here before unpinning.
