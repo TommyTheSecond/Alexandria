@@ -1,12 +1,21 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Alexandria Fund UI', () => {
-  test('fund_missing_shows_soon: shows "Donations open soon" when fund contract is not deployed', async ({ page }) => {
-    // When deployments/fuji-fund.json does not exist, both pages show "Donations open soon"
+  test('fund_disabled_by_default: shows feature disabled notice when fund=1 is omitted', async ({ page }) => {
+    // By default for hackathon preview, fund pages display disabled notice
     await page.goto('/#/donate');
-    await expect(page.getByText('Donations open soon')).toBeVisible();
+    await expect(page.getByText('Feature disabled for hackathon preview.')).toBeVisible();
 
     await page.goto('/#/nodes');
+    await expect(page.getByText('Feature disabled for hackathon preview.')).toBeVisible();
+  });
+
+  test('fund_missing_shows_soon: shows "Donations open soon" when fund contract is not deployed', async ({ page }) => {
+    // When enabled with ?fund=1 but deployments/fuji-fund.json does not exist, both pages show "Donations open soon"
+    await page.goto('/?fund=1#/donate');
+    await expect(page.getByText('Donations open soon')).toBeVisible();
+
+    await page.goto('/?fund=1#/nodes');
     await expect(page.getByText('Donations open soon')).toBeVisible();
   });
 
@@ -35,7 +44,7 @@ test.describe('Alexandria Fund UI', () => {
       };
     });
 
-    await page.goto('/#/donate');
+    await page.goto('/?fund=1#/donate');
 
     // If fund deployment is present, verify split and inputs
     const donateInput = page.getByLabel(/Amount/i);
@@ -59,7 +68,7 @@ test.describe('Alexandria Fund UI', () => {
   });
 
   test('nodes_lists_status: displays nodes table and run a node guide link', async ({ page }) => {
-    await page.goto('/#/nodes');
+    await page.goto('/?fund=1#/nodes');
     const nodesHeading = page.getByRole('heading', { name: /Node Operators/i });
     await expect(nodesHeading).toBeVisible();
 
@@ -87,7 +96,7 @@ test.describe('Alexandria Fund UI', () => {
       };
     });
 
-    await page.goto('/#/nodes');
+    await page.goto('/?fund=1#/nodes');
 
     const openSoon = page.getByText('Donations open soon');
     if (await openSoon.isVisible()) {

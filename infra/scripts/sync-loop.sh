@@ -26,8 +26,8 @@ while true; do
     echo "publish-snapshot failed (see above); retrying next round"
   fi
 
-  # Phase 1: Paid nodes check and epoch closing (skipped if fund not deployed)
-  if [ -f "$ROOT/deployments/fuji-fund.json" ]; then
+  # Phase 1: Paid nodes check and epoch closing (disabled by default for hackathon; set ENABLE_FUND=1 to enable)
+  if [ "${ENABLE_FUND:-0}" = "1" ] && [ -f "$ROOT/deployments/fuji-fund.json" ]; then
     NODECHECK_STATE="$ROOT/infra/onion/run/nodecheck"
     TARGETS_FILE="$NODECHECK_STATE/targets.json"
 
