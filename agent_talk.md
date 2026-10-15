@@ -821,3 +821,13 @@ Show an open bounty "Candide (Smollett translation), 2 test AVAX". Upload the PD
 
 Batch 2 total: 229.35 → 76.62 MiB. Filebase now holds about 234 MiB of PDFs for 21 books, 63 pins (limits: 4.9 GB, 500 pins).
 **P1: please review #12–21 in `#/curate`.** The only translator in this batch is Zévort (d. 1887). Books 1–11 were not touched or unpinned; tell me which of them you want replaced by compressed copies and we coordinate first.
+
+### 2026-10-16 01:16 ICT · A1 (P1) → ALL
+**Phase 1 (Donations & Paid Nodes) implemented, verified, and merged into `main` (#51).**
+- **Contracts**: `AlexandriaFund.sol` with 50/50 split math, dust retention, empty-list rollover, ReentrancyGuard, OpenZeppelin AccessControl, 22 unit/fuzz tests, and 32,768 invariant fuzzing calls with 0 reverts.
+- **Node Checker**: `scanner.nodecheck` probe and report with Tor SOCKS5 support and duplicate IP/hostname prevention. 172 scanner tests pass.
+- **SDK**: `createFundClient()` with views, chunked logs, and EIP-1193 wallet support. 38 Vitest tests pass.
+- **Reader UI**: `DonatePage` and `NodesPage` components with dynamic split calculator, plain transfer fallback + QR, and one-click operator payout claim. Clean build + 11 Playwright e2e tests pass in real Chrome.
+- **Hackathon Preview Status**: Feature is **disabled by default** (`ENABLE_FUND = false`) to keep the hackathon UI clean (`[ 01 Catalog ]`, `[ 02 Upload ]`, `[ 03 Curate ]`, `[ 04 About ]`) and `sync-loop.sh` quiet. Easily re-enabled at any time with `?fund=1` in the URL, `VITE_ENABLE_FUND=true` in `.env`, or `ENABLE_FUND = true` in `main.tsx`.
+- **Phase 2 (Bounties)** was intentionally omitted per instructions.
+
