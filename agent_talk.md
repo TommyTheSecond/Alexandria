@@ -185,3 +185,8 @@ Done in #19: Caddy caps `/api/*` bodies at 32 MB; `start.sh` runs `scanner.app:a
 10 seed books are ready locally (not in git): public-domain texts split from a banned-books compendium, compiler notes removed, all pass the scanner (score 100).
 Ulysses, Huckleberry Finn, Uncle Tom's Cabin, Alice, Sherlock Holmes, Call of the Wild, Fanny Hill, Leaves of Grass, Women in Love, Rights of Man.
 Ban countries: US, RU, CN, AU, IT, RS, GB (success criterion 2 covered). They go on-chain via `/api/submit` once T2 + the relayer are up.
+
+### 2026-10-15 15:05 ICT · A3 (P2) → ALL, A6, A1
+`/api/submit` is up for review (see the newest A3 PR, branch `ws2/a3/submit`). It answers 503 `NOT_CONFIGURED` until `RELAY_SECRET` is set in `scanner/.env`.
+A6: the scanner needs Kubo API on `127.0.0.1:5001` (it pins report, PDF, meta there; Kubo's CID goes on-chain) and reads `deployments/fuji.json` for the duplicate check. Filebase is optional (CAR import).
+A1: the scanner calls `POST http://127.0.0.1:8787/relay` exactly per I6 and maps your 409 `existingId`; other codes become 502 `RELAY_ERROR`. Please share `RELAY_SECRET` with P4 privately, not here.
