@@ -34,6 +34,14 @@ ipfs config --json Gateway.NoFetch true
 ipfs daemon >"$RUN/kubo.log" 2>&1 & pids+=($!)
 echo "kubo     starting (log: infra/onion/run/kubo.log)"
 
+# Relayer (A2) on 127.0.0.1:8787: unlocks P1's encrypted keystore (#31) with a mode-600 password file.
+envval() { grep -E "^$1=" relayer/.env 2>/dev/null | head -1 | cut -d= -f2-; }
+KS="$(envval RELAYER_KEYSTORE)"; PW="$(envval RELAYER_PASSWORD_FILE)"
+RELAYER_READY=0
+if [ -f relayer/package.json ] && [ -f deployments/fuji.json ] && [ -n "$KS" ] && [ -f "$KS" ] && [ -n "$PW" ] && [ -s "$PW" ]; then
+  RELAYER_READY=1
+fi
+
 # Scanner (A3) on 127.0.0.1:8000 with no access log, from the repo root (it reads schemas/).
 # Uses .venv (infra/onion/setup-scanner.sh) when present. Override with SCANNER_CMD.
 # ClamAV is required on the server: a missing scanner rejects uploads instead of skipping (A3).
@@ -47,16 +55,18 @@ fi
 if [ -n "$SCANNER_CMD" ] && [ -z "${SCANNER_CMD_OVERRIDE:-}" ] && ! "$PY" -c "import scanner.app" >/dev/null 2>&1; then
   echo "scanner  NOT started: its Python packages are missing or outdated."
   echo "         Fix: infra/onion/setup-scanner.sh, then restart this script."
-elif [ -n "$SCANNER_CMD" ]; then
+elif [ -n "$SCANNER_CMD" ] && [ "$RELAYER_READY" = 1 ]; then
   $SCANNER_CMD >"$RUN/scanner.log" 2>&1 & pids+=($!)
   echo "scanner  starting (log: infra/onion/run/scanner.log)"
+elif [ -n "$SCANNER_CMD" ]; then
+  # No relayer: an empty RELAY_SECRET keeps /api/submit off (503), so nothing is pinned without reaching the chain.
+  RELAY_SECRET= $SCANNER_CMD >"$RUN/scanner.log" 2>&1 & pids+=($!)
+  echo "scanner  starting, uploads OFF until the relayer runs (scan only)"
 else
   echo "scanner  not built yet: /api/* returns 502 until it is"
 fi
-# Relayer (A2) on 127.0.0.1:8787: unlocks P1's encrypted keystore (#31) with a mode-600 password file.
-envval() { grep -E "^$1=" relayer/.env 2>/dev/null | head -1 | cut -d= -f2-; }
-KS="$(envval RELAYER_KEYSTORE)"; PW="$(envval RELAYER_PASSWORD_FILE)"
-if [ -f relayer/package.json ] && [ -f deployments/fuji.json ] && [ -n "$KS" ] && [ -f "$KS" ] && [ -n "$PW" ] && [ -s "$PW" ]; then
+
+if [ "$RELAYER_READY" = 1 ]; then
   pnpm --filter @alexandria/relayer start >"$RUN/relayer.log" 2>&1 & pids+=($!)
   echo "relayer  starting (log: infra/onion/run/relayer.log)"
 else
