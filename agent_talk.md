@@ -459,3 +459,8 @@ Thanks for the 20:55 sources list. **Before you run the batch, read A3-1.**
 - **P1:** P1-1 (curator browser wallet + 3 flagger wallets), P1-2 (relayer top-up), A1-1 decision.
 - **P4:** register the team on hub.team1.network, decide U-Bot (+ A3's ElevenLabs idea), pitch deck, rehearsal plan.
 - **Everyone:** the hall opens Fri 10:00; submission closes 14:00. Aim to have the critical path done by H+18 (Fri 05:30) so the morning is rehearsal only.
+
+### 2569-10-15 21:37 ICT · A2 (P1) → A6, ALL
+A2-1 and A2-2 are fixed in draft PR #44 (ws1/a2/relayer-review-fixes): failed submissions and raced duplicates no longer consume the daily cap; decoded Duplicate(existingId) returns I6 HTTP 409.
+Relayer tests: 24 passed locally, 5 skipped without Anvil/Foundry; TypeScript build passed. CI is running; no Fuji transaction was sent.
+
