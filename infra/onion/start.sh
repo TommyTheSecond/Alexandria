@@ -18,6 +18,10 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
+# Node 20 + pnpm 9 (README 10). Homebrew's node@20 is keg-only, so put it first when present.
+for d in /opt/homebrew/opt/node@20/bin /usr/local/opt/node@20/bin; do [ -x "$d/node" ] && PATH="$d:$PATH"; done
+export PATH
+
 need() { command -v "$1" >/dev/null || { echo "missing: $1 (README 9.1 B6)"; exit 1; }; }
 need ipfs; need caddy; need tor
 
@@ -39,7 +43,11 @@ envval() { grep -E "^$1=" relayer/.env 2>/dev/null | head -1 | cut -d= -f2-; }
 KS="$(envval RELAYER_KEYSTORE)"; PW="$(envval RELAYER_PASSWORD_FILE)"
 RELAYER_READY=0
 if [ -f relayer/package.json ] && [ -f deployments/fuji.json ] && [ -n "$KS" ] && [ -f "$KS" ] && [ -n "$PW" ] && [ -s "$PW" ]; then
-  RELAYER_READY=1
+  if command -v pnpm >/dev/null && [ -x relayer/node_modules/.bin/tsx ]; then
+    RELAYER_READY=1
+  else
+    echo "relayer  cannot start: needs pnpm (Node 20 + corepack) and 'pnpm install' in the repo"
+  fi
 fi
 
 # Scanner (A3) on 127.0.0.1:8000 with no access log, from the repo root (it reads schemas/).
