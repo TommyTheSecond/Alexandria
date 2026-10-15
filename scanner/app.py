@@ -18,6 +18,7 @@ from starlette.datastructures import UploadFile
 
 from . import __version__, settings
 from .checks import MAX_PDF_BYTES, NearDupIndex
+from .checks.bounty import bounty_check_from_env
 from .checks.dup import LookupId
 from .pipeline import scan
 from .ratelimit import RateLimiter
@@ -100,17 +101,20 @@ def service_from_env(data_dir: Path) -> tuple[Optional[SubmitService], LookupId]
     pinner = Pinner(KuboPinner(settings.get("KUBO_API_URL", "http://127.0.0.1:5001")), filebase)
     relay = RelayClient(settings.get("RELAYER_URL", "http://127.0.0.1:8787"), secret)
     service = SubmitService(pinner=pinner, relay=relay, data_dir=data_dir, lookup_id=lookup,
-                            near_dup=NearDupIndex.load(data_dir / "minhash.pkl"))
+                            near_dup=NearDupIndex.load(data_dir / "minhash.pkl"),
+                            bounty_check=bounty_check_from_env(settings.get, settings.REPO_ROOT))
     return service, lookup
 
 
 def create_app(data_dir: Optional[Path] = None, *, lookup_id: LookupId = None, submit_service=_UNSET,
-               limiter: Optional[RateLimiter] = None) -> FastAPI:
+               limiter: Optional[RateLimiter] = None, bounty_check=_UNSET) -> FastAPI:
     data_dir = Path(data_dir or settings.get("ALEXANDRIA_DATA_DIR") or DEFAULT_DATA_DIR)
     if submit_service is _UNSET:
         submit_service, env_lookup = service_from_env(data_dir)
         lookup_id = lookup_id or env_lookup
     limiter = limiter or RateLimiter(per_client_hour=int(settings.get("UPLOADS_PER_HOUR", "5")))
+    if bounty_check is _UNSET:  # None unless deployments/fuji-bounties.json exists (I9)
+        bounty_check = bounty_check_from_env(settings.get, settings.REPO_ROOT)
     app = FastAPI(title="Alexandria scanner", version=__version__, docs_url=None, redoc_url=None, openapi_url=None)
     app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=False,
                        allow_methods=["GET", "POST"], allow_headers=["*"])
@@ -125,7 +129,8 @@ def create_app(data_dir: Optional[Path] = None, *, lookup_id: LookupId = None, s
         if error:
             return error
         data, meta, sha, total, _ = parsed
-        return await run_in_threadpool(scan, data, meta, lookup_id=lookup_id, sha256=sha, total_size=total)
+        return await run_in_threadpool(scan, data, meta, lookup_id=lookup_id, sha256=sha, total_size=total,
+                                       bounty_check=bounty_check)
 
     @app.post("/api/submit")
     async def submit(request: Request):

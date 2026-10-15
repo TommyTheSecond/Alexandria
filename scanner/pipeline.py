@@ -9,6 +9,7 @@ from typing import Callable, Optional
 
 from . import __version__, checks, sandbox
 from .checks import ScanCheck
+from .checks.bounty import BountyCheck
 from .checks.dup import LookupId, NearDupIndex
 from .verdict import verdict_and_score
 
@@ -33,7 +34,8 @@ def parse_in_child(data: bytes) -> dict:
 
 def scan_detailed(pdf: bytes, meta: object, *, lookup_id: LookupId = None, near_dup: Optional[NearDupIndex] = None,
                   timeout: float = PARSE_TIMEOUT_S, av: Callable[[bytes], ScanCheck] = checks.av_clamav,
-                  sha256: Optional[str] = None, total_size: Optional[int] = None) -> ScanOutcome:
+                  sha256: Optional[str] = None, total_size: Optional[int] = None,
+                  bounty_check: Optional[BountyCheck] = None) -> ScanOutcome:
     """Scan one PDF + BookMetaInput.
 
     `sha256` and `total_size` describe the whole upload when the caller only kept
@@ -41,7 +43,7 @@ def scan_detailed(pdf: bytes, meta: object, *, lookup_id: LookupId = None, near_
     """
     sha = sha256 or "0x" + hashlib.sha256(pdf).hexdigest()
     meta_dict = meta if isinstance(meta, dict) else {}
-    pages, words = 0, []
+    pages, words, analysis = 0, [], None
     results: list[ScanCheck] = [
         checks.pdf_magic(pdf),
         checks.pdf_size(total_size if total_size is not None else len(pdf)),
@@ -79,6 +81,14 @@ def scan_detailed(pdf: bytes, meta: object, *, lookup_id: LookupId = None, near_
         checks.pd_source(meta_dict),
         checks.ban_source(meta_dict),
     ]
+    # Bounty uploads only (I9). Severity review, never reject, and it can never break a scan.
+    if bounty_check is not None and isinstance(meta_dict.get("bountyId"), int):
+        try:
+            results.append(bounty_check(meta_dict, analysis, results))
+        except Exception as exc:  # noqa: BLE001
+            results.append(checks.fail("bounty.match", "review",
+                                       f'{{"bountyId":{meta_dict["bountyId"]},"match":"unsure","auto":false,'
+                                       f'"error":"check failed ({type(exc).__name__})"}}'))
     verdict, score = verdict_and_score(results)
     report = {
         "schemaVersion": "1.0.0",
