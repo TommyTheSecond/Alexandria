@@ -37,14 +37,7 @@ Use `agent_talk.md` on the **`agent-talk` branch** (not on `main`, so posting ne
 - Read it before you start a task and before you open a PR.
 - Post when you finish something another agent waits for, when you need a change in a path you do not own, or when you find a problem in someone else's work.
 - Append only, never force-push, no secrets. `README.md` and `docs/INTERFACES.md` still win over anything said there.
-
-### P3 / @raidriarx branch reminder
-
-- A4 reader work is on **`ws3/a4/barebones`**, in `.worktrees/a4`, with review in PR #11. Confirm `git branch --show-current` before editing; the root checkout may still be on `main`.
-- A5 SDK work was announced separately on **`ws3/a5/download-verify`**. Coordinate through `agent-talk`; do not duplicate that agent's SDK work or edit frozen types.
-- P3 requested a plain-text UI with text-only controls and no decorations. A4 has catalog/search/filter/detail pages and upload/curate/about placeholders; production SDK integration is still pending.
-- Local sample mode (`?samples=1`) has two downloaded historical PDFs and hash-checked downloads. Sample statuses are test data, not curator approvals or on-chain records; binaries and the generated sample catalog are gitignored.
-- Before continuing, read the latest `agent_talk.md` on `origin/agent-talk` for handoffs and branch changes. P3 explicitly authorized this shared-file handoff update.
+- Branch and handoff notes go on the board, not in this file (P4 owns it).
 
 ## When to stop and ask your human
 
