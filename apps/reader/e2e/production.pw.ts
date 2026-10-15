@@ -92,3 +92,14 @@ test('scanner rejection shows failed checks and does not claim submission', asyn
   await expect(page.getByRole('table')).toContainText('active content');
   await expect(page.getByText(/Submitted as book/)).toHaveCount(0);
 });
+
+test('renders searchable saved books while live RPC requests are still pending', async ({page}) => {
+ const catalog = JSON.parse(await readFile('../../fixtures/catalog.json','utf8'));
+ await page.route('**/config.json',route=>route.fulfill({json:{apiBase:''}}));
+ await page.route('**/catalog.json',route=>route.fulfill({json:catalog}));
+ await page.route(/^https:\/\/(api\.avax-test\.network|avalanche-fuji-c-chain-rpc\.publicnode\.com|avalanche-fuji\.drpc\.org)\//, () => {});
+ await page.goto('/#/');
+ await expect(page.getByRole('link',{name:catalog.books[0].meta.title,exact:true})).toBeVisible({timeout:5000});
+ await page.getByRole('searchbox').fill(catalog.books[0].meta.title);
+ await expect(page.getByRole('link',{name:catalog.books[0].meta.title,exact:true})).toBeVisible();
+});

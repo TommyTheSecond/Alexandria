@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { existsSync } from 'node:fs';
+test.skip(!existsSync('public/samples/catalog.json'), 'Local sample collection is not installed');
 
 test('ASCII library is static, responsive, and keeps catalog usable', async ({ page }) => {
   await page.goto('/?samples=1#/');

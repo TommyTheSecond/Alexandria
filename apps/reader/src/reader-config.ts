@@ -9,7 +9,7 @@ interface Endpoints {
 
 export function resolveReaderConfig(hostname: string, runtime: RuntimeConfig, endpoints: Endpoints) {
   const onion = hostname.endsWith('.onion');
-  const apiBase = runtime.apiBase?.trim() || (onion ? '/api' : '');
+  const apiBase = onion ? '/api' : (runtime.apiBase?.trim() ?? '');
   const client: ClientConfig = {
     rpcUrls: onion ? endpoints.rpcs.onion : endpoints.rpcs.clearnet,
     gateways: onion ? endpoints.gateways.onion : endpoints.gateways.clearnet,

@@ -49,16 +49,34 @@ function App() {
     const controller = new AbortController();
     let active = true;
     if (!sampleMode) {
+      let refreshing = false;
+      let liveClient: AlexandriaClient | undefined;
+      const refresh = async () => {
+        if (!liveClient || refreshing || !active) return;
+        refreshing = true;
+        try {
+          const data = await liveClient.getCatalog();
+          if (active) { setCatalog(data); setState(''); }
+        } catch { /* Keep the rendered snapshot and retry next time. */ }
+        finally { refreshing = false; }
+      };
       connectReader().then(async connection => {
         if (!active) return;
         setClient(connection.client);
         setUploadEnabled(connection.uploadEnabled);
         setOnionUrl(connection.onionUrl);
         setReportGateway(connection.reportGateway);
-        const data = await connection.client.getCatalog();
-        if (active) { setCatalog(data); setState(''); }
+        liveClient = connection.client;
+        try {
+          const data = await connection.client.getCatalog({ live: false });
+          if (active) { setCatalog(data); setState(''); }
+        } catch { if (active) setState('Saved catalog unavailable. Trying live data...'); }
+        await refresh();
       }).catch(() => { if (active) setState('The catalog is not available yet. Please try again later.'); });
-      return () => { active = false; removeEventListener('hashchange', change); controller.abort(); };
+      const timer = setInterval(refresh, 30000);
+      const focused = () => { void refresh(); };
+      addEventListener('focus', focused);
+      return () => { active = false; clearInterval(timer); removeEventListener('focus', focused); removeEventListener('hashchange', change); controller.abort(); };
     }
     fetch(politicalMode ? './political/catalog.json' : './samples/catalog.json', { signal: controller.signal }).then(async response => {
       if (!response.ok) throw Error('unavailable');

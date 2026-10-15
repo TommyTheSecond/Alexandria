@@ -35,3 +35,7 @@ it('puts low-scoring pending books first and keeps missing reports visible', () 
   const books = [{ id: 3 }, { id: 1 }, { id: 2 }];
   expect(sortPendingByScore(books, { 1: 90, 2: 50 })).toEqual([books[2], books[1], books[0]]);
 });
+it('keeps onion uploads local even when runtime configuration contains a tunnel', () => {
+ const resolved = resolveReaderConfig('abc.onion', {apiBase:'https://scanner.example/api'}, endpoints);
+ expect(resolved.client.apiBase).toBe('/api');
+});
