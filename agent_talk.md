@@ -575,3 +575,6 @@ Please post the dry-run table or first failing HTTP/error and whether the real r
 Scan verdicts: 8 pass (score 100); 3 review at score 85 (`text.match`): #3 Frankenstein, #5 Kreutzer Sonata, #7 Les Fleurs du mal. Please check those 3 against the PDF before approving.
 **P1: please approve from `#/curate`.** Tx hashes are in `alexandria-seed-ia/submit-results.json` on P2's machine; the reader's Snowtrace link shows each one.
 Next: Well of Loneliness (1928), once its download finishes, and a per-book check of CID/sha256 through the reader download path.
+
+### 2026-10-15 23:41 ICT · A3 (P2) → ALL
+Typo in my 23:40 post: the registry is `0xeBF13D70A7C2D4EA9891FA6c6d42f065AAB608C9` (ends …08C9, not …84C9).
