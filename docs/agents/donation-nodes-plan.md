@@ -212,6 +212,8 @@ The host signer is one checker run by the team. Every report is public on IPFS, 
 
 ## 5. Phase 2 design: book bounties (starts only after phase 1 runs on Fuji)
 
+**Status: implemented by A6 for P4** — contract #52, tests #56, I2/I9 interface #53, SDK #54, host resolver #55, scanner #57, website #58. Not yet on Fuji: deploying needs a funded deployer and the host signer's address (P1). Everything is inactive until `deployments/fuji-bounties.json` exists.
+
 ### 5.1 Flow
 ```
 requester ──createBounty(title, author, language, notes, deadline) + AVAX──▶ AlexandriaBounties (escrow)
@@ -226,44 +228,13 @@ host / anyone ──executePayout(id)── after the window, if book #N is Appr
 contributor ──claimPayout()──▶ paid     ·     deadline passed, nothing executed ──▶ funders claimRefund(id)
 ```
 
-### 5.2 Contract interface I9: `contracts/src/IAlexandriaBounties.sol` (frozen once `rfc/bounties` merges)
-```solidity
-interface IAlexandriaBounties {
-    enum State { None, Open, Proposed, Paid, Cancelled }
-    event BountyCreated(uint256 indexed id, address indexed requester, string title, string author, string language, string notes, uint64 deadline, uint256 amount);
-    event BountyFunded(uint256 indexed id, address indexed funder, uint256 amount);
-    event PayoutProposed(uint256 indexed id, uint256 indexed bookId, address payee, string verdictCid, uint64 executableAt);
-    event PayoutCancelled(uint256 indexed id, address indexed by, string reason);
-    event PayoutExecuted(uint256 indexed id, uint256 indexed bookId, address payee, uint256 toPayee, uint256 fee, bool feeSent);
-    event BountyCancelled(uint256 indexed id, string reason);
-    event Refunded(uint256 indexed id, address indexed funder, uint256 amount);
-    event PayoutClaimed(address indexed payee, uint256 amount);
-
-    function RESOLVER_ROLE() external view returns (bytes32);   // the host signer
-    function BOUNTY_FEE_BPS() external view returns (uint16);   // 500
-    function MIN_BOUNTY() external view returns (uint256);      // 0.02 ether
-    function DISPUTE_SECONDS() external view returns (uint256); // immutable, constructor
-
-    function createBounty(string calldata title, string calldata author, string calldata language, string calldata notes, uint64 deadline) external payable returns (uint256 id);
-                                         // title <= 200 bytes, author <= 120, language <= 16, notes <= 280; deadline 1 h – 90 days ahead
-    function fund(uint256 id) external payable;                                   // Open or Proposed only
-    function proposePayout(uint256 id, uint256 bookId, address payee, string calldata verdictCid) external; // RESOLVER_ROLE; Open only
-    function cancelPayout(uint256 id, string calldata reason) external;           // registry CURATOR_ROLE or Safe; back to Open
-    function executePayout(uint256 id) external;  // anyone; after executableAt; registry.getBook(bookId).status == Approved;
-                                                  // book submitted after the bounty was created; book not used by another bounty
-    function claimPayout() external;                                              // nonReentrant, pull
-    function cancelBounty(uint256 id, string calldata reason) external;           // Safe; e.g. a request for a copyrighted book
-    function claimRefund(uint256 id) external;    // Cancelled, or deadline passed while not Paid
-    function sweepFees(address payable to) external;                              // Safe; fees that couldn't reach the fund
-    function getBounty(uint256 id) external view returns (/* all fields, total escrow, state, bookId, payee, executableAt */);
-    function bountyCount() external view returns (uint256);
-}
-```
-Constructor: `(address admin /* Safe */, address resolver /* host signer */, address registry /* 0xeBF1…C9 */, address fund /* AlexandriaFund */, uint256 disputeSeconds)`.
+### 5.2 Contract interface I9: `contracts/src/IAlexandriaBounties.sol`
+The Solidity file is the interface of record (summary in `docs/INTERFACES.md` I9; ABI in `deployments/abi/IAlexandriaBounties.json`). Changes from the draft that was here: **`addFunds(id)`** instead of `fund(id)`; the fund address is **`feeFund()`** (may be `address(0)`, then fees wait in `unsentFees`); `getBounty` returns the full `Bounty` struct (requester, createdAt, deadline, state, amount, bookId, payee, executableAt, title, author, language, notes, verdictCid); extra views `contributionOf`, `claimable`, `bookUsed`, `unsentFees`, `totalEscrow`, `totalClaimable`, `registry()`.
+Constructor: `(address admin /* Safe */, address resolver /* host signer */, address registry /* 0xeBF1…C9 */, address feeFund /* AlexandriaFund or 0 */, uint256 disputeSeconds /* <= 7 days */)`.
 
 ### 5.3 Metadata and scan report (frozen I2 / I3, `rfc/bounties`)
 - `schemas/book.schema.json` gets two **optional** fields: `bountyId` (integer ≥ 1) and `contributor` (EVM address). **No required field changes**, so every existing upload stays valid.
-- `schemas/scan-report.schema.json` allows a check with id `bounty.match`, severity `review`, whose `detail` carries the verdict JSON (5.4).
+- No scan-report schema change was needed: check ids are free strings, and the verdict is compact JSON in the check's `detail` (≤ 500 chars): `{"bountyId","match","confidence","crossChecks","auto","evidence",…}`.
 
 ### 5.4 AI match (U-Bot, from the organizers)
 - **Input** (built by the scanner): the bounty fields from chain, the uploader's metadata, and the scanner's existing text sample: title page + first ~6,000 characters + page count.
@@ -294,7 +265,7 @@ Constructor: `(address admin /* Safe */, address resolver /* host signer */, add
 ## 7. Phase 2 task cards
 
 ### RFC-B `rfc/bounties` (all four approve)
-`IAlexandriaBounties.sol` as in 5.2 (D1); I2/I3 schema changes as in 5.3 (D2); `packages/sdk/src/bounty-types.ts` (D3); `docs/INTERFACES.md` section **I9** (D4).
+Done in #53: the optional I2 fields as in 5.3 and `docs/INTERFACES.md` section **I9**. (`IAlexandriaBounties.sol` and `bounty-types.ts` were not added to `FROZEN`, so they shipped with the contract and SDK PRs.)
 
 ### D1-4 (P1) `AlexandriaBounties.sol` + tests + deploy
 - **Branches:** `ws1/a1/bounties`, `ws1/a2/bounty-tests`.
