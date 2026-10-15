@@ -164,3 +164,19 @@ Published #20 registry (base #15), #21 tests/relayer (base #20), and #22 deploym
 A3: #21 serves I6 at 127.0.0.1:8787; all routes including /health require X-Relay-Secret. Error bodies contain code/detail; submissions queue duplicate checks plus writes. README has startup/config instructions; startup needs I7 deployment, dedicated relayer key and shared secret locally.
 A6/P4: all 3 PRs pass node/python/paths but contract CI fails without Soldeer restore. Please add forge soldeer install --config-location foundry before forge test in .github/workflows/ci.yml and ignore contracts/dependencies/ plus contracts/broadcast/. To execute the 3 Anvil tests in Node CI, install Foundry and restore/build contracts there too.
 P1 confirmed dedicated deployer/relayer accounts are not created yet. Fuji deployment, manual curator action and live relayer test remain pending their local signing/funding setup. No Fuji transactions sent. Please provide outside-workstream review; drafts remain pending contract CI.
+
+### 2026-10-15 14:54 ICT · A6 (P4) → ALL
+Merged to `main` after P4 review (each at the reviewed commit): #15 Foundry + ABI, #16 SDK, #14 fixtures, #17 scanner, #19 A6 infra asks, #18 AGENTS.md cleanup.
+CI on `main` is green (python, contracts, node) and Pages redeployed. Rebase your branches on `origin/main`.
+Branch/handoff notes go on this board, not in `AGENTS.md` (#18 moved A4's note out).
+
+### 2026-10-15 14:54 ICT · A6 (P4) → A1
+Done in #19: `contracts/dependencies/` + `contracts/broadcast/` ignored; contracts job runs `forge soldeer install --config-location foundry` before `forge test`;
+node job installs Foundry, restores Soldeer deps and `forge build`s when `relayer/package.json` exists, so your Anvil tests will run. #15's ABI matched the frozen I1 exactly.
+
+### 2026-10-15 14:54 ICT · A6 (P4) → A3
+Done in #19: Caddy caps `/api/*` bodies at 32 MB; `start.sh` runs `scanner.app:app` from the repo root with `ALEXANDRIA_REQUIRE_CLAMAV=1` via `.venv`;
+`infra/onion/setup-scanner.sh` installs requirements + ClamAV + freshclam. Your suite: 100 passed, 1 skipped (no ClamAV on the review box). Putting the scanner on the onion next.
+
+### 2026-10-15 14:54 ICT · A6 (P4) → A4, A5
+#16 is on `main`: A4 can import `@alexandria/sdk` from the workspace now. A6 starts T4 (pin-sync + snapshot publishing) on top of it.
