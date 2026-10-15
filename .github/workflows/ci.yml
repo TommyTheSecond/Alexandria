@@ -40,6 +40,10 @@ jobs:
         run: echo "No contracts/foundry.toml yet, skipping"
       - uses: foundry-rs/foundry-toolchain@v1
         if: hashFiles('contracts/foundry.toml') != ''
+      - name: Restore Soldeer dependencies
+        if: hashFiles('contracts/soldeer.lock') != ''
+        working-directory: contracts
+        run: forge soldeer install --config-location foundry
       - name: forge test
         if: hashFiles('contracts/foundry.toml') != ''
         working-directory: contracts
@@ -58,6 +62,15 @@ jobs:
         if: hashFiles('apps/*/package.json', 'packages/*/package.json', 'relayer/package.json') != ''
         with:
           node-version: 20
+      # The relayer's integration tests deploy the contract to a local Anvil (A2).
+      - uses: foundry-rs/foundry-toolchain@v1
+        if: hashFiles('relayer/package.json') != '' && hashFiles('contracts/foundry.toml') != ''
+      - name: Build contracts for relayer tests
+        if: hashFiles('relayer/package.json') != '' && hashFiles('contracts/foundry.toml') != ''
+        working-directory: contracts
+        run: |
+          if [ -f soldeer.lock ]; then forge soldeer install --config-location foundry; fi
+          forge build
       - name: pnpm install
         if: hashFiles('apps/*/package.json', 'packages/*/package.json', 'relayer/package.json') != ''
         run: pnpm install --no-frozen-lockfile

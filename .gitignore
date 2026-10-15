@@ -11,6 +11,8 @@ dist/
 coverage/
 contracts/out/
 contracts/cache/
+contracts/dependencies/
+contracts/broadcast/
 fixtures/out/
 scanner/data/
 
