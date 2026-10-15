@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@alexandria/sdk": "workspace:*",
-    "preact": "^10.26.0"
+    "@types/qrcode": "^1.5.6",
+    "preact": "^10.26.0",
+    "qrcode": "^1.5.4"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
