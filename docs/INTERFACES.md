@@ -138,7 +138,9 @@ Implementation constructor (not part of the interface):
       }
     },
     "submittedVia": { "enum": ["web", "ubot", "direct"] },
-    "scanReportCid": { "type": ["string", "null"], "pattern": "^baf[a-z2-7]{20,97}$" }
+    "scanReportCid": { "type": ["string", "null"], "pattern": "^baf[a-z2-7]{20,97}$" },
+    "bountyId": { "type": "integer", "minimum": 1, "description": "optional: the I9 bounty this upload answers" },
+    "contributor": { "type": "string", "pattern": "^0x[0-9a-fA-F]{40}$", "description": "optional: address paid if the bounty pays out (public)" }
   },
   "$defs": {
     "person": {
@@ -168,6 +170,8 @@ Implementation constructor (not part of the interface):
 ```
 
 The uploader sends **`BookMetaInput`**: every field except `schemaVersion`, `pdf`, `submittedVia` and `scanReportCid`. The scanner fills those in.
+
+`bountyId` and `contributor` are optional and only used by bounty uploads (I9); every other upload stays exactly as before.
 
 ---
 
@@ -392,3 +396,30 @@ Listens on `127.0.0.1:8787` only. Every request needs the header `X-Relay-Secret
 ```
 
 `deployments/anvil.json` has the same shape for local runs (chainId `31337`).
+
+---
+
+## I9: Book bounties (`contracts/src/IAlexandriaBounties.sol`)
+
+The contract interface is the Solidity file itself; the ABI is `deployments/abi/IAlexandriaBounties.json`. Design and isolation rules: `docs/agents/donation-nodes-plan.md` sections 5 and 6.
+
+- **Lifecycle:** `createBounty` (escrow, ≥ 0.02 AVAX) → `addFunds` → `proposePayout` (host signer, `RESOLVER_ROLE`) → dispute window `DISPUTE_SECONDS` (600 on Fuji) during which a curator or the Safe may `cancelPayout` → `executePayout` (anyone; the registry book must be `Approved`) → 95 % `claimPayout` by the contributor, 5 % to `AlexandriaFund.donate`. If the fee can't be delivered (no fund, fund reverts), the payout still happens and the fee waits in `unsentFees` for the Safe (`sweepFees`).
+- **Refunds:** `claimRefund` after `cancelBounty` (Safe) or once the deadline passes while the bounty is still Open.
+- **Uploads:** an upload answers a bounty with the optional I2 fields `bountyId` and `contributor`.
+- **Scanner:** a bounty upload gets the check `bounty.match` (severity `review`, never `reject`); its `detail` is compact JSON `{"bountyId":n,"match":"yes|no|unsure","confidence":0–1,"crossChecks":true|false,"evidence":"…"}`.
+- **Deployment record** `deployments/fuji-bounties.json`:
+
+```json
+{
+  "network": "fuji",
+  "chainId": 43113,
+  "address": "0x…",
+  "deployBlock": 0,
+  "deployTx": "0x…",
+  "registry": "0x… (I7 address)",
+  "fund": "0x… or 0x0000000000000000000000000000000000000000",
+  "disputeSeconds": 600,
+  "abi": "abi/IAlexandriaBounties.json",
+  "explorer": "https://testnet.snowtrace.io/address/0x…"
+}
+```
