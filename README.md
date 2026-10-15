@@ -480,6 +480,15 @@ Each criterion names its metric and unit, and is checked at gate G3.
 | A book turns out not to be public domain | Curators reject it. Filebase and Kubo unpin it. The on-chain record stays, but the file is gone. |
 | Free-tier quota runs out (Filebase 5 GB) | Keep the corpus under 1 GB. A6 monitors usage. |
 
+## 15. Sources
+
+- Avalanche: [C-Chain or L1](https://build.avax.network/docs/dapps/c-chain-or-avalanche-l1), [Etna changes](https://academy.avax.network/guide/etna-changes), [Fuji workflow (RPC, chainId)](https://docs.avax.network/build/dapp/fuji-workflow)
+- Safe on Fuji: [Avalanche Academy: Safe/Ash wallet](https://build.avax.network/academy/avalanche-l1/permissioned-l1s/06-multisig-setup/03-create-safe-wallet)
+- Storage: [Filebase free tier](https://filebase.com/free/), [Pinata free tier](https://agentdeals.dev/vendor/pinata-ipfs), [ar.io upload docs](https://docs.ar.io/build/upload/)
+- Project Gutenberg: [Offline catalogs](https://www.gutenberg.org/ebooks/offline_catalogs), [Linking policy](https://www.gutenberg.org/policy/linking.html)
+- Censorship: [GreatFire ipfs.io test](https://en.greatfire.org/https/gateway.ipfs.io/ipfs/bafybeifx7yeb55armcsxwwitkymga5xf53dxiarykms3ygqic223w5sk3m), [IPFS blocked by the Great Firewall](https://discuss.ipfs.tech/t/ipfs-and-kubo-have-been-blocked-by-china-gfw/19969), [OONI Explorer](https://explorer.ooni.org/)
+- U-Hackathon: [information sheet](https://docs.google.com/spreadsheets/d/1551A03HTawH4JUsVmK_TxwPAoPz2fhmhy7hkRdC_ao4/htmlview), [opening deck](https://u-hackathon-2026.vercel.app/), [U-Bot](https://u.bot/)
+
 ## 16. Demo script (draft, P4)
 
 Live demos are on Fri 16 Oct at 20:00, if we make the top 3 of the Web3 track. Judges score **execution 40%, practicality 40%,
@@ -505,12 +514,3 @@ usability 10%, partners 5%, U-Bot 5%** (see 9.0), so show working features on re
 - [ ] Tor Browser (with Snowflake) has the onion open; a clean Chrome profile has GitHub Pages open.
 - [ ] Junk PDF and a fresh public-domain PDF ready on the desktop; a curator wallet unlocked on Fuji; 3 flagger wallets funded.
 - [ ] Fallback: a screen recording of the full run, in case the venue Wi-Fi fails.
-
-## 15. Sources
-
-- Avalanche: [C-Chain or L1](https://build.avax.network/docs/dapps/c-chain-or-avalanche-l1), [Etna changes](https://academy.avax.network/guide/etna-changes), [Fuji workflow (RPC, chainId)](https://docs.avax.network/build/dapp/fuji-workflow)
-- Safe on Fuji: [Avalanche Academy: Safe/Ash wallet](https://build.avax.network/academy/avalanche-l1/permissioned-l1s/06-multisig-setup/03-create-safe-wallet)
-- Storage: [Filebase free tier](https://filebase.com/free/), [Pinata free tier](https://agentdeals.dev/vendor/pinata-ipfs), [ar.io upload docs](https://docs.ar.io/build/upload/)
-- Project Gutenberg: [Offline catalogs](https://www.gutenberg.org/ebooks/offline_catalogs), [Linking policy](https://www.gutenberg.org/policy/linking.html)
-- Censorship: [GreatFire ipfs.io test](https://en.greatfire.org/https/gateway.ipfs.io/ipfs/bafybeifx7yeb55armcsxwwitkymga5xf53dxiarykms3ygqic223w5sk3m), [IPFS blocked by the Great Firewall](https://discuss.ipfs.tech/t/ipfs-and-kubo-have-been-blocked-by-china-gfw/19969), [OONI Explorer](https://explorer.ooni.org/)
-- U-Hackathon: [information sheet](https://docs.google.com/spreadsheets/d/1551A03HTawH4JUsVmK_TxwPAoPz2fhmhy7hkRdC_ao4/htmlview), [opening deck](https://u-hackathon-2026.vercel.app/), [U-Bot](https://u.bot/)
