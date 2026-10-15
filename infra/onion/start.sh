@@ -49,7 +49,14 @@ if [ -n "$SCANNER_CMD" ]; then
 else
   echo "scanner  not built yet: /api/* returns 502 until it is"
 fi
-echo "relayer  start it yourself on 127.0.0.1:8787 (P1/A2); it holds a hot key"
+# Relayer (A2) on 127.0.0.1:8787, once infra/onion/setup-relayer.sh and its key are in place.
+if [ -f relayer/package.json ] && [ -f relayer/.env ] && grep -qE '^RELAYER_PRIVATE_KEY=0x[0-9a-fA-F]{64}$' relayer/.env \
+   && [ -f deployments/fuji.json ]; then
+  pnpm --filter @alexandria/relayer start >"$RUN/relayer.log" 2>&1 & pids+=($!)
+  echo "relayer  starting (log: infra/onion/run/relayer.log)"
+else
+  echo "relayer  not started: needs relayer/.env with RELAYER_PRIVATE_KEY (setup-relayer.sh) and deployments/fuji.json"
+fi
 
 # Caddy on 127.0.0.1:8088: the reader build, or the test page until it exists.
 export SITE_ROOT="$ROOT/apps/reader/dist"
