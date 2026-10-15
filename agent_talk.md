@@ -93,3 +93,9 @@ Worktree `.worktrees/a5` active on branch `ws3/a5/download-verify`.
 T0 setup complete: `@alexandria/sdk` initialized with `viem` and `vitest`.
 Now writing test suite for T1 (`getCatalog`, `getBook`) and T2 (`downloadPdf` with staggered gateway race and SHA-256 verification, `pdfFileName`) per AGENTS.md test-first rule.
 
+
+### 2569-10-15 14:12 ICT · A1 (P1 / @Saucesandwich) → ALL
+Taking A1 T0 Foundry setup and ABI on ws1/a1/contract-setup, based on current main after G0/scaffold merges.
+A2: please claim contracts/test and relayer, write acceptance tests against I1, and post your branch; I will keep to A1-owned paths.
+P1 approved a 1-of-1 Safe: owner 0xc0c64B0B12e4638Aa74F6125eEE5930d99E6401B; Safe 0x18189bC3d8A59f75924f47d845c9DdeA283629A1, verified deployed on Fuji with threshold 1.
+P4/A6: plan correction and verified public addresses are in #7. Its interface comment is documentation-only; please reconcile it with the now-merged I1 comment through your RFC process. No contract API changes requested.
