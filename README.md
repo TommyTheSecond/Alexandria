@@ -127,9 +127,9 @@ A confirmed book can still be flagged, but flags no longer change its state.
 
 | Role | GitHub |
 |---|---|
-| P1 (chain) | |
-| P2 (content) | |
-| P3 (reader) | |
+| P1 (chain) | @Saucesandwich |
+| P2 (content) | @taminggg1-cmyk |
+| P3 (reader) | @raidriarx |
 | P4 (access + ops, integration lead) | @TommyTheSecond |
 
 Human-only work (no agent): P2 runs U-bot and checks each book's public-domain status and ban sources. All 4 people approve books as curators.
@@ -153,25 +153,25 @@ Agent briefs: [A1](docs/agents/A1-contracts.md) · [A2](docs/agents/A2-tests-rel
 
 ```
 *                                   @TommyTheSecond
-/contracts/                         @P1
-/relayer/                           @P1
-/deployments/                       @P1
-/scanner/                           @P2
-/ingest/                            @P2
-/fixtures/                          @P2
-/apps/reader/                       @P3
-/packages/sdk/                      @P3
-/snapshots/                         @P3
+/contracts/                         @Saucesandwich
+/relayer/                           @Saucesandwich
+/deployments/                       @Saucesandwich
+/scanner/                           @taminggg1-cmyk
+/ingest/                            @taminggg1-cmyk
+/fixtures/                          @taminggg1-cmyk
+/apps/reader/                       @raidriarx
+/packages/sdk/                      @raidriarx
+/snapshots/                         @raidriarx
 /infra/                             @TommyTheSecond
 /assets/                            @TommyTheSecond
 /.github/                           @TommyTheSecond
-/contracts/src/IAlexandria.sol      @P1 @P2 @P3 @TommyTheSecond
-/schemas/                           @P1 @P2 @P3 @TommyTheSecond
-/packages/sdk/src/types.ts          @P1 @P2 @P3 @TommyTheSecond
-/docs/INTERFACES.md                 @P1 @P2 @P3 @TommyTheSecond
+/contracts/src/IAlexandria.sol      @Saucesandwich @taminggg1-cmyk @raidriarx @TommyTheSecond
+/schemas/                           @Saucesandwich @taminggg1-cmyk @raidriarx @TommyTheSecond
+/packages/sdk/src/types.ts          @Saucesandwich @taminggg1-cmyk @raidriarx @TommyTheSecond
+/docs/INTERFACES.md                 @Saucesandwich @taminggg1-cmyk @raidriarx @TommyTheSecond
 ```
 
-Replace `@P1`–`@P3` with your GitHub usernames. In CODEOWNERS the last matching line wins, so the frozen-file lines must stay at the bottom.
+In CODEOWNERS the last matching line wins, so the frozen-file lines must stay at the bottom.
 
 ## 5. Frozen interfaces
 
