@@ -25,7 +25,7 @@ Copy `scanner/.env.example` to `scanner/.env` (gitignored) and fill in at least 
 - **Kubo** on `127.0.0.1:5001`. It is required, and its CIDs are the ones that go on-chain.
 - **The relayer** (I6) on `127.0.0.1:8787`, with the same `RELAY_SECRET`.
 - **`deployments/fuji.json`**, so the scanner can check `idBySha256` for duplicates. Without it, `dup.sha256` is skipped and the relayer still refuses duplicates.
-- **Filebase** (optional): `FILEBASE_BUCKET`, `FILEBASE_ACCESS_KEY` and `FILEBASE_SECRET_KEY`.
+- **Filebase** (optional): `FILEBASE_BUCKET`, `FILEBASE_ACCESS_KEY_ID` and `FILEBASE_SECRET_ACCESS_KEY`.
   - Each pinned object is exported from Kubo as a CAR and uploaded with the metadata `import=car`, so Filebase keeps Kubo's CID.
   - If Filebase reports a different CID, the scanner logs a warning.
   - A Filebase failure never blocks an upload.

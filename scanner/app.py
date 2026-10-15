@@ -94,9 +94,9 @@ def service_from_env(data_dir: Path) -> tuple[Optional[SubmitService], LookupId]
         log.warning("RELAY_SECRET not set: /api/submit answers 503")
         return None, lookup
     filebase = None
-    if settings.get("FILEBASE_BUCKET") and settings.get("FILEBASE_ACCESS_KEY") and settings.get("FILEBASE_SECRET_KEY"):
-        filebase = FilebasePinner.from_keys(settings.get("FILEBASE_BUCKET"), settings.get("FILEBASE_ACCESS_KEY"),
-                                            settings.get("FILEBASE_SECRET_KEY"))
+    if settings.get("FILEBASE_BUCKET") and settings.get("FILEBASE_ACCESS_KEY_ID") and settings.get("FILEBASE_SECRET_ACCESS_KEY"):
+        filebase = FilebasePinner.from_keys(settings.get("FILEBASE_BUCKET"), settings.get("FILEBASE_ACCESS_KEY_ID"),
+                                            settings.get("FILEBASE_SECRET_ACCESS_KEY"))
     pinner = Pinner(KuboPinner(settings.get("KUBO_API_URL", "http://127.0.0.1:5001")), filebase)
     relay = RelayClient(settings.get("RELAYER_URL", "http://127.0.0.1:8787"), secret)
     service = SubmitService(pinner=pinner, relay=relay, data_dir=data_dir, lookup_id=lookup,
