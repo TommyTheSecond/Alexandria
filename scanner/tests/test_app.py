@@ -113,3 +113,39 @@ def test_cors_allows_any_origin_without_credentials(tmp_path):
     r = _client(tmp_path).get("/api/health", headers={"Origin": "https://tommythesecond.github.io"})
     assert r.headers["access-control-allow-origin"] == "*"
     assert "access-control-allow-credentials" not in r.headers
+
+
+class FixedService:
+    def __init__(self, status):
+        self.status = status
+
+    def submit(self, pdf, meta, *, via, sha256, total_size):
+        from scanner.submit import SubmitResponse
+
+        return SubmitResponse(self.status, {"code": "X"})
+
+
+def test_submit_answers_4xx_do_not_use_the_quota(tmp_path):
+    for status in (400, 409, 413, 422):
+        client = TestClient(create_app(data_dir=tmp_path, submit_service=FixedService(status)))
+        assert [_post_submit(client).status_code for _ in range(6)] == [status] * 6
+
+
+def test_submit_relay_errors_use_the_quota(tmp_path):
+    client = TestClient(create_app(data_dir=tmp_path, submit_service=FixedService(502)))
+    assert [_post_submit(client).status_code for _ in range(6)] == [502] * 5 + [429]
+
+
+def test_submit_bad_form_does_not_use_the_quota(tmp_path):
+    client = TestClient(create_app(data_dir=tmp_path, submit_service=FakeService()))
+    for _ in range(6):
+        r = client.post("/api/submit", files={"pdf": ("good.pdf", GOOD.read_bytes(), "application/pdf")},
+                        data={"meta": "{not json"})
+        assert r.status_code == 400
+    assert _post_submit(client).status_code == 200
+
+
+def test_submit_hourly_limit_from_env(tmp_path, monkeypatch):
+    monkeypatch.setenv("UPLOADS_PER_HOUR", "20")
+    client = TestClient(create_app(data_dir=tmp_path, submit_service=FakeService()))
+    assert [_post_submit(client).status_code for _ in range(21)] == [200] * 20 + [429]

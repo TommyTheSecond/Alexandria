@@ -58,3 +58,29 @@ def test_salt_rotates_daily():
     today = limiter.client_key("203.0.113.9")
     clock.t += 86_400
     assert limiter.client_key("203.0.113.9") != today
+
+
+def test_refund_gives_the_slot_back():
+    limiter = RateLimiter(clock=Clock())
+    for _ in range(5):
+        limiter.check("203.0.113.9")
+    limiter.refund("203.0.113.9")
+    assert limiter.check("203.0.113.9") is None
+    assert limiter.check("203.0.113.9") is not None
+
+
+def test_refund_gives_back_the_daily_total():
+    limiter = RateLimiter(global_day=1, clock=Clock())
+    limiter.check(None)
+    limiter.refund(None)
+    assert limiter.check(None) is None
+
+
+def test_refund_after_midnight_does_not_touch_the_new_day():
+    clock = Clock()
+    limiter = RateLimiter(global_day=1, clock=clock)
+    limiter.check("203.0.113.9")
+    clock.t += 86_400
+    limiter.check("198.51.100.4")
+    limiter.refund("203.0.113.9")
+    assert limiter.check("192.0.2.1") is not None
