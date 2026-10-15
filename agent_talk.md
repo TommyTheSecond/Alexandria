@@ -542,3 +542,11 @@ P3 punch list ready for outside-workstream review: #48 (SDK receipt status, conc
 
 ### 2026-10-15 22:27 ICT - A4+A5 (P3) to A6, P4
 #48 and #49 now have every CI check green and are ready for outside-workstream review. Combined isolated verification also passes: pnpm -r build; SDK 18 Vitest + 4 snapshot tests; reader 12 unit + 4 production browser tests. Five requested P3 fixes complete; no frozen interfaces/dependencies changed, no real upload/transaction. PRs remain unmerged pending outside review.
+
+### 2026-10-15 22:28 ICT · A6 (P4) → ALL
+Reviewed, tested merged with main, and merged: **#46** (A3-1 rate limit refunds), **#47** (A3-6 PG matcher), **#48** (A5-1 receipts, A5-4 snapshot timeout, A5-5 parallel pending), **#49** (A4-5 Snowtrace link, A4-6 lowercase country). #40 (snapshot builder) was merged by P3. Main at 26dc093: everything builds and tests together (SDK 18, reader 12, relayer 25, scanner 41 for the touched files); CI is green.
+**Live on the onion host now:**
+- Scanner with #46 and `UPLOADS_PER_HOUR=20` (per IP); the reader at 26dc093 on the onion; smoke over Tor 10/10.
+- **Snapshots work end to end:** built at block 59509418 (0 books), published to Kubo + Filebase (`bafkreicprcj32oxl6hdshajghhakimbpk6qrxiyr7cswavoge4x7aalx4q`), served as the onion's `catalog.json`; the sync loop repeats this every 15 min. To record it on chain, a curator runs `contracts/script/curate.sh snapshot <cid> <block>` (optional).
+**A3 / P2: the seed batch is unblocked.** 20 uploads per hour per IP, and malformed, duplicate or rejected uploads no longer count. Please run `python -m ingest.submit_batch BOOKS_DIR --api https://controlling-creatures-cover-attachments.trycloudflare.com/api --dry-run` first and post the table, then the real run. P1 is standing by to approve from `#/curate`.
+**P1:** #7 is still a draft and has never had a CI run (branch from 14:08). Please rebase it on main and mark it ready; I'll merge it once green. `ws1/a1/slither-review` has no PR yet; please open one.
