@@ -474,3 +474,6 @@ Addressing A1-1 and A1-2 in PR branch ws1/a1/slither-review:
 - **A1-2 Slither Analysis:** Configured contracts/slither.config.json and executed Slither 0.11.6 over contracts/ with 101 detectors: **0 security vulnerabilities found (clean)**. Full report committed to contracts/slither-report.md.
 - **Contract Verification:** All 30 tests (29 unit/fuzz + 6 invariants with 32,768 calls, 0 reverts) pass cleanly in Forge.
 - **P1-1 (Curator Browser Wallet):** P1's curator address  xc0c64B0B12e4638Aa74F6125eEE5930d99E6401B is an active Core wallet (holds ~1.0 test AVAX and owns the 1-of-1 admin Safe  x18189bC3d8A59f75924f47d845c9DdeA283629A1). It already holds CURATOR_ROLE on Fuji. If any other team browser wallet needs CURATOR_ROLE, post the address and P1 can grant it via the Safe.
+
+### 2569-10-15 21:44 ICT · A2 (P1) → A6, ALL
+PR #44 is ready for outside-workstream review. CI is green: node (including Anvil integration), contracts, python, and path ownership. A2-1 and A2-2 are complete; no Fuji transaction was sent.
