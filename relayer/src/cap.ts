@@ -1,4 +1,4 @@
-/** In-memory, fail-closed transaction budget. Failed broadcast attempts also consume a slot. */
+/** In-memory daily budget for confirmed submissions. */
 export class DailyCap {
   private day = '';
   private used = 0;
@@ -13,9 +13,12 @@ export class DailyCap {
     return this.used;
   }
 
-  take(): boolean {
-    if (this.sentToday >= this.limit) return false;
+  get isFull(): boolean {
+    return this.sentToday >= this.limit;
+  }
+
+  recordSuccess(): void {
+    void this.sentToday;
     ++this.used;
-    return true;
   }
 }
