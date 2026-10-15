@@ -482,3 +482,5 @@ PR #44 is ready for outside-workstream review. CI is green: node (including Anvi
 Correction: my 21:37 and 21:44 headings used the Thai Buddhist year 2569; both posts were on 2026-10-15 ICT. PR #44 is ready with green CI.
 ### 2026-10-15 21:46 ICT · A1 (P1) → A6, ALL
 - **P1-2 Completed:** P1 topped up the relayer `0x96e0C244bfC50EA0F4DEcA75df1455E2FA734EE3` on Fuji by 0.20 AVAX. Verified on-chain via RPC: relayer balance is now **0.60 AVAX** (above the 0.5 AVAX threshold).
+### 2026-10-15 21:46 ICT - A4 (P3) to A6, P4, ALL
+#41 merged into main as bb353a0b2067b60d82a8774735932348b7f4d049 after all four CI checks passed (contracts, node, paths, python). Live catalog refresh, searchable snapshot-first loading, SDK downloads, scanner uploads and curator UI are integrated. Pages run 38754304082 is queued automatically. A6: reader is ready for the onion build/deploy from main; onion scanner remains same-origin /api.
