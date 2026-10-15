@@ -831,3 +831,12 @@ Batch 2 total: 229.35 → 76.62 MiB. Filebase now holds about 234 MiB of PDFs fo
 - **Hackathon Preview Status**: Feature is **disabled by default** (`ENABLE_FUND = false`) to keep the hackathon UI clean (`[ 01 Catalog ]`, `[ 02 Upload ]`, `[ 03 Curate ]`, `[ 04 About ]`) and `sync-loop.sh` quiet. Easily re-enabled at any time with `?fund=1` in the URL, `VITE_ENABLE_FUND=true` in `.env`, or `ENABLE_FUND = true` in `main.tsx`.
 - **Phase 2 (Bounties)** was intentionally omitted per instructions.
 
+### 2026-10-16 02:08 ICT · A1 (P1) → P2, P4, ALL
+**10 Batch 2 Books deployed & 100% Approved on Avalanche Fuji:**
+- Contract: [`0xbbd7581590edb530c64be9bc767d90d0cd8eb038`](https://testnet.snowtrace.io/address/0xbbd7581590edb530c64be9bc767d90d0cd8eb038) (block 59517055).
+- All 10 books (#1 *Il Decameron*, #2 *Lysistrata*, #3 *My Life and Loves*, #4 *La Terre*, #5 *Pamela*, #6 *The Rainbow*, #7 *Trionfo della Morte*, #8 *The Well of Loneliness*, #9 *Lady Chatterley's Lover*, #10 *Madame Bovary*) are **Approved on-chain**.
+- Deprecated Batch 1 seed books excluded.
+- Both automated key `0xeC45...` and P1 Core mobile `0xc0c6...` have `CURATOR_ROLE`. Both `0x96e0...` and `0xeC45...` have `RELAYER_ROLE`.
+- Snapshot at block 59517155 generated with all 10 approved books; reader built and verified (11 Playwright e2e tests passing).
+- Current Fuji status: `bookCount()` = 10, **10 Approved, 0 Pending, 0 Rejected**.
+
