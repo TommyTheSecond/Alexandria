@@ -123,6 +123,15 @@ A confirmed book can still be flagged, but flags no longer change its state.
 | Shared, frozen | all 4 | none | `contracts/src/IAlexandria.sol`, `schemas/`, `packages/sdk/src/types.ts`, `docs/INTERFACES.md` |
 | Plan | P4 | none | `README.md`, `AGENTS.md`, `CLAUDE.md`, `docs/agents/` |
 
+**People:**
+
+| Role | GitHub |
+|---|---|
+| P1 (chain) | |
+| P2 (content) | |
+| P3 (reader) | |
+| P4 (access + ops, integration lead) | @TommyTheSecond |
+
 Human-only work (no agent): P2 runs U-bot and checks each book's public-domain status and ban sources. All 4 people approve books as curators.
 
 Agent briefs: [A1](docs/agents/A1-contracts.md) · [A2](docs/agents/A2-tests-relayer.md) · [A3](docs/agents/A3-scanner-ingest.md) · [A4](docs/agents/A4-reader-ui.md) · [A5](docs/agents/A5-sdk.md) · [A6](docs/agents/A6-access-ops.md). Every agent also reads [AGENTS.md](AGENTS.md).
@@ -143,7 +152,7 @@ Agent briefs: [A1](docs/agents/A1-contracts.md) · [A2](docs/agents/A2-tests-rel
 ### 4.2 `.github/CODEOWNERS`
 
 ```
-*                                   @P4
+*                                   @TommyTheSecond
 /contracts/                         @P1
 /relayer/                           @P1
 /deployments/                       @P1
@@ -153,16 +162,16 @@ Agent briefs: [A1](docs/agents/A1-contracts.md) · [A2](docs/agents/A2-tests-rel
 /apps/reader/                       @P3
 /packages/sdk/                      @P3
 /snapshots/                         @P3
-/infra/                             @P4
-/assets/                            @P4
-/.github/                           @P4
-/contracts/src/IAlexandria.sol      @P1 @P2 @P3 @P4
-/schemas/                           @P1 @P2 @P3 @P4
-/packages/sdk/src/types.ts          @P1 @P2 @P3 @P4
-/docs/INTERFACES.md                 @P1 @P2 @P3 @P4
+/infra/                             @TommyTheSecond
+/assets/                            @TommyTheSecond
+/.github/                           @TommyTheSecond
+/contracts/src/IAlexandria.sol      @P1 @P2 @P3 @TommyTheSecond
+/schemas/                           @P1 @P2 @P3 @TommyTheSecond
+/packages/sdk/src/types.ts          @P1 @P2 @P3 @TommyTheSecond
+/docs/INTERFACES.md                 @P1 @P2 @P3 @TommyTheSecond
 ```
 
-Replace `@P1`–`@P4` with your GitHub usernames. In CODEOWNERS the last matching line wins, so the frozen-file lines must stay at the bottom.
+Replace `@P1`–`@P3` with your GitHub usernames. In CODEOWNERS the last matching line wins, so the frozen-file lines must stay at the bottom.
 
 ## 5. Frozen interfaces
 
