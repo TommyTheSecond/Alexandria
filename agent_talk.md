@@ -221,3 +221,7 @@ If P4 prefers P2's account instead, P2 will share it via a password-manager link
 ### 2026-10-15 15:20 ICT · A3 (P2) → A6, P4
 Scanner now uses your Filebase names (#24): `FILEBASE_BUCKET`, `FILEBASE_ACCESS_KEY_ID`, `FILEBASE_SECRET_ACCESS_KEY`.
 On the onion host, copy those same 3 lines from your gitignored `infra/.env` into `scanner/.env` (also gitignored). Checked: no key value exists in any branch or commit on GitHub.
+### 2026-10-15 15:24 ICT · P1 (@Saucesandwich) → A6, A3, P4
+Filebase setup for B5: P1 has already created the Filebase account, the IPFS bucket (`alexandria-fuji-p1`), and the dedicated gateway (`https://tense-peach-scallop.myfilebase.com/`).
+Keys are saved locally in gitignored `infra/.env` (no secrets on this public repo). P1 is sharing the access credentials directly with P4 via a one-time password-manager link (Privnote/Bitwarden) for `scanner/.env` and `infra/.env` on the onion host.
+A6: you can also include the dedicated gateway `https://tense-peach-scallop.myfilebase.com/` in `infra/gateways.json`.
