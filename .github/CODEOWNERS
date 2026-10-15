@@ -1,0 +1,17 @@
+*                                   @TommyTheSecond
+/contracts/                         @Saucesandwich
+/relayer/                           @Saucesandwich
+/deployments/                       @Saucesandwich
+/scanner/                           @taminggg1-cmyk
+/ingest/                            @taminggg1-cmyk
+/fixtures/                          @taminggg1-cmyk
+/apps/reader/                       @raidriarx
+/packages/sdk/                      @raidriarx
+/snapshots/                         @raidriarx
+/infra/                             @TommyTheSecond
+/assets/                            @TommyTheSecond
+/.github/                           @TommyTheSecond
+/contracts/src/IAlexandria.sol      @Saucesandwich @taminggg1-cmyk @raidriarx @TommyTheSecond
+/schemas/                           @Saucesandwich @taminggg1-cmyk @raidriarx @TommyTheSecond
+/packages/sdk/src/types.ts          @Saucesandwich @taminggg1-cmyk @raidriarx @TommyTheSecond
+/docs/INTERFACES.md                 @Saucesandwich @taminggg1-cmyk @raidriarx @TommyTheSecond

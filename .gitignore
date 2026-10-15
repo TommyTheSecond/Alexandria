@@ -1,0 +1,28 @@
+# Secrets (README 13): only .env.example is committed
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Build output
+node_modules/
+dist/
+coverage/
+contracts/out/
+contracts/cache/
+fixtures/out/
+scanner/data/
+
+# Onion private key and Kubo repo: never commit
+infra/tor/hs/
+infra/kubo/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# OS
+.DS_Store
