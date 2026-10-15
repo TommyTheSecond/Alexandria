@@ -24,10 +24,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: infra unit tests
-        run: node --test infra/
       - name: Changed files stay inside the branch's owned paths
         run: node infra/scripts/check-paths.mjs
+
+  # On pushes to main too, so a broken infra script shows up after a merge, not only on PRs.
+  infra:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: infra unit tests
+        run: node --test infra/
 
   contracts:
     runs-on: ubuntu-latest
@@ -74,6 +83,11 @@ jobs:
       - name: pnpm install
         if: hashFiles('apps/*/package.json', 'packages/*/package.json', 'relayer/package.json') != ''
         run: pnpm install --no-frozen-lockfile
+      # Typecheck and build every package together (reader tsc + Vite, SDK tsc, relayer tsc), so a
+      # type error or a broken cross-package import can't merge green on tests alone.
+      - name: pnpm -r build
+        if: hashFiles('apps/*/package.json', 'packages/*/package.json', 'relayer/package.json') != ''
+        run: pnpm -r build
       - name: pnpm -r test
         if: hashFiles('apps/*/package.json', 'packages/*/package.json', 'relayer/package.json') != ''
         run: pnpm -r test

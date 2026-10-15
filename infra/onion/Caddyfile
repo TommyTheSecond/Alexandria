@@ -41,3 +41,23 @@ http://:8088 {
 		file_server
 	}
 }
+
+# Clearnet upload tunnel's way in (tunnel.sh): only the scanner API, with the same 32 MB body cap as the
+# onion. Cloudflare puts the uploader's IP in CF-Connecting-IP; pass it on as X-Forwarded-For so the
+# scanner's per-IP upload limit still works (it trusts X-Forwarded-For only from a loopback proxy).
+http://:8089 {
+	bind 127.0.0.1
+
+	handle /api/* {
+		request_body {
+			max_size 32MB
+		}
+		reverse_proxy 127.0.0.1:8000 {
+			header_up X-Forwarded-For {header.CF-Connecting-IP}
+		}
+	}
+
+	handle {
+		respond 404
+	}
+}

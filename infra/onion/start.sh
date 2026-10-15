@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Starts the onion mirror (A6 T1): Kubo, the scanner if it exists, Caddy and Tor.
+# Starts the onion mirror (A6 T1): Kubo, the relayer, the scanner, Caddy (with the reader) and Tor.
 # Run from anywhere: infra/onion/start.sh   Ctrl-C stops everything.
 # Every service listens on 127.0.0.1 only. Tor is the only way in.
 set -euo pipefail
@@ -84,11 +84,17 @@ else
   echo "scanner  not built yet: /api/* returns 502 until it is"
 fi
 
-# Caddy on 127.0.0.1:8088: the reader build, or the test page until it exists.
-export SITE_ROOT="$ROOT/apps/reader/dist"
-[ -f "$SITE_ROOT/index.html" ] || SITE_ROOT="$ROOT/infra/onion/test-site"
+# Caddy on 127.0.0.1:8088 serves infra/onion/run/site: the reader built for the onion by build-site.sh.
+# Until the first build finishes it holds the test page. The build runs in the background (after a
+# `git pull` it rebuilds), so Tor comes up without waiting; Caddy serves the new files once they land.
+# Caddy on 127.0.0.1:8089 is the clearnet tunnel's way in (tunnel.sh): /api only, same body cap.
+export SITE_ROOT="$RUN/site"
+if [ ! -f "$SITE_ROOT/index.html" ]; then
+  mkdir -p "$SITE_ROOT" && cp -R infra/onion/test-site/. "$SITE_ROOT/" && rm -f "$RUN/site.commit"
+fi
 caddy run --config infra/onion/Caddyfile --adapter caddyfile >"$RUN/caddy.log" 2>&1 & pids+=($!)
-echo "caddy    serving $SITE_ROOT"
+echo "caddy    serving infra/onion/run/site on 127.0.0.1:8088; tunnel entry on 127.0.0.1:8089"
+infra/onion/build-site.sh &
 
 # Tor: the onion's private key lives in infra/tor/hs (gitignored).
 mkdir -p infra/tor/hs infra/tor/data

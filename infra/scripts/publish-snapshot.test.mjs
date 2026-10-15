@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateSnapshot, curateCommand, publishSnapshot } from './publish-snapshot.mjs';
+import { validateSnapshot, curateCommand, publishSnapshot, snapshotPath, buildArgs } from './publish-snapshot.mjs';
 import { kuboClient } from './kubo.mjs';
 import { startFakeKubo } from './fake-kubo.mjs';
 
@@ -48,4 +48,13 @@ test('an invalid snapshot is never added to Kubo', async () => {
   await assert.rejects(publishSnapshot({ bytes: Buffer.from('{"chainId":1}'), kubo: kuboClient(k.url) }));
   k.close();
   assert.equal(k.calls.length, 0);
+});
+
+test('the host can keep its snapshot outside the committed file', () => {
+  const committed = snapshotPath({});
+  assert.match(committed, /snapshots\/latest\.json$/);
+  assert.deepEqual(buildArgs(committed), ['--filter', '@alexandria/sdk', 'run', 'build-snapshot']);
+  const host = snapshotPath({ SNAPSHOT_FILE: '/tmp/alexandria-host/latest.json' });
+  assert.equal(host, '/tmp/alexandria-host/latest.json');
+  assert.deepEqual(buildArgs(host).slice(-2), ['--out', '/tmp/alexandria-host/latest.json']);
 });

@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import { existsSync } from 'node:fs';
+test.skip(!existsSync('public/political/catalog.json'), 'Local political collection is not installed');
 
 test('political demo shows eleven real books and source disclosure',async({page})=>{
   await page.goto('/?collection=political#/');

@@ -13,7 +13,15 @@ miss() { echo "FAIL  $1"; fail=1; }
 
 check_routes() { # $1 = base URL, rest = extra curl args
   local base="$1"; shift
-  curl -fsS "$@" "$base/" | grep -q ALEXANDRIA && pass "$base/ serves the site" || miss "$base/ serves the site"
+  local page
+  page="$(curl -fsS "$@" "$base/")"
+  if echo "$page" | grep -q 'id="app"'; then pass "$base/ serves the reader"
+  elif echo "$page" | grep -q ALEXANDRIA; then miss "$base/ serves the test page, not the reader (see infra/onion/run/site-build.log)"
+  else miss "$base/ serves the site"; fi
+  # A Tor user's upload must stay on the onion: the reader's config must point at /api, not the tunnel.
+  curl -fsS "$@" "$base/config.json" | grep -qE '"apiBase": *"/api"' \
+    && pass "$base/config.json keeps uploads on the onion (/api)" \
+    || miss "$base/config.json does not set apiBase to /api"
 
   local got
   got="$(curl -fsS "$@" "$base/ipfs/$CID" | shasum -a 256 | cut -d' ' -f1)"

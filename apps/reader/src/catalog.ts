@@ -10,6 +10,7 @@ export interface CatalogBook {
     authors: { name: string }[];
     firstPublishedYear?: number;
     description?: string;
+    pdf?: { bytes: number };
     publicDomain?: { sourceUrl: string; sourceName: string };
     bans: { country: string; scope: string; year?: number; authority?: string; sourceUrl?: string }[];
   } | null;
