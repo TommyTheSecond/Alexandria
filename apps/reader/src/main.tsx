@@ -31,6 +31,7 @@ function App() {
   const [scope, setScope] = useState('');
   const [file, setFile] = useState<File>();
   const [message, setMessage] = useState('');
+  const [submissionTx, setSubmissionTx] = useState<string | null>(null);
   const [client, setClient] = useState<AlexandriaClient | null>(null);
   const [uploadEnabled, setUploadEnabled] = useState(false);
   const [onionUrl, setOnionUrl] = useState('');
@@ -44,7 +45,7 @@ function App() {
   const [duplicateId, setDuplicateId] = useState<number | null>(null);
   const [reports, setReports] = useState<Record<number, ScanReport | null>>({});
   useEffect(() => {
-    const change = () => { setRoute(location.hash.slice(1) || '/'); setMessage(''); setScanReport(null); setDuplicateId(null); };
+    const change = () => { setRoute(location.hash.slice(1) || '/'); setMessage(''); setSubmissionTx(null); setScanReport(null); setDuplicateId(null); };
     addEventListener('hashchange', change);
     const controller = new AbortController();
     let active = true;
@@ -131,6 +132,7 @@ function App() {
   }
   async function checkUpload(event: SubmitEvent) {
     event.preventDefault();
+    setSubmissionTx(null);
     const form = event.currentTarget as HTMLFormElement;
     if (!file) return setMessage('Choose a PDF first.');
     if (file.size > 31457280) return setMessage('The PDF must be 30 MB or smaller.');
@@ -151,6 +153,9 @@ function App() {
     try {
       const result = await client.submit(file, meta);
       setScanReport(result.report);
+      if (result.report.verdict !== 'reject' && /^0x[0-9a-f]{64}$/.test(result.txHash ?? '')) {
+        setSubmissionTx(result.txHash);
+      }
       const failed = result.report.checks?.filter(check => !check.passed).map(check => check.id).join(', ');
       setMessage(result.report.verdict === 'reject' ? `Rejected: ${failed || 'scanner checks failed'}. Nothing was uploaded.` :
         `Submitted as book #${result.bookId}. A curator must review it before it appears in the catalog.`);
@@ -245,9 +250,9 @@ function App() {
       </> : route === '/upload' ? <>
         <h2>Upload a book</h2><p>Only public-domain PDFs. First published in 1930 or earlier, with every author and translator deceased by 1955. Unknown years require curator review.</p>
         {!uploadEnabled && <p>Uploads are not available from this mirror yet. Reading and downloads still work.</p>}
-        <form onSubmit={checkUpload}><label>PDF (up to 30 MB)<input type="file" accept="application/pdf,.pdf" required onChange={e => setFile(e.currentTarget.files?.[0])} /></label><label>Title<input name="title" required maxLength={300} /></label><label>Author<input name="authors" required /></label><label>Author death year, if known<input name="authorDeath" type="number" max="2026" /></label><label>Translator, if any<input name="translators" /></label><label>Translator death year, if known<input name="translatorDeath" type="number" max="2026" /></label><label>First publication year<input name="year" type="number" min="-3000" max="2026" required /></label><label>Language code<input name="language" defaultValue="en" pattern="[a-z]{2,3}(-[A-Za-z0-9]{2,8})*" required /></label><label>Description<input name="description" maxLength={1000} /></label><label>Public-domain source name<input name="sourceName" required /></label><label>Public-domain source URL<input name="source" type="url" required /></label><label>Ban country (two-letter code)<input name="country" pattern="[A-Z]{2}" required /></label><label>Ban authority<input name="authority" required /></label><label>Ban year<input name="banYear" type="number" min="-3000" max="2026" required /></label><label>Ban scope<select name="scope" required>{['national','regional','import','postal','library','school','religious'].map(s => <option key={s}>{s}</option>)}</select></label><label>Ban source URL<input name="banSource" type="url" required /></label><button type="submit" disabled={busy || !uploadEnabled}>Submit for review</button></form>{scanReport && <section aria-label="Scan report"><h3>Scan report: {scanReport.verdict}</h3><table><thead><tr><th>Check</th><th>Result</th><th>Detail</th></tr></thead><tbody>{(scanReport.checks ?? []).map(check => <tr key={check.id}><th scope="row">{check.id}</th><td>{check.passed ? 'Pass' : check.severity === 'reject' ? 'Reject' : 'Review'}</td><td>{check.detail}</td></tr>)}</tbody></table></section>}{duplicateId && <p><a href={`#/book/${duplicateId}`}>Open existing book #{duplicateId}</a></p>}
+        <form onSubmit={checkUpload}><label>PDF (up to 30 MB)<input type="file" accept="application/pdf,.pdf" required onChange={e => setFile(e.currentTarget.files?.[0])} /></label><label>Title<input name="title" required maxLength={300} /></label><label>Author<input name="authors" required /></label><label>Author death year, if known<input name="authorDeath" type="number" max="2026" /></label><label>Translator, if any<input name="translators" /></label><label>Translator death year, if known<input name="translatorDeath" type="number" max="2026" /></label><label>First publication year<input name="year" type="number" min="-3000" max="2026" required /></label><label>Language code<input name="language" defaultValue="en" pattern="[a-z]{2,3}(-[A-Za-z0-9]{2,8})*" required /></label><label>Description<input name="description" maxLength={1000} /></label><label>Public-domain source name<input name="sourceName" required /></label><label>Public-domain source URL<input name="source" type="url" required /></label><label>Ban country (two-letter code)<input name="country" pattern="[A-Za-z]{2}" required /></label><label>Ban authority<input name="authority" required /></label><label>Ban year<input name="banYear" type="number" min="-3000" max="2026" required /></label><label>Ban scope<select name="scope" required>{['national','regional','import','postal','library','school','religious'].map(s => <option key={s}>{s}</option>)}</select></label><label>Ban source URL<input name="banSource" type="url" required /></label><button type="submit" disabled={busy || !uploadEnabled}>Submit for review</button></form>{scanReport && <section aria-label="Scan report"><h3>Scan report: {scanReport.verdict}</h3><table><thead><tr><th>Check</th><th>Result</th><th>Detail</th></tr></thead><tbody>{(scanReport.checks ?? []).map(check => <tr key={check.id}><th scope="row">{check.id}</th><td>{check.passed ? 'Pass' : check.severity === 'reject' ? 'Reject' : 'Review'}</td><td>{check.detail}</td></tr>)}</tbody></table></section>}{duplicateId && <p><a href={`#/book/${duplicateId}`}>Open existing book #{duplicateId}</a></p>}
       </> : route === '/curate' ? <><h2>Curate submissions</h2><p>Curators approve or reject books after reviewing the scan report and public-domain sources.</p><button type="button" disabled={busy || !client} onClick={connectCurator}>Connect curator wallet</button>{isCurator && <><p>{pending.length} pending books</p>{pending.map(item => <PendingCard key={item.id} item={item} report={reports[item.id]} reportUrl={reportUrl} busy={busy} onDownload={() => downloadBook(item, true)} onReview={reviewBook} />)}</>}</> : route === '/about' ? <><h2>About Alexandria</h2><p>A library of banned books in the public domain, named after the Library of Alexandria.</p><p>Reading and downloading do not require an account or wallet. PDFs are checked against their on-chain SHA-256 hash before saving.</p><p>The registry uses Avalanche Fuji testnet; files use IPFS. {onionUrl && <>Onion mirror: <a href={onionUrl}>{onionUrl}</a>.</>}</p><p>Unaudited · Fuji testnet only.</p></> : <><h2>Page not found</h2><a href="#/">Return to catalog</a></>}
-      {message && <p role="status">{message}</p>}
+      {message && <p role="status">{message}{submissionTx && <> <a href={`https://testnet.snowtrace.io/tx/${submissionTx}`}>View submission on Snowtrace</a></>}</p>}
     </main><footer><div className="ascii-rule" aria-hidden="true">{'='.repeat(180)}</div><div className="footer-grid"><p>ALEXANDRIA<br /><span>A home for words that would not disappear.</span></p><p>PUBLIC DOMAIN / OPEN ACCESS<br />Unaudited · Fuji testnet only</p></div><p className="footer-colophon">SET IN CHARACTERS. HELD IN COMMON. <span aria-hidden="true">[ EOF ]</span></p></footer>
   </>;
 }
