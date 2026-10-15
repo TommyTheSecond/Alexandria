@@ -16,8 +16,11 @@ http://:8088 {
 		}
 	}
 
-	# Scanner upload API (A3), I5.
+	# Scanner upload API (A3), I5. The scanner accepts 30 MB PDFs; cap the whole multipart body.
 	handle /api/* {
+		request_body {
+			max_size 32MB
+		}
 		reverse_proxy 127.0.0.1:8000 {
 			header_up -X-Forwarded-For
 		}

@@ -24,10 +24,12 @@ try {
     -RedirectStandardOutput "$Run\kubo.log" -RedirectStandardError "$Run\kubo.err.log"
   Write-Host 'kubo     starting (log: infra\onion\run\kubo.log)'
 
-  # Scanner (A3) on 127.0.0.1:8000 with no access log. Override with $env:SCANNER_CMD.
+  # Scanner (A3) on 127.0.0.1:8000 with no access log, from the repo root. ClamAV is required.
+  $env:ALEXANDRIA_REQUIRE_CLAMAV = '1'
+  $py = if (Test-Path '.venv\Scripts\python.exe') { '.venv\Scripts\python.exe' } else { 'python' }
   $scanner = $env:SCANNER_CMD
   if (-not $scanner -and (Test-Path 'scanner\app.py')) {
-    $scanner = 'python -m uvicorn scanner.app:app --host 127.0.0.1 --port 8000 --no-access-log'
+    $scanner = "$py -m uvicorn scanner.app:app --host 127.0.0.1 --port 8000 --no-access-log"
   }
   if ($scanner) {
     $exe, $args_ = $scanner -split ' ', 2
