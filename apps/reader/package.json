@@ -4,15 +4,16 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 127.0.0.1",
-    "build": "tsc --noEmit && vite build",
+    "dev": "node scripts/copy-snapshot.mjs && vite --host 127.0.0.1",
+    "build": "pnpm --filter @alexandria/sdk build && node scripts/copy-snapshot.mjs && tsc --noEmit && vite build",
     "test": "vitest run"
   },
   "dependencies": {
+    "@alexandria/sdk": "workspace:*",
     "preact": "^10.26.0"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.13.0",
+    "@axe-core/playwright": "4.13.0",
     "@playwright/test": "^1.64.1",
     "typescript": "~5.7.3",
     "vite": "^5.4.21",
