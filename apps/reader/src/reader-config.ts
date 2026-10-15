@@ -20,3 +20,7 @@ export function resolveReaderConfig(hostname: string, runtime: RuntimeConfig, en
   };
   return { client, uploadEnabled: Boolean(apiBase), onionUrl: runtime.onion ? `http://${runtime.onion}/` : '' };
 }
+
+export function sortPendingByScore<T extends { id: number }>(books: T[], scores: Record<number, number>) {
+  return [...books].sort((a, b) => (scores[a.id] ?? Infinity) - (scores[b.id] ?? Infinity) || a.id - b.id);
+}

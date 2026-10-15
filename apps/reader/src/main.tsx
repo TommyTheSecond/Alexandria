@@ -5,8 +5,10 @@ import './style.css';
 import { verifiedSample } from './sample-download';
 import { HeaderArt } from './HeaderArt';
 import { AthensArt } from './AthensArt';
-import { AlexandriaError, type AlexandriaClient, type Book, type BookMetaInput, type WalletActions } from '@alexandria/sdk';
+import { AlexandriaError, type AlexandriaClient, type Book, type BookMetaInput, type ScanReport, type WalletActions } from '@alexandria/sdk';
 import { connectReader } from './reader-client';
+import { sortPendingByScore } from './reader-config';
+import { PendingCard } from './PendingCard';
 const politicalMode = new URLSearchParams(location.search).get('collection') === 'political';
 const sampleMode = politicalMode || new URLSearchParams(location.search).get('samples') === '1';
 
@@ -38,8 +40,11 @@ function App() {
   const [pending, setPending] = useState<Book[]>([]);
   const [isCurator, setIsCurator] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [scanReport, setScanReport] = useState<ScanReport | null>(null);
+  const [duplicateId, setDuplicateId] = useState<number | null>(null);
+  const [reports, setReports] = useState<Record<number, ScanReport | null>>({});
   useEffect(() => {
-    const change = () => { setRoute(location.hash.slice(1) || '/'); setMessage(''); };
+    const change = () => { setRoute(location.hash.slice(1) || '/'); setMessage(''); setScanReport(null); setDuplicateId(null); };
     addEventListener('hashchange', change);
     const controller = new AbortController();
     let active = true;
@@ -85,8 +90,8 @@ function App() {
       setMessage(politicalMode ? 'PDF verified against the local source manifest and downloaded.' : 'Sample PDF verified and downloaded.');
     } catch (error) { setMessage(error instanceof Error ? error.message : 'Download failed.'); }
   }
-  async function downloadBook(book: CatalogBook) {
-    if (!client || !['approved', 'flagged'].includes(book.status) ||
+  async function downloadBook(book: CatalogBook, allowPending = false) {
+    if (!client || !(['approved', 'flagged'].includes(book.status) || (allowPending && book.status === 'pending')) ||
         !/^baf[a-z2-7]{20,97}$/.test(book.pdfCid ?? '') || !/^0x[0-9a-f]{64}$/.test(book.pdfSha256 ?? '')) {
       setMessage('This book does not have a verified PDF available yet.');
       return;
@@ -124,14 +129,39 @@ function App() {
       bans: [{ country: value('country').toUpperCase(), authority: value('authority'), year: Number(value('banYear')),
         scope: value('scope') as BookMetaInput['bans'][number]['scope'], sourceUrl: value('banSource') }],
     };
-    setBusy(true); setMessage('Scanning and submitting PDF…');
+    setBusy(true); setScanReport(null); setDuplicateId(null); setMessage('Scanning and submitting PDF…');
     try {
       const result = await client.submit(file, meta);
-      setMessage(result.report.verdict === 'reject' ? 'Scanner rejected this PDF. Nothing was uploaded.' :
+      setScanReport(result.report);
+      const failed = result.report.checks?.filter(check => !check.passed).map(check => check.id).join(', ');
+      setMessage(result.report.verdict === 'reject' ? `Rejected: ${failed || 'scanner checks failed'}. Nothing was uploaded.` :
         `Submitted as book #${result.bookId}. A curator must review it before it appears in the catalog.`);
     } catch (error) {
-      setMessage(error instanceof AlexandriaError ? `${error.code}: ${error.message}` : 'Submission failed. Please try again.');
+      if (error instanceof AlexandriaError) {
+        const detail = error.detail as { existingId?: number; retryAfterSec?: number } | undefined;
+        if (error.code === 'DUPLICATE') { setDuplicateId(detail?.existingId ?? null); setMessage('This PDF is already registered.'); }
+        else if (error.code === 'RATE_LIMIT') setMessage(`Upload limit reached. Try again in ${detail?.retryAfterSec ?? 'a few'} seconds.`);
+        else if (error.code === 'TOO_LARGE') setMessage('Choose a PDF smaller than 30 MB.');
+        else setMessage(`${error.code}: ${error.message}`);
+      } else setMessage('Submission failed. Please try again.');
     } finally { setBusy(false); }
+  }
+  async function refreshPending(queueClient: AlexandriaClient) {
+    const books = await queueClient.getPending();
+    const loaded = await Promise.all(books.map(async item => {
+      const url = reportUrl(item.meta?.scanReportCid);
+      if (!url) return [item.id, null] as const;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) return [item.id, null] as const;
+        const report = await response.json() as ScanReport;
+        return [item.id, Number.isFinite(report.score) && Array.isArray(report.checks) ? report : null] as const;
+      } catch { return [item.id, null] as const; }
+    }));
+    const byId = Object.fromEntries(loaded) as Record<number, ScanReport | null>;
+    setReports(byId);
+    const scores = Object.fromEntries(loaded.filter(([, report]) => report).map(([id, report]) => [id, report!.score]));
+    setPending(sortPendingByScore(books, scores));
   }
   async function connectCurator() {
     if (!client) return;
@@ -139,7 +169,7 @@ function App() {
     try {
       const actions = await client.connectWallet();
       if (!await actions.isCurator()) { setMessage('This wallet does not have the curator role.'); return; }
-      setWallet(actions); setIsCurator(true); setPending(await client.getPending()); setMessage('Curator wallet connected.');
+      setWallet(actions); setIsCurator(true); await refreshPending(client); setMessage('Curator wallet connected.');
     } catch (error) { setMessage(error instanceof AlexandriaError ? `${error.code}: ${error.message}` : 'Wallet connection failed.'); }
     finally { setBusy(false); }
   }
@@ -150,7 +180,7 @@ function App() {
     setBusy(true);
     try {
       await wallet.review(id, approve, reason);
-      setPending(await client.getPending());
+      await refreshPending(client);
       setCatalog(await client.getCatalog());
       setMessage(`Book #${id} ${approve ? 'approved' : 'rejected'}.`);
     } catch (error) { setMessage(error instanceof AlexandriaError ? `${error.code}: ${error.message}` : 'Review failed.'); }
@@ -193,12 +223,12 @@ function App() {
         {!state && !visible.length && <p className="empty-state">[ No books on this shelf yet. Try another search. ]</p>}
         </section><section className="closing-note"><div className="ascii-rule" aria-hidden="true">{'-'.repeat(180)}</div><p>They burned the first library.<br /><strong>We are building the next one together.</strong></p><a href="#/upload">[ CONTRIBUTE A BOOK --&gt; ]</a></section>
       </> : route.startsWith('/book/') ? <>
-        <a href="#/">Back to catalog</a>{book ? <><h2>{book.meta?.title ?? `Book ${book.id}`}</h2><p>{book.meta?.authors.map(a => a.name).join(', ')}</p><p>{book.meta?.firstPublishedYear}</p><p>{book.meta?.description}</p>{book.status === 'flagged' && <p>Under review. This book remains available.</p>}<h3>Ban history</h3>{!book.meta?.bans.length && <p>Not yet researched. Inclusion in this political collection is not a claim that the book was banned.</p>}<ul>{book.meta?.bans.map((ban, i) => <li key={i}>{[ban.year, ban.country, ban.authority, ban.scope].filter(Boolean).join(' · ')} {safeUrl(ban.sourceUrl) && <a href={safeUrl(ban.sourceUrl)}>Source</a>}</li>)}</ul>{safeUrl(book.meta?.publicDomain?.sourceUrl) && <p><a href={safeUrl(book.meta?.publicDomain?.sourceUrl)}>Public-domain source</a></p>}{sampleMode && book.sampleFile ? <button type="button" onClick={() => downloadSample(book)}>{politicalMode ? 'Download PDF' : 'Download sample PDF'}</button> : <><button type="button" disabled={busy || !client} onClick={() => downloadBook(book)}>Download PDF{book.meta?.pdf?.bytes ? ` · ${(book.meta.pdf.bytes / 1024 / 1024).toFixed(1)} MB` : ''}</button>{progress > 0 && <p role="status">Received {(progress / 1024 / 1024).toFixed(1)} MB; verifying before saving.</p>}<label>Reason for flagging<input id="flag-reason" maxLength={300} /></label><button type="button" disabled={busy || !client} onClick={() => flagBook(book.id)}>Flag for curator review</button></>}</> : <p>{state || 'Book not found.'}</p>}
+        <a href="#/">Back to catalog</a>{book ? <><h2>{book.meta?.title ?? `Book ${book.id}`}</h2><p>{book.meta?.authors.map(a => a.name).join(', ')}</p><p>{book.meta?.firstPublishedYear}</p><p>{book.meta?.description}</p>{book.status === 'flagged' && <p>Under review. This book remains available.</p>}<h3>Ban history</h3>{!book.meta?.bans.length && <p>Not yet researched. Inclusion in this political collection is not a claim that the book was banned.</p>}<ul>{book.meta?.bans.map((ban, i) => <li key={i}>{[ban.year, ban.country, ban.authority, ban.scope].filter(Boolean).join(' · ')} {safeUrl(ban.sourceUrl) && <a href={safeUrl(ban.sourceUrl)}>Source</a>}</li>)}</ul>{safeUrl(book.meta?.publicDomain?.sourceUrl) && <p><a href={safeUrl(book.meta?.publicDomain?.sourceUrl)}>Public-domain source</a></p>}{sampleMode && book.sampleFile ? <button type="button" onClick={() => downloadSample(book)}>{politicalMode ? 'Download PDF' : 'Download sample PDF'}</button> : <><button type="button" disabled={busy || !client} onClick={() => downloadBook(book)}>Download PDF{book.meta?.pdf?.bytes ? ` · ${(book.meta.pdf.bytes / 1024 / 1024).toFixed(1)} MB` : ''}</button>{progress > 0 && <><progress value={progress} max={book.meta?.pdf?.bytes || progress} aria-label="PDF download progress" /><p role="status">Received {(progress / 1024 / 1024).toFixed(1)} MB; verifying before saving.</p></>}<label>Reason for flagging<input id="flag-reason" maxLength={300} /></label><button type="button" disabled={busy || !client} onClick={() => flagBook(book.id)}>Flag for curator review</button></>}</> : <p>{state || 'Book not found.'}</p>}
       </> : route === '/upload' ? <>
         <h2>Upload a book</h2><p>Only public-domain PDFs. First published in 1930 or earlier, with every author and translator deceased by 1955. Unknown years require curator review.</p>
         {!uploadEnabled && <p>Uploads are not available from this mirror yet. Reading and downloads still work.</p>}
-        <form onSubmit={checkUpload}><label>PDF (up to 30 MB)<input type="file" accept="application/pdf,.pdf" required onChange={e => setFile(e.currentTarget.files?.[0])} /></label><label>Title<input name="title" required maxLength={300} /></label><label>Author<input name="authors" required /></label><label>Author death year, if known<input name="authorDeath" type="number" max="2026" /></label><label>Translator, if any<input name="translators" /></label><label>Translator death year, if known<input name="translatorDeath" type="number" max="2026" /></label><label>First publication year<input name="year" type="number" min="-3000" max="2026" required /></label><label>Language code<input name="language" defaultValue="en" pattern="[a-z]{2,3}(-[A-Za-z0-9]{2,8})*" required /></label><label>Description<input name="description" maxLength={1000} /></label><label>Public-domain source name<input name="sourceName" required /></label><label>Public-domain source URL<input name="source" type="url" required /></label><label>Ban country (two-letter code)<input name="country" pattern="[A-Z]{2}" required /></label><label>Ban authority<input name="authority" required /></label><label>Ban year<input name="banYear" type="number" min="-3000" max="2026" required /></label><label>Ban scope<select name="scope" required>{['national','regional','import','postal','library','school','religious'].map(s => <option key={s}>{s}</option>)}</select></label><label>Ban source URL<input name="banSource" type="url" required /></label><button type="submit" disabled={busy || !uploadEnabled}>Submit for review</button></form>
-      </> : route === '/curate' ? <><h2>Curate submissions</h2><p>Curators approve or reject books after reviewing the scan report and public-domain sources.</p><button type="button" disabled={busy || !client} onClick={connectCurator}>Connect curator wallet</button>{isCurator && <><p>{pending.length} pending books</p>{pending.map(item => <article key={item.id} className="pending-book"><h3>#{item.id} {item.meta?.title ?? 'Metadata unavailable'}</h3><p>{item.meta?.authors.map(author => author.name).join(', ')}</p>{safeUrl(item.meta?.publicDomain.sourceUrl) && <p><a href={safeUrl(item.meta?.publicDomain.sourceUrl)}>Public-domain source</a></p>}{reportUrl(item.meta?.scanReportCid) ? <p><a href={reportUrl(item.meta?.scanReportCid)} target="_blank" rel="noopener noreferrer">Open scan report</a></p> : <p>No scan report is attached. Scan this file manually before approval.</p>}<label>Review reason<input id={`reason-${item.id}`} maxLength={300} /></label><button type="button" disabled={busy} onClick={() => reviewBook(item.id, true)}>Approve</button><button type="button" disabled={busy} onClick={() => reviewBook(item.id, false)}>Reject</button></article>)}</>}</> : route === '/about' ? <><h2>About Alexandria</h2><p>A library of banned books in the public domain, named after the Library of Alexandria.</p><p>Reading and downloading do not require an account or wallet. PDFs are checked against their on-chain SHA-256 hash before saving.</p><p>The registry uses Avalanche Fuji testnet; files use IPFS. {onionUrl && <>Onion mirror: <a href={onionUrl}>{onionUrl}</a>.</>}</p><p>Unaudited · Fuji testnet only.</p></> : <><h2>Page not found</h2><a href="#/">Return to catalog</a></>}
+        <form onSubmit={checkUpload}><label>PDF (up to 30 MB)<input type="file" accept="application/pdf,.pdf" required onChange={e => setFile(e.currentTarget.files?.[0])} /></label><label>Title<input name="title" required maxLength={300} /></label><label>Author<input name="authors" required /></label><label>Author death year, if known<input name="authorDeath" type="number" max="2026" /></label><label>Translator, if any<input name="translators" /></label><label>Translator death year, if known<input name="translatorDeath" type="number" max="2026" /></label><label>First publication year<input name="year" type="number" min="-3000" max="2026" required /></label><label>Language code<input name="language" defaultValue="en" pattern="[a-z]{2,3}(-[A-Za-z0-9]{2,8})*" required /></label><label>Description<input name="description" maxLength={1000} /></label><label>Public-domain source name<input name="sourceName" required /></label><label>Public-domain source URL<input name="source" type="url" required /></label><label>Ban country (two-letter code)<input name="country" pattern="[A-Z]{2}" required /></label><label>Ban authority<input name="authority" required /></label><label>Ban year<input name="banYear" type="number" min="-3000" max="2026" required /></label><label>Ban scope<select name="scope" required>{['national','regional','import','postal','library','school','religious'].map(s => <option key={s}>{s}</option>)}</select></label><label>Ban source URL<input name="banSource" type="url" required /></label><button type="submit" disabled={busy || !uploadEnabled}>Submit for review</button></form>{scanReport && <section aria-label="Scan report"><h3>Scan report: {scanReport.verdict}</h3><table><thead><tr><th>Check</th><th>Result</th><th>Detail</th></tr></thead><tbody>{(scanReport.checks ?? []).map(check => <tr key={check.id}><th scope="row">{check.id}</th><td>{check.passed ? 'Pass' : check.severity === 'reject' ? 'Reject' : 'Review'}</td><td>{check.detail}</td></tr>)}</tbody></table></section>}{duplicateId && <p><a href={`#/book/${duplicateId}`}>Open existing book #{duplicateId}</a></p>}
+      </> : route === '/curate' ? <><h2>Curate submissions</h2><p>Curators approve or reject books after reviewing the scan report and public-domain sources.</p><button type="button" disabled={busy || !client} onClick={connectCurator}>Connect curator wallet</button>{isCurator && <><p>{pending.length} pending books</p>{pending.map(item => <PendingCard key={item.id} item={item} report={reports[item.id]} reportUrl={reportUrl} busy={busy} onDownload={() => downloadBook(item, true)} onReview={reviewBook} />)}</>}</> : route === '/about' ? <><h2>About Alexandria</h2><p>A library of banned books in the public domain, named after the Library of Alexandria.</p><p>Reading and downloading do not require an account or wallet. PDFs are checked against their on-chain SHA-256 hash before saving.</p><p>The registry uses Avalanche Fuji testnet; files use IPFS. {onionUrl && <>Onion mirror: <a href={onionUrl}>{onionUrl}</a>.</>}</p><p>Unaudited · Fuji testnet only.</p></> : <><h2>Page not found</h2><a href="#/">Return to catalog</a></>}
       {message && <p role="status">{message}</p>}
     </main><footer><div className="ascii-rule" aria-hidden="true">{'='.repeat(180)}</div><div className="footer-grid"><p>ALEXANDRIA<br /><span>A home for words that would not disappear.</span></p><p>PUBLIC DOMAIN / OPEN ACCESS<br />Unaudited · Fuji testnet only</p></div><p className="footer-colophon">SET IN CHARACTERS. HELD IN COMMON. <span aria-hidden="true">[ EOF ]</span></p></footer>
   </>;

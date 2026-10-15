@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveReaderConfig } from './reader-config';
+import { resolveReaderConfig, sortPendingByScore } from './reader-config';
 
 const endpoints = {
   rpcs: { clearnet: ['https://rpc.example'], onion: ['/rpc'] },
@@ -29,4 +29,9 @@ describe('reader SDK configuration', () => {
     expect(resolved.client.apiBase).toBe('https://scanner.example/api');
     expect(resolved.uploadEnabled).toBe(true);
   });
+});
+
+it('puts low-scoring pending books first and keeps missing reports visible', () => {
+  const books = [{ id: 3 }, { id: 1 }, { id: 2 }];
+  expect(sortPendingByScore(books, { 1: 90, 2: 50 })).toEqual([books[2], books[1], books[0]]);
 });
