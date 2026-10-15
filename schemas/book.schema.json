@@ -35,7 +35,9 @@
       }
     },
     "submittedVia": { "enum": ["web", "ubot", "direct"] },
-    "scanReportCid": { "type": ["string", "null"], "pattern": "^baf[a-z2-7]{20,97}$" }
+    "scanReportCid": { "type": ["string", "null"], "pattern": "^baf[a-z2-7]{20,97}$" },
+    "bountyId": { "type": "integer", "minimum": 1, "description": "optional: the I9 bounty this upload answers" },
+    "contributor": { "type": "string", "pattern": "^0x[0-9a-fA-F]{40}$", "description": "optional: address paid if the bounty pays out (public)" }
   },
   "$defs": {
     "person": {
