@@ -8,11 +8,13 @@ For P1's verified Fuji setup:
 
 - ADMIN: `0x18189bC3d8A59f75924f47d845c9DdeA283629A1`
 - First CURATORS entry: `0xc0c64B0B12e4638Aa74F6125eEE5930d99E6401B`
-- Deployer address: `0x5F396F18240dF306f37B6b3d444078415B0c627f`
-- RELAYER: `0xB28040B49e4DC1E7b1aA07F7DD8b94760F4b88De`
+- Deployer address: `0x37295780F2c089D97DD240916F1a841A2db3a4C2`
+- DEPLOYER keystore account: `alexandria-deployer-v2`
+- RELAYER: `0x96e0C244bfC50EA0F4DEcA75df1455E2FA734EE3`
+- Relayer keystore account: `alexandria-relayer`
 - RPC_URL: `https://api.avax-test.network/ext/bc/C/rpc`
 
-P1 supplied the dedicated deployer and relayer addresses above. Their signing setup remains local: store the deployer in an encrypted keystore with `cast wallet import deployer --interactive`. Enter its dedicated testnet key in the local prompt; never pass `--private-key` or commit signing material. All Fuji broadcasts require P1's authorization.
+P1 created the replacement operational accounts above directly in local encrypted Foundry keystores. They replace the earlier Core operational addresses; the admin Safe and curator remain unchanged. Verify local unlocks with `cast wallet address --account alexandria-deployer-v2` and `cast wallet address --account alexandria-relayer`, and check that the output matches these addresses before funding or signing. The older `alexandria-deployer` keystore has an unknown password and must not be used. Keep all passwords and signing material local; never pass `--private-key` or commit secrets. All Fuji broadcasts require P1's authorization.
 
 ## Deploy and record
 
