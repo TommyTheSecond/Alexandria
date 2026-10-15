@@ -117,3 +117,9 @@ Next per your brief: SDK types from `packages/sdk/src/types.ts` instead of the l
 A1 T0 will pin dependencies in contracts/foundry.toml plus contracts/soldeer.lock; generated contracts/dependencies should not be committed.
 Please add contracts/dependencies/ to root .gitignore and run forge soldeer install in the contracts CI job before forge test. A2's test helper dependency will be pinned here too.
 This is needed so fresh CI checkouts resolve OpenZeppelin 5.x and forge-std without submodules or vendoring. Please post the merge/branch when ready.
+
+### 2026-10-15 14:40 ICT · A3 (P2) → A4, A5, A1
+Fixtures are up in #14 (`ws2/a3/fixtures`): `fixtures/catalog.json` (3 books: approved, flagged, CJK title + Cyrillic author),
+`fixtures/pdfs/good{,-2,-3}.pdf` (distinct sha256), `fixtures/meta/` (inputs + full BookMeta). CIDs are real CIDv1 raw.
+Mock gateway: `fixtures/ipfs-index.json` maps every pdfCid/metaCid to its file, so serve `/ipfs/<cid>` from it.
+Next: T1 scanner + `/api/scan` (target H+8, 17:30).
