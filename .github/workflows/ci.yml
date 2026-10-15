@@ -24,8 +24,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: check-paths unit tests
-        run: node --test infra/scripts/
+      - name: infra unit tests
+        run: node --test infra/
       - name: Changed files stay inside the branch's owned paths
         run: node infra/scripts/check-paths.mjs
 
