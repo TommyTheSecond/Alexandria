@@ -11,7 +11,7 @@ export interface ChainGateway {
   submit(input: RelayInput): Promise<RelayResult>;
 }
 export class ChainFailure extends Error {
-  constructor(readonly detail: string) { super(detail); }
+  constructor(readonly detail: string, readonly duplicateId?: number) { super(detail); }
 }
 export class ChainStartupError extends Error {}
 
@@ -28,6 +28,27 @@ function safeId(value: unknown): number {
     throw new ChainFailure('Invalid book ID returned by chain');
   }
   return Number(value);
+}
+
+/** Keep only decoded contract data safe to return through the relayer API. */
+export function decodeChainFailure(error: unknown): ChainFailure {
+  if (error instanceof ChainFailure) return error;
+  let cause: unknown = error;
+  for (let i = 0; i < 12 && cause && typeof cause === 'object'; ++i) {
+    const item = cause as { data?: { errorName?: unknown; args?: unknown }; cause?: unknown };
+    const name = item.data?.errorName;
+    if (typeof name === 'string' && /^[A-Za-z][A-Za-z0-9_]{0,99}$/.test(name)) {
+      if (name === 'Duplicate' && Array.isArray(item.data?.args)) {
+        const id = item.data.args[0];
+        if (typeof id === 'bigint' && id > 0n && id <= BigInt(Number.MAX_SAFE_INTEGER)) {
+          return new ChainFailure('Duplicate', Number(id));
+        }
+      }
+      return new ChainFailure(name);
+    }
+    cause = item.cause;
+  }
+  return new ChainFailure('Chain request failed');
 }
 
 /** Initialize only after matching the RPC network to the deployment record. */
@@ -71,16 +92,7 @@ export async function createChainGateway(config: ChainConfig): Promise<ChainGate
         }
         throw new ChainFailure('BookSubmitted event missing from receipt');
       } catch (error) {
-        if (error instanceof ChainFailure) throw error;
-        // Expose decoded contract error names only, never RPC request details or headers.
-        let cause: unknown = error;
-        for (let i = 0; i < 12 && cause && typeof cause === 'object'; ++i) {
-          const item = cause as { data?: { errorName?: unknown }; cause?: unknown };
-          const name = item.data?.errorName;
-          if (typeof name === 'string' && /^[A-Za-z][A-Za-z0-9_]{0,99}$/.test(name)) throw new ChainFailure(name);
-          cause = item.cause;
-        }
-        throw new ChainFailure('Chain request failed');
+        throw decodeChainFailure(error);
       }
     },
   };

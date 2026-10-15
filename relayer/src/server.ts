@@ -71,14 +71,19 @@ export function createRelayerServer(options: Options): Server {
       const job = tail.then(async () => {
         const existingId = await options.gateway.existingId(input.pdfSha256);
         if (existingId !== 0) { respond(response, 409, { code: 'DUPLICATE', existingId }); return; }
-        if (!cap.take()) { respond(response, 429, { code: 'DAILY_CAP' }); return; }
+        if (cap.isFull) { respond(response, 429, { code: 'DAILY_CAP' }); return; }
         const result = await options.gateway.submit(input);
+        cap.recordSuccess();
         respond(response, 200, result);
         options.onSubmitted?.(result);
       });
       tail = job.catch(() => undefined);
       await job;
     } catch (error) {
+      if (error instanceof ChainFailure && error.duplicateId !== undefined) {
+        respond(response, 409, { code: 'DUPLICATE', existingId: error.duplicateId });
+        return;
+      }
       respond(response, 502, { code: 'CHAIN_ERROR', detail: error instanceof ChainFailure ? error.detail : 'Chain request failed' });
     }
   });

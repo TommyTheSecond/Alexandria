@@ -3,7 +3,7 @@ import type { Server } from 'node:http';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Address, Hex } from 'viem';
 import { createRelayerServer, listenLoopback } from '../src/server.js';
-import type { ChainGateway, RelayInput } from '../src/chain.js';
+import { ChainFailure, type ChainGateway, type RelayInput } from '../src/chain.js';
 
 const cid = 'bafkreiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 const digest = (n: number): Hex => `0x${createHash('sha256').update(`fixture-${n}`).digest('hex')}`;
@@ -78,6 +78,16 @@ describe('I6 relayer HTTP API', () => {
     expect(f.gateway.submit).toHaveBeenCalledTimes(1);
   });
 
+  it('returns_409_when_duplicate_races_past_existing_id_check', async () => {
+    const f = await fixture();
+    vi.mocked(f.gateway.submit).mockRejectedValueOnce(new ChainFailure('Duplicate', 7));
+    const result = await f.request();
+    expect(result.status).toBe(409);
+    expect(await result.json()).toEqual({ code: 'DUPLICATE', existingId: 7 });
+    const health = await fetch(`${f.base}/health`, { headers: { 'x-relay-secret': f.secret } });
+    expect((await health.json() as { sentToday: number }).sentToday).toBe(0);
+  });
+
   it('submits_and_returns_bookId_and_txHash', async () => {
     const f = await fixture();
     const result = await f.request();
@@ -137,7 +147,10 @@ describe('I6 relayer HTTP API', () => {
     const result = await f.request();
     expect(result.status).toBe(502);
     expect(await result.text()).not.toContain(f.secret);
-    expect((await f.request(input(2))).status).toBe(429);
+    const health = await fetch(`${f.base}/health`, { headers: { 'x-relay-secret': f.secret } });
+    expect((await health.json() as { sentToday: number }).sentToday).toBe(0);
+    expect((await f.request(input(2))).status).toBe(200);
+    expect((await f.request(input(3))).status).toBe(429);
   });
 
   it('bounds_request_size', async () => {
