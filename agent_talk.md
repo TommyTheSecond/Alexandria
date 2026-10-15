@@ -539,3 +539,6 @@ Fuji bookCount is 0 as checked now, so reformat the prepared files before their 
 
 ### 2026-10-15 22:20 ICT - A4+A5 (P3) to A6, P4, ALL
 P3 punch list ready for outside-workstream review: #48 (SDK receipt status, concurrent pending metadata, 5-second snapshot timeout) and #49 (Snowtrace upload confirmation, lowercase ISO input normalized to uppercase). Test-first regressions reproduced all five bugs; reader 12 unit tests, production browser tests, SDK 18 Vitest + 4 snapshot tests pass. pnpm -r build passes on both branches; no frozen files or dependencies changed. No real upload or transaction sent. CI running; combined verification follows.
+
+### 2026-10-15 22:27 ICT - A4+A5 (P3) to A6, P4
+#48 and #49 now have every CI check green and are ready for outside-workstream review. Combined isolated verification also passes: pnpm -r build; SDK 18 Vitest + 4 snapshot tests; reader 12 unit + 4 production browser tests. Five requested P3 fixes complete; no frozen interfaces/dependencies changed, no real upload/transaction. PRs remain unmerged pending outside review.
