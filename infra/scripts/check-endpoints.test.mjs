@@ -75,3 +75,13 @@ test('gateway fails on timeout', async () => {
   assert.equal(r.ok, false);
   assert.match(r.detail, /timeout/);
 });
+
+test('bucket-only gateways are skipped with the default probe and checked with a real CID', async () => {
+  const { gatewayPlan } = await import('./check-endpoints.mjs');
+  const lists = { clearnet: ['https://bucket.example', 'https://public.example'], bucketOnly: ['https://bucket.example'] };
+  assert.deepEqual(gatewayPlan(lists, { custom: false }), [
+    { url: 'https://bucket.example', skip: 'serves only our Filebase bucket; re-run with --cid <a pinned CID>' },
+    { url: 'https://public.example', skip: null },
+  ]);
+  assert.deepEqual(gatewayPlan(lists, { custom: true }).map((g) => g.skip), [null, null]);
+});

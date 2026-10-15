@@ -1,5 +1,6 @@
 {
   "clearnet": [
+    "https://tense-peach-scallop.myfilebase.com",
     "https://ipfs.filebase.io",
     "https://gateway.pinata.cloud",
     "https://4everland.io",
@@ -7,10 +8,14 @@
   ],
   "onion": [
     "",
+    "https://tense-peach-scallop.myfilebase.com",
     "https://ipfs.filebase.io",
     "https://gateway.pinata.cloud",
     "https://4everland.io",
     "https://storry.tv"
+  ],
+  "bucketOnly": [
+    "https://tense-peach-scallop.myfilebase.com"
   ],
   "excluded": {
     "https://ipfs.io": "switching to a service-worker-only gateway: plain fetches get a notice, not the file (checked 2026-10-15)",
