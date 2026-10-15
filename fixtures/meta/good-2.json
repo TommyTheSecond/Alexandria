@@ -1,0 +1,32 @@
+{
+  "title": "Fixture Book Two",
+  "authors": [
+    {
+      "name": "Basil Fixture",
+      "deathYear": 1910
+    }
+  ],
+  "translators": [
+    {
+      "name": "Clara Fixture",
+      "deathYear": 1940
+    }
+  ],
+  "firstPublishedYear": 1895,
+  "language": "en",
+  "description": "Generated test fixture with a translator and a flagged status.",
+  "publicDomain": {
+    "sourceName": "Wikisource",
+    "sourceUrl": "https://en.wikisource.org/wiki/Fixture"
+  },
+  "bans": [
+    {
+      "country": "RU",
+      "historicalAuthority": "Russian Empire",
+      "authority": "Fixture Censorship Committee",
+      "year": 1896,
+      "scope": "national",
+      "sourceUrl": "https://example.org/alexandria-fixtures/ban-2"
+    }
+  ]
+}

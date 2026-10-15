@@ -1,0 +1,17 @@
+# spam.keywords: one phrase per line, matched case-insensitively on word boundaries.
+# 3 or more hits in one book send it to curator review (README section 6).
+# Keep phrases modern-spam specific: old books legitimately say "telegram", "betting", "lottery".
+airdrop
+bitcoin
+bonus code
+casino
+cialis
+click here
+crypto
+free spins
+nft
+onlyfans
+promo code
+seed phrase
+viagra
+whatsapp

@@ -34,10 +34,14 @@ ipfs config --json Gateway.NoFetch true
 ipfs daemon >"$RUN/kubo.log" 2>&1 & pids+=($!)
 echo "kubo     starting (log: infra/onion/run/kubo.log)"
 
-# Scanner (A3) on 127.0.0.1:8000 with no access log. Override with SCANNER_CMD.
+# Scanner (A3) on 127.0.0.1:8000 with no access log, from the repo root (it reads schemas/).
+# Uses .venv (infra/onion/setup-scanner.sh) when present. Override with SCANNER_CMD.
+# ClamAV is required on the server: a missing scanner rejects uploads instead of skipping (A3).
+export ALEXANDRIA_REQUIRE_CLAMAV=1
+PY="python3"; [ -x "$ROOT/.venv/bin/python" ] && PY="$ROOT/.venv/bin/python"
 SCANNER_CMD="${SCANNER_CMD:-}"
 if [ -z "$SCANNER_CMD" ] && [ -f scanner/app.py ]; then
-  SCANNER_CMD="python3 -m uvicorn scanner.app:app --host 127.0.0.1 --port 8000 --no-access-log"
+  SCANNER_CMD="$PY -m uvicorn scanner.app:app --host 127.0.0.1 --port 8000 --no-access-log"
 fi
 if [ -n "$SCANNER_CMD" ]; then
   $SCANNER_CMD >"$RUN/scanner.log" 2>&1 & pids+=($!)
