@@ -1,9 +1,515 @@
 {
   "network": "fuji",
   "chainId": 43113,
-  "contract": "0xeBF13D70A7C2D4EA9891FA6c6d42f065AAB608C9",
-  "atBlock": 59506071,
-  "generatedAt": "2026-10-15T13:56:14.000Z",
+  "contract": "0xbbd7581590edb530c64be9bc767d90d0cd8eb038",
+  "atBlock": 59517155,
+  "generatedAt": "2026-10-15T19:00:58.000Z",
   "source": "snapshot",
-  "books": []
+  "books": [
+    {
+      "id": 1,
+      "status": "approved",
+      "flags": 0,
+      "confirmed": false,
+      "submitter": "0xeC45c35A1C4F84CD1823A6dC2CB7F62aBA62EcE2",
+      "submittedAt": 1792090740,
+      "pdfCid": "bafybeidzceqhcn5mxjys34i6qflr6eiwvmhbwnynsb7dw4j7piifihz6ba",
+      "metaCid": "bafkreidq7ixzgywhhy6pgbdw2uiq727wvpnmedvv2mnixy4etomjqtl754",
+      "pdfSha256": "0xc954049271357c15182f6a7c9d26fcef072fdf4e1687f257c9f8d8f46be182d0",
+      "meta": {
+        "schemaVersion": "1.0.0",
+        "title": "Il Decameron",
+        "authors": [
+          {
+            "name": "Giovanni Boccaccio",
+            "deathYear": 1375
+          }
+        ],
+        "translators": [],
+        "firstPublishedYear": 1353,
+        "language": "it",
+        "description": "Boccaccio's hundred tales told by ten young Florentines sheltering from the plague, in the original Italian.",
+        "publicDomain": {
+          "sourceName": "Internet Archive scan, F. A. Brockhaus edition (Leipzig, 1877), Italian",
+          "sourceUrl": "https://archive.org/details/ildecameron00boccuoft"
+        },
+        "bans": [
+          {
+            "country": "VA",
+            "authority": "Index Librorum Prohibitorum (Pope Paul IV)",
+            "year": 1559,
+            "scope": "religious",
+            "sourceUrl": "https://en.wikipedia.org/wiki/The_Decameron",
+            "historicalAuthority": "Papal States"
+          },
+          {
+            "country": "AU",
+            "authority": "Commonwealth of Australia censorship",
+            "year": 1927,
+            "scope": "national",
+            "sourceUrl": "https://en.wikipedia.org/wiki/List_of_books_banned_by_governments"
+          }
+        ],
+        "pdf": {
+          "cid": "bafybeidzceqhcn5mxjys34i6qflr6eiwvmhbwnynsb7dw4j7piifihz6ba",
+          "sha256": "0xc954049271357c15182f6a7c9d26fcef072fdf4e1687f257c9f8d8f46be182d0",
+          "bytes": 13310112,
+          "pages": 774
+        },
+        "submittedVia": "ubot",
+        "scanReportCid": "bafkreic4vrhuajhfhsdxdpjzf55rrxxtx6x75de5rvbdfezn5ryrohqml4"
+      }
+    },
+    {
+      "id": 2,
+      "status": "approved",
+      "flags": 0,
+      "confirmed": false,
+      "submitter": "0xeC45c35A1C4F84CD1823A6dC2CB7F62aBA62EcE2",
+      "submittedAt": 1792090743,
+      "pdfCid": "bafybeig3ujg3kof4imkfqflwwj6qfbm6fpqxhkr6izltm2nhac7qnyvnp4",
+      "metaCid": "bafkreia2nz63shwtcbisots5rkl2eh2rm62vazwnhtek6uua4hjcnufhzy",
+      "pdfSha256": "0xaa3720a37bc4c1fcbb0dec6fa4dc994d1c47e09fa1bc7b6830dcaedd315ae12a",
+      "meta": {
+        "schemaVersion": "1.0.0",
+        "title": "Lysistrata",
+        "authors": [
+          {
+            "name": "Aristophane",
+            "deathYear": -386
+          }
+        ],
+        "translators": [
+          {
+            "name": "Charles Zévort",
+            "deathYear": 1887
+          }
+        ],
+        "firstPublishedYear": -411,
+        "language": "fr",
+        "description": "Aristophanes' comedy of the women's strike against the Peloponnesian War, in Charles Zévort's French translation.",
+        "publicDomain": {
+          "sourceName": "Internet Archive scan, Charpentier et Fasquelle edition (Paris, 1898), French",
+          "sourceUrl": "https://archive.org/details/lysistrata00arisuoft"
+        },
+        "bans": [
+          {
+            "country": "GR",
+            "authority": "Greek military government",
+            "year": 1967,
+            "scope": "national",
+            "sourceUrl": "https://en.wikipedia.org/wiki/List_of_books_banned_by_governments"
+          }
+        ],
+        "pdf": {
+          "cid": "bafybeig3ujg3kof4imkfqflwwj6qfbm6fpqxhkr6izltm2nhac7qnyvnp4",
+          "sha256": "0xaa3720a37bc4c1fcbb0dec6fa4dc994d1c47e09fa1bc7b6830dcaedd315ae12a",
+          "bytes": 3738088,
+          "pages": 196
+        },
+        "submittedVia": "ubot",
+        "scanReportCid": "bafkreif4wmkuwwv64ypg5yxbp5apsrjbsjp64uuftfi5mwjits6vzgqy5y"
+      }
+    },
+    {
+      "id": 3,
+      "status": "approved",
+      "flags": 0,
+      "confirmed": false,
+      "submitter": "0xeC45c35A1C4F84CD1823A6dC2CB7F62aBA62EcE2",
+      "submittedAt": 1792090749,
+      "pdfCid": "bafybeid66lk3pz4334vnzkutoz4obvfq7hrpxmv4jasvyf75dbh4g6hege",
+      "metaCid": "bafkreichugwahtczsrecdfjbpetmiah6sgz3xjf75wgnduz7fflv5s3dqi",
+      "pdfSha256": "0xf9fb493d8f8816764c00d01f68953c67e7994841c40fa62afc7b29343a0e930e",
+      "meta": {
+        "schemaVersion": "1.0.0",
+        "title": "My Life and Loves (Volume 1)",
+        "authors": [
+          {
+            "name": "Frank Harris",
+            "deathYear": 1931
+          }
+        ],
+        "translators": [],
+        "firstPublishedYear": 1922,
+        "language": "en",
+        "description": "The first volume of Frank Harris's sexually frank autobiography, privately printed in Paris.",
+        "publicDomain": {
+          "sourceName": "Internet Archive scan, privately printed first edition (Paris, 1922), volume 1",
+          "sourceUrl": "https://archive.org/details/mylifeloves01harrrich"
+        },
+        "bans": [
+          {
+            "country": "US",
+            "authority": "United States authorities (banned for about 40 years)",
+            "year": 1922,
+            "scope": "national",
+            "sourceUrl": "https://en.wikipedia.org/wiki/My_Life_and_Loves"
+          },
+          {
+            "country": "GB",
+            "authority": "United Kingdom authorities (banned for about 40 years)",
+            "year": 1922,
+            "scope": "national",
+            "sourceUrl": "https://en.wikipedia.org/wiki/My_Life_and_Loves"
+          }
+        ],
+        "pdf": {
+          "cid": "bafybeid66lk3pz4334vnzkutoz4obvfq7hrpxmv4jasvyf75dbh4g6hege",
+          "sha256": "0xf9fb493d8f8816764c00d01f68953c67e7994841c40fa62afc7b29343a0e930e",
+          "bytes": 7063625,
+          "pages": 394
+        },
+        "submittedVia": "ubot",
+        "scanReportCid": "bafkreiakkle2ysob7tzk5j4rs7lrds5akvns4sngsk3rrmwwpy5wge35s4"
+      }
+    },
+    {
+      "id": 4,
+      "status": "approved",
+      "flags": 0,
+      "confirmed": false,
+      "submitter": "0xeC45c35A1C4F84CD1823A6dC2CB7F62aBA62EcE2",
+      "submittedAt": 1792090754,
+      "pdfCid": "bafybeieeymjx7sj2i4xl63tra43f7j5tzkblykm2cnqxeaa72d4rv2ozky",
+      "metaCid": "bafkreicmyfidc2clin2swbgai3rfgqgf25y6wlsliaah7gtewg43yb66wm",
+      "pdfSha256": "0x53b3b9db213621f27d6e49cf08713c9cdd6d6ee2f8a62fb8639956603188ace2",
+      "meta": {
+        "schemaVersion": "1.0.0",
+        "title": "La Terre",
+        "authors": [
+          {
+            "name": "Émile Zola",
+            "deathYear": 1902
+          }
+        ],
+        "translators": [],
+        "firstPublishedYear": 1887,
+        "language": "fr",
+        "description": "Zola's novel of peasant life in the Beauce, part of the Rougon-Macquart cycle, in the original French.",
+        "publicDomain": {
+          "sourceName": "Internet Archive scan, Charpentier et Fasquelle edition (Paris, 1893), French",
+          "sourceUrl": "https://archive.org/details/1893laterrezola00zola"
+        },
+        "bans": [
+          {
+            "country": "VA",
+            "authority": "Index Librorum Prohibitorum (all works of Zola)",
+            "year": 1894,
+            "scope": "religious",
+            "sourceUrl": "https://en.wikipedia.org/wiki/List_of_authors_and_works_on_the_Index_Librorum_Prohibitorum",
+            "historicalAuthority": "Holy See"
+          },
+          {
+            "country": "GB",
+            "authority": "Obscenity prosecution of publisher Henry Vizetelly (English translation)",
+            "year": 1888,
+            "scope": "national",
+            "sourceUrl": "https://en.wikipedia.org/wiki/La_Terre"
+          }
+        ],
+        "pdf": {
+          "cid": "bafybeieeymjx7sj2i4xl63tra43f7j5tzkblykm2cnqxeaa72d4rv2ozky",
+          "sha256": "0x53b3b9db213621f27d6e49cf08713c9cdd6d6ee2f8a62fb8639956603188ace2",
+          "bytes": 8576728,
+          "pages": 532
+        },
+        "submittedVia": "ubot",
+        "scanReportCid": "bafkreigbxdzvv5qvbv7cd5nl5ssuhfsrhap3uwxu4myaixkpdciha5jora"
+      }
+    },
+    {
+      "id": 5,
+      "status": "approved",
+      "flags": 0,
+      "confirmed": false,
+      "submitter": "0xeC45c35A1C4F84CD1823A6dC2CB7F62aBA62EcE2",
+      "submittedAt": 1792090757,
+      "pdfCid": "bafybeiglkykbsgujk2xn2geoiwh7rzf4jyj4k6flfpdfnjytlqws3xtfya",
+      "metaCid": "bafkreiec554lm5epziazsd2bupuv2qcgx2q5hbo73qf3ms7orrcqn7om3e",
+      "pdfSha256": "0xadaaf29a523ce1e633f82ae619ef9fd5417f4908c197e3902c1967b72f4e274f",
+      "meta": {
+        "schemaVersion": "1.0.0",
+        "title": "Pamela; or, Virtue Rewarded",
+        "authors": [
+          {
+            "name": "Samuel Richardson",
+            "deathYear": 1761
+          }
+        ],
+        "translators": [],
+        "firstPublishedYear": 1740,
+        "language": "en",
+        "description": "Richardson's epistolary novel of a servant girl who resists her master's advances.",
+        "publicDomain": {
+          "sourceName": "Internet Archive scan, 1873 edition (ed. Thomas Archer, d. 1893)",
+          "sourceUrl": "https://archive.org/details/09632839.2642.emory.edu"
+        },
+        "bans": [
+          {
+            "country": "VA",
+            "authority": "Index Librorum Prohibitorum",
+            "year": 1744,
+            "scope": "religious",
+            "sourceUrl": "https://en.wikipedia.org/wiki/List_of_authors_and_works_on_the_Index_Librorum_Prohibitorum",
+            "historicalAuthority": "Holy See"
+          }
+        ],
+        "pdf": {
+          "cid": "bafybeiglkykbsgujk2xn2geoiwh7rzf4jyj4k6flfpdfnjytlqws3xtfya",
+          "sha256": "0xadaaf29a523ce1e633f82ae619ef9fd5417f4908c197e3902c1967b72f4e274f",
+          "bytes": 15572532,
+          "pages": 554
+        },
+        "submittedVia": "ubot",
+        "scanReportCid": "bafkreiahfl2fek2sdqu7vqfycg77jezzlrdmtqya4it5ccjvje35c4kye4"
+      }
+    },
+    {
+      "id": 6,
+      "status": "approved",
+      "flags": 0,
+      "confirmed": false,
+      "submitter": "0xeC45c35A1C4F84CD1823A6dC2CB7F62aBA62EcE2",
+      "submittedAt": 1792090764,
+      "pdfCid": "bafybeiblukfemqeettnijyeeouhhiabkqt4u5szmrt4s6ugrlebd74jx6u",
+      "metaCid": "bafkreigfkt5lbu2bxwc4huptlhyup3qgyzv653di4eo4t247elehyqmxry",
+      "pdfSha256": "0x0e142eb9c89275eee744654388156631517ae7885f63208effa1c5e48bedab17",
+      "meta": {
+        "schemaVersion": "1.0.0",
+        "title": "The Rainbow",
+        "authors": [
+          {
+            "name": "D. H. Lawrence",
+            "deathYear": 1930
+          }
+        ],
+        "translators": [],
+        "firstPublishedYear": 1915,
+        "language": "en",
+        "description": "Three generations of the Brangwen family in the English Midlands.",
+        "publicDomain": {
+          "sourceName": "Internet Archive scan, B. W. Huebsch edition (New York, 1921)",
+          "sourceUrl": "https://archive.org/details/rainbowlawrence00lawrrich"
+        },
+        "bans": [
+          {
+            "country": "GB",
+            "authority": "Bow Street Magistrates' Court obscenity order (1,011 copies seized and burned)",
+            "year": 1915,
+            "scope": "national",
+            "sourceUrl": "https://en.wikipedia.org/wiki/The_Rainbow"
+          }
+        ],
+        "pdf": {
+          "cid": "bafybeiblukfemqeettnijyeeouhhiabkqt4u5szmrt4s6ugrlebd74jx6u",
+          "sha256": "0x0e142eb9c89275eee744654388156631517ae7885f63208effa1c5e48bedab17",
+          "bytes": 9528797,
+          "pages": 486
+        },
+        "submittedVia": "ubot",
+        "scanReportCid": "bafkreifrfdrzopcdlivie5cg2snjmq7pko7lnnc2qqutxutdt26znls6ui"
+      }
+    },
+    {
+      "id": 7,
+      "status": "approved",
+      "flags": 0,
+      "confirmed": false,
+      "submitter": "0xeC45c35A1C4F84CD1823A6dC2CB7F62aBA62EcE2",
+      "submittedAt": 1792090767,
+      "pdfCid": "bafybeidhvsqkjwtnw6ekcs3w7jvpc7eqhvvientjldszgq2fng22z6eiqu",
+      "metaCid": "bafkreihnb7wnpwljqjfxwfkyyeg2jmnxsryhr5biomvrdj3v7j3fbisnum",
+      "pdfSha256": "0xa82c3848d2eb74d248dfd9ca8021f256f902134666a126df0c708615c64a4b57",
+      "meta": {
+        "schemaVersion": "1.0.0",
+        "title": "Trionfo della Morte",
+        "authors": [
+          {
+            "name": "Gabriele D'Annunzio",
+            "deathYear": 1938
+          }
+        ],
+        "translators": [],
+        "firstPublishedYear": 1894,
+        "language": "it",
+        "description": "D'Annunzio's novel of an obsessive love affair, in the original Italian.",
+        "publicDomain": {
+          "sourceName": "Internet Archive scan, Fratelli Treves edition (Milan, 1896), Italian",
+          "sourceUrl": "https://archive.org/details/trionfodellamort00dannuoft"
+        },
+        "bans": [
+          {
+            "country": "VA",
+            "authority": "Index Librorum Prohibitorum (D'Annunzio's love stories)",
+            "year": 1911,
+            "scope": "religious",
+            "sourceUrl": "https://en.wikipedia.org/wiki/List_of_authors_and_works_on_the_Index_Librorum_Prohibitorum",
+            "historicalAuthority": "Holy See"
+          }
+        ],
+        "pdf": {
+          "cid": "bafybeidhvsqkjwtnw6ekcs3w7jvpc7eqhvvientjldszgq2fng22z6eiqu",
+          "sha256": "0xa82c3848d2eb74d248dfd9ca8021f256f902134666a126df0c708615c64a4b57",
+          "bytes": 7083494,
+          "pages": 518
+        },
+        "submittedVia": "ubot",
+        "scanReportCid": "bafkreictjgspayeyypvchd665oa4h7ei56aferhklil4qpfztjhusqi2te"
+      }
+    },
+    {
+      "id": 8,
+      "status": "approved",
+      "flags": 0,
+      "confirmed": false,
+      "submitter": "0xeC45c35A1C4F84CD1823A6dC2CB7F62aBA62EcE2",
+      "submittedAt": 1792090770,
+      "pdfCid": "bafybeic5zz557atyurvfmjb5qgnn5xlj2ld3gq6dozrdboaojqcyoiixbi",
+      "metaCid": "bafkreif6224zdtpcicyh5djosx26ddki2uxmhgduowi7dywnpdxewyhzza",
+      "pdfSha256": "0x1779ef474d6dc13715bd4d487543f3fd406ed7191b51d909e20d3bebd8703d4b",
+      "meta": {
+        "schemaVersion": "1.0.0",
+        "title": "The Well of Loneliness",
+        "authors": [
+          {
+            "name": "Radclyffe Hall",
+            "deathYear": 1943
+          }
+        ],
+        "translators": [],
+        "firstPublishedYear": 1928,
+        "language": "en",
+        "description": "Hall's novel of Stephen Gordon, judged obscene by a British court in 1928.",
+        "publicDomain": {
+          "sourceName": "Internet Archive scan, Covici Friede edition (New York, 1928)",
+          "sourceUrl": "https://archive.org/details/wellofloneliness00hall"
+        },
+        "bans": [
+          {
+            "country": "GB",
+            "authority": "British court obscenity ruling",
+            "year": 1928,
+            "scope": "national",
+            "sourceUrl": "https://en.wikipedia.org/wiki/List_of_books_banned_by_governments"
+          }
+        ],
+        "pdf": {
+          "cid": "bafybeic5zz557atyurvfmjb5qgnn5xlj2ld3gq6dozrdboaojqcyoiixbi",
+          "sha256": "0x1779ef474d6dc13715bd4d487543f3fd406ed7191b51d909e20d3bebd8703d4b",
+          "bytes": 8859802,
+          "pages": 520
+        },
+        "submittedVia": "ubot",
+        "scanReportCid": "bafkreibzkmm62xwlwzjxos6rxl4vwo37b6vi75i2qphjyifg3ev5kx76pu"
+      }
+    },
+    {
+      "id": 9,
+      "status": "approved",
+      "flags": 0,
+      "confirmed": false,
+      "submitter": "0xeC45c35A1C4F84CD1823A6dC2CB7F62aBA62EcE2",
+      "submittedAt": 1792090776,
+      "pdfCid": "bafybeibhocfiybnnm5webvsjbeus36wv5sozk2ulv32mdbgqqgwl4as6xa",
+      "metaCid": "bafkreigbobpqzwxlxvjaevuruvi4gtkdtwilp3bllkadjagnmjd7pj336q",
+      "pdfSha256": "0x48070209b0677e96894a33c88951a3f811e6a77f6e264a3a3edd6ce65ededaa4",
+      "meta": {
+        "schemaVersion": "1.0.0",
+        "title": "Lady Chatterley's Lover",
+        "authors": [
+          {
+            "name": "D. H. Lawrence",
+            "deathYear": 1930
+          }
+        ],
+        "translators": [],
+        "firstPublishedYear": 1928,
+        "language": "en",
+        "description": "Lawrence's last novel, the third manuscript version first printed privately in Florence in 1928.",
+        "publicDomain": {
+          "sourceName": "Internet Archive scan, Nelson Doubleday printing of the 1928 Florence text",
+          "sourceUrl": "https://archive.org/details/ladychatterleysl0000dhla_u4h4"
+        },
+        "bans": [
+          {
+            "country": "GB",
+            "authority": "United Kingdom obscenity law (lifted 1960)",
+            "year": 1928,
+            "scope": "national",
+            "sourceUrl": "https://en.wikipedia.org/wiki/List_of_books_banned_by_governments"
+          },
+          {
+            "country": "US",
+            "authority": "United States obscenity law (lifted 1959)",
+            "year": 1928,
+            "scope": "national",
+            "sourceUrl": "https://en.wikipedia.org/wiki/List_of_books_banned_by_governments"
+          },
+          {
+            "country": "AU",
+            "authority": "Commonwealth of Australia censorship",
+            "year": 1929,
+            "scope": "national",
+            "sourceUrl": "https://en.wikipedia.org/wiki/List_of_books_banned_by_governments"
+          }
+        ],
+        "pdf": {
+          "cid": "bafybeibhocfiybnnm5webvsjbeus36wv5sozk2ulv32mdbgqqgwl4as6xa",
+          "sha256": "0x48070209b0677e96894a33c88951a3f811e6a77f6e264a3a3edd6ce65ededaa4",
+          "bytes": 5949496,
+          "pages": 328
+        },
+        "submittedVia": "ubot",
+        "scanReportCid": "bafkreig55dxwmrc33r4ulx2uxa2nfxeauykpw25e2iwrxpro5j43kuvuqi"
+      }
+    },
+    {
+      "id": 10,
+      "status": "approved",
+      "flags": 0,
+      "confirmed": false,
+      "submitter": "0xeC45c35A1C4F84CD1823A6dC2CB7F62aBA62EcE2",
+      "submittedAt": 1792090780,
+      "pdfCid": "bafybeihs2rkr2fukui3x27mupdrnaxleoqu7ayh626je5natbk6kuc7c5i",
+      "metaCid": "bafkreidmdk7wcfbjruajehms7mfc3u33vmq6p5j6onecbvbhfb4dvitnce",
+      "pdfSha256": "0x21843a05879a665072eb1a7a9087837087e70c7f88d3a49c68bc61adced69a7b",
+      "meta": {
+        "schemaVersion": "1.0.0",
+        "title": "Madame Bovary",
+        "authors": [
+          {
+            "name": "Gustave Flaubert",
+            "deathYear": 1880
+          }
+        ],
+        "translators": [],
+        "firstPublishedYear": 1857,
+        "language": "fr",
+        "description": "Emma Bovary's marriage, affairs and debts in provincial Normandy. French text with the full Project Gutenberg header and licence.",
+        "publicDomain": {
+          "sourceName": "Project Gutenberg eBook #14155 (Internet Archive mirror), French",
+          "sourceUrl": "https://archive.org/details/madamebovary14155gut"
+        },
+        "bans": [
+          {
+            "country": "VA",
+            "authority": "Index Librorum Prohibitorum",
+            "year": 1864,
+            "scope": "religious",
+            "sourceUrl": "https://en.wikipedia.org/wiki/List_of_authors_and_works_on_the_Index_Librorum_Prohibitorum",
+            "historicalAuthority": "Holy See"
+          }
+        ],
+        "pdf": {
+          "cid": "bafybeihs2rkr2fukui3x27mupdrnaxleoqu7ayh626je5natbk6kuc7c5i",
+          "sha256": "0x21843a05879a665072eb1a7a9087837087e70c7f88d3a49c68bc61adced69a7b",
+          "bytes": 657004,
+          "pages": 326
+        },
+        "submittedVia": "ubot",
+        "scanReportCid": "bafkreibifbuncjhxypsy2ji6emezyr6civbslnayrpxrhbprwcc6psrbgm"
+      }
+    }
+  ]
 }
