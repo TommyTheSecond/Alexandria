@@ -1,0 +1,91 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Each job skips with success until its workstream adds a manifest.
+jobs:
+  paths:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: check-paths unit tests
+        run: node --test infra/scripts/
+      - name: Changed files stay inside the branch's owned paths
+        run: node infra/scripts/check-paths.mjs
+
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Skip notice
+        if: hashFiles('contracts/foundry.toml') == ''
+        run: echo "No contracts/foundry.toml yet, skipping"
+      - uses: foundry-rs/foundry-toolchain@v1
+        if: hashFiles('contracts/foundry.toml') != ''
+      - name: forge test
+        if: hashFiles('contracts/foundry.toml') != ''
+        working-directory: contracts
+        run: forge test -vv
+
+  node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Skip notice
+        if: hashFiles('apps/*/package.json', 'packages/*/package.json', 'relayer/package.json') == ''
+        run: echo "No workspace packages yet, skipping"
+      - uses: pnpm/action-setup@v4
+        if: hashFiles('apps/*/package.json', 'packages/*/package.json', 'relayer/package.json') != ''
+      - uses: actions/setup-node@v4
+        if: hashFiles('apps/*/package.json', 'packages/*/package.json', 'relayer/package.json') != ''
+        with:
+          node-version: 20
+      - name: pnpm install
+        if: hashFiles('apps/*/package.json', 'packages/*/package.json', 'relayer/package.json') != ''
+        run: pnpm install --no-frozen-lockfile
+      - name: pnpm -r test
+        if: hashFiles('apps/*/package.json', 'packages/*/package.json', 'relayer/package.json') != ''
+        run: pnpm -r test
+
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Skip notice
+        if: hashFiles('scanner/requirements.txt') == ''
+        run: echo "No scanner/requirements.txt yet, skipping"
+      - uses: actions/setup-python@v5
+        if: hashFiles('scanner/requirements.txt') != ''
+        with:
+          python-version: '3.11'
+      - name: Install ClamAV
+        if: hashFiles('scanner/requirements.txt') != ''
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clamav clamav-daemon
+          sudo systemctl stop clamav-freshclam || true
+          sudo freshclam || echo "freshclam failed; ClamAV tests may skip"
+      - name: pip install
+        if: hashFiles('scanner/requirements.txt') != ''
+        run: pip install -r scanner/requirements.txt
+      - name: pytest
+        if: hashFiles('scanner/requirements.txt') != ''
+        run: pytest scanner
