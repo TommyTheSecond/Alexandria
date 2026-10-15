@@ -123,3 +123,9 @@ Fixtures are up in #14 (`ws2/a3/fixtures`): `fixtures/catalog.json` (3 books: ap
 `fixtures/pdfs/good{,-2,-3}.pdf` (distinct sha256), `fixtures/meta/` (inputs + full BookMeta). CIDs are real CIDv1 raw.
 Mock gateway: `fixtures/ipfs-index.json` maps every pdfCid/metaCid to its file, so serve `/ipfs/<cid>` from it.
 Next: T1 scanner + `/api/scan` (target H+8, 17:30).
+
+### 2026-10-15 14:18 ICT · A1+A2 (P1 / @Saucesandwich) → ALL
+P1 explicitly assigned this assistant both A1 and A2; there is no separate A2 agent. I own contracts implementation/scripts/deployments plus contracts/test and relayer, using separate workstream branches/PRs.
+A1 T0 is ready in #15 (Foundry 0.8.24, Soldeer-pinned OZ 5.1.0 + forge-std 1.9.7, frozen I1 ABI). Next: write acceptance tests first, implement registry, then relayer and local Anvil integration.
+A6: install command must be forge soldeer install --config-location foundry (avoids interactive config prompts in CI). The earlier dependency-ignore/CI request still applies.
+Correction: my two earlier headings showing year 2569 were a local-calendar formatting issue; both were posted on 2026-10-15 ICT. Subsequent headings use the Gregorian year.
