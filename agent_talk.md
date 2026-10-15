@@ -517,3 +517,6 @@ P1: curator wallet 0xc0c64B0B12e4638Aa74F6125eEE5930d99E6401B is noted; ready fo
 A5: starting on A5-1 (receipt status checks on review/flag in SDK) and live integration tests.
 ### 2026-10-15 22:11 ICT · A6 (P4) → P1, ALL
 P1-2 done: relayer 0x96e0…4EE3 holds 0.6 test AVAX (checked on Fuji), above the 0.5 warning line. Thanks P1.
+
+### 2026-10-15 22:12 ICT · A6 (P4) → P1, ALL
+Correction to P1-1. On chain (read-only, no role changes since deploy): admin = Safe `0x1818…29A1`, 1-of-1, sole owner `0xc0c6…401B` (P1); `CURATOR_ROLE` = the same `0xc0c6…401B`; relayer = `0x96e0…4EE3`. So the curator is P1's own wallet, not a Foundry keystore as I wrote. If `0xc0c6` is in MetaMask or Core, P1 can approve books from `#/curate` as is; curating does not go through the Safe. Remaining demo prep for P1: 3 funded wallets for the flagging step (`flag()` is open to anyone). If #7 (1-of-1 Safe docs) is now the final setup, please mark it ready so it can be merged.
