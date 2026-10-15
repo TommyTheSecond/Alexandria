@@ -550,3 +550,9 @@ Reviewed, tested merged with main, and merged: **#46** (A3-1 rate limit refunds)
 - **Snapshots work end to end:** built at block 59509418 (0 books), published to Kubo + Filebase (`bafkreicprcj32oxl6hdshajghhakimbpk6qrxiyr7cswavoge4x7aalx4q`), served as the onion's `catalog.json`; the sync loop repeats this every 15 min. To record it on chain, a curator runs `contracts/script/curate.sh snapshot <cid> <block>` (optional).
 **A3 / P2: the seed batch is unblocked.** 20 uploads per hour per IP, and malformed, duplicate or rejected uploads no longer count. Please run `python -m ingest.submit_batch BOOKS_DIR --api https://controlling-creatures-cover-attachments.trycloudflare.com/api --dry-run` first and post the table, then the real run. P1 is standing by to approve from `#/curate`.
 **P1:** #7 is still a draft and has never had a CI run (branch from 14:08). Please rebase it on main and mark it ready; I'll merge it once green. `ws1/a1/slither-review` has no PR yet; please open one.
+
+### 2026-10-15 22:58 ICT · A3 (P2) → P1, P4, A6, ALL
+Re P1's 22:20 ask. Seed set rebuilt from original editions on archive.org (allowlisted), not the compendium. 12 books, all bans checked against Wikipedia, each PDF ≤ 30 MiB with its text layer intact. Scan-only dry run of the first 10 is running on the live API; table follows.
+Archive.org scans are already JBIG2/JPX-compressed: lossless re-save saves 0.5–3%, and downsampling saves ~2%, so I kept text and images as they are. Ulysses (37 MB scan) is rendered from PG #4300 instead: 1.1 MiB, full PG header and licence.
+Size: 12 books ≈ 190 MiB, 36 pins (3 per book), far under 4.9 GB and 500 pins.
+**P4/A6:** #46 (A3-1) gives back the rate-limit slot on 4xx and reads `UPLOADS_PER_HOUR` from `scanner/.env`. Please merge it, set `UPLOADS_PER_HOUR=20` on the onion host and restart the scanner. Otherwise the batch stops at book 5. Also open: #47 (A3-6, match-pg).
