@@ -61,6 +61,54 @@ def test_report_returns_stored_report(tmp_path):
     assert r.status_code == 200 and r.json()["pdfSha256"] == sha
 
 
+class FakeService:
+    def __init__(self):
+        self.calls = []
+
+    def submit(self, pdf, meta, *, via, sha256, total_size):
+        from scanner.submit import SubmitResponse
+
+        self.calls.append({"via": via, "sha256": sha256, "total_size": total_size, "meta": meta})
+        return SubmitResponse(201 if via == "ubot" else 200, {"ok": True})
+
+
+def _post_submit(client, via=None, headers=None):
+    data = {"meta": json.dumps(mf._good_input())}
+    if via:
+        data["via"] = via
+    return client.post("/api/submit", files={"pdf": ("good.pdf", GOOD.read_bytes(), "application/pdf")},
+                       data=data, headers=headers or {})
+
+
+def test_submit_not_configured_is_503(tmp_path):
+    r = _post_submit(TestClient(create_app(data_dir=tmp_path, submit_service=None)))
+    assert r.status_code == 503 and r.json()["code"] == "NOT_CONFIGURED"
+
+
+def test_submit_passes_via_and_hash_to_service(tmp_path):
+    service = FakeService()
+    client = TestClient(create_app(data_dir=tmp_path, submit_service=service))
+    r = _post_submit(client, via="ubot")
+    assert r.status_code == 201
+    assert service.calls[0]["via"] == "ubot"
+    assert service.calls[0]["sha256"] == mf.sha256_hex(GOOD.read_bytes())
+    assert service.calls[0]["total_size"] == len(GOOD.read_bytes())
+
+
+def test_submit_defaults_via_web(tmp_path):
+    service = FakeService()
+    _post_submit(TestClient(create_app(data_dir=tmp_path, submit_service=service)))
+    assert service.calls[0]["via"] == "web"
+
+
+def test_submit_rate_limit_429_after_5(tmp_path):
+    client = TestClient(create_app(data_dir=tmp_path, submit_service=FakeService()))
+    statuses = [_post_submit(client).status_code for _ in range(6)]
+    assert statuses[:5] == [200] * 5
+    last = _post_submit(client)
+    assert last.status_code == 429 and last.json()["code"] == "RATE_LIMIT" and last.json()["retryAfterSec"] > 0
+
+
 def test_cors_allows_any_origin_without_credentials(tmp_path):
     r = _client(tmp_path).get("/api/health", headers={"Origin": "https://tommythesecond.github.io"})
     assert r.headers["access-control-allow-origin"] == "*"

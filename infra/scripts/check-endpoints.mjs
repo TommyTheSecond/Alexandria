@@ -56,6 +56,15 @@ export async function checkGateway(base, { cid, sha256, timeoutMs = 20_000 } = D
 // "" (same origin) and "/rpc" only work on the onion build, so they are not checked here.
 const remote = (list) => list.filter((u) => u.startsWith('https://'));
 
+/** Which gateways to check. Bucket-only gateways (our Filebase) 404 on the public probe file. */
+export function gatewayPlan(lists, { custom }) {
+  const bucketOnly = new Set(lists.bucketOnly ?? []);
+  return remote(lists.clearnet).map((url) => ({
+    url,
+    skip: !custom && bucketOnly.has(url) ? 'serves only our Filebase bucket; re-run with --cid <a pinned CID>' : null,
+  }));
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const arg = (name) => {
@@ -67,17 +76,17 @@ async function main() {
 
   const read = (f) => JSON.parse(readFileSync(new URL(`../${f}`, import.meta.url), 'utf8'));
   const rpcs = remote(read('rpcs.json').clearnet);
-  const gateways = remote(read('gateways.json').clearnet);
+  const gateways = gatewayPlan(read('gateways.json'), { custom: Boolean(arg('--cid')) });
 
   const rows = await Promise.all([
     ...rpcs.map(async (u) => ['rpc', u, await checkRpc(u)]),
-    ...gateways.map(async (u) => ['gateway', u, await checkGateway(u, probe)]),
+    ...gateways.map(async (g) => ['gateway', g.url, g.skip ? { ok: true, skipped: true, detail: g.skip } : await checkGateway(g.url, probe)]),
   ]);
 
   const width = Math.max(...rows.map(([, u]) => u.length));
   console.log(`probe CID ${probe.cid}\n`);
   for (const [kind, url, r] of rows) {
-    console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${kind.padEnd(7)}  ${url.padEnd(width)}  ${r.detail}`);
+    console.log(`${r.skipped ? 'SKIP' : r.ok ? 'PASS' : 'FAIL'}  ${kind.padEnd(7)}  ${url.padEnd(width)}  ${r.detail}`);
   }
   const failed = rows.filter(([, , r]) => !r.ok).length;
   console.log(`\n${rows.length - failed}/${rows.length} endpoints pass`);

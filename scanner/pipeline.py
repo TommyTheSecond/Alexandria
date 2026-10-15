@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Callable, Optional
 
@@ -14,17 +15,25 @@ from .verdict import verdict_and_score
 PARSE_TIMEOUT_S = 60
 
 
+@dataclass
+class ScanOutcome:
+    report: dict
+    pages: int = 0                                  # 0 when the PDF was never parsed
+    words: list[str] = field(default_factory=list)  # for the near-duplicate index
+
+
 def parse_in_child(data: bytes) -> dict:
     """Everything that parses the PDF. Runs inside sandbox.run()."""
     parse = checks.pdf_parse(data)
     if not parse.passed:
-        return {"parse": parse, "active": None, "analysis": None}
-    return {"parse": parse, "active": checks.pdf_active(data), "analysis": checks.analyse_text(data)}
+        return {"parse": parse, "active": None, "analysis": None, "pages": 0}
+    return {"parse": parse, "active": checks.pdf_active(data), "analysis": checks.analyse_text(data),
+            "pages": checks.page_count(data)}
 
 
-def scan(pdf: bytes, meta: object, *, lookup_id: LookupId = None, near_dup: Optional[NearDupIndex] = None,
-         timeout: float = PARSE_TIMEOUT_S, av: Callable[[bytes], ScanCheck] = checks.av_clamav,
-         sha256: Optional[str] = None, total_size: Optional[int] = None) -> dict:
+def scan_detailed(pdf: bytes, meta: object, *, lookup_id: LookupId = None, near_dup: Optional[NearDupIndex] = None,
+                  timeout: float = PARSE_TIMEOUT_S, av: Callable[[bytes], ScanCheck] = checks.av_clamav,
+                  sha256: Optional[str] = None, total_size: Optional[int] = None) -> ScanOutcome:
     """Scan one PDF + BookMetaInput.
 
     `sha256` and `total_size` describe the whole upload when the caller only kept
@@ -32,6 +41,7 @@ def scan(pdf: bytes, meta: object, *, lookup_id: LookupId = None, near_dup: Opti
     """
     sha = sha256 or "0x" + hashlib.sha256(pdf).hexdigest()
     meta_dict = meta if isinstance(meta, dict) else {}
+    pages, words = 0, []
     results: list[ScanCheck] = [
         checks.pdf_magic(pdf),
         checks.pdf_size(total_size if total_size is not None else len(pdf)),
@@ -47,10 +57,12 @@ def scan(pdf: bytes, meta: object, *, lookup_id: LookupId = None, near_dup: Opti
             results.append(checks.fail("pdf.parse", "reject", f"parser failed: {exc}"))
         else:
             results.append(child["parse"])
+            pages = child["pages"]
             if child["active"] is not None:
                 results.append(child["active"])
             analysis = child["analysis"]
             if analysis is not None:
+                words = analysis.words
                 results += [
                     checks.text_extract(analysis),
                     checks.text_match(analysis, meta_dict),
@@ -68,7 +80,7 @@ def scan(pdf: bytes, meta: object, *, lookup_id: LookupId = None, near_dup: Opti
         checks.ban_source(meta_dict),
     ]
     verdict, score = verdict_and_score(results)
-    return {
+    report = {
         "schemaVersion": "1.0.0",
         "pdfSha256": sha,
         "scannerVersion": __version__,
@@ -77,3 +89,8 @@ def scan(pdf: bytes, meta: object, *, lookup_id: LookupId = None, near_dup: Opti
         "checks": [r.to_dict() for r in results],
         "scannedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
+    return ScanOutcome(report=report, pages=pages, words=words)
+
+
+def scan(pdf: bytes, meta: object, **kwargs) -> dict:
+    return scan_detailed(pdf, meta, **kwargs).report
