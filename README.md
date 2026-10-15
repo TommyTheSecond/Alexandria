@@ -34,7 +34,7 @@ This README is the single source of truth for the 24-hour hackathon. All 4 peopl
 - **PDF download** for every approved book, checked against its SHA-256 hash before saving.
 - **Upload for anyone**, through the website (no wallet needed) or directly on-chain (with a wallet).
 - An automatic **spam and junk scanner**, plus human curator approval.
-- An on-chain registry on **Avalanche Fuji C-Chain**, with a 3-of-4 Safe multisig as admin.
+- An on-chain registry on **Avalanche Fuji C-Chain**, with a 1-of-1 Safe controlled by P1 as admin.
 - Several access paths: GitHub Pages, IPFS gateways, a **Tor onion mirror**, and a snapshot catalog that works when no RPC can be reached.
 - A typewriter and ASCII art theme that stays easy to read.
 - A reachability report for **China, Iran, Russia and the USA**, based on OONI data.
@@ -53,7 +53,7 @@ This README is the single source of truth for the 24-hour hackathon. All 4 peopl
 |---|---|
 | D1 | Only banned books that are copyright-free (public domain), stored as PDF. |
 | D2 | Reachability is measured in China, Iran and Russia (strict internet controls) and the USA (many book bans). |
-| D3 | The 3-of-4 Safe multisig (Ash Wallet on Fuji) is the **admin**. It adds or removes curators and can close submissions. **Each of the 4 curators approves books alone**, so approvals are fast. *(Change from plan v0.2: a 3-of-4 vote on every book is too slow for 24 hours. Revert this if the team disagrees.)* |
+| D3 | The 1-of-1 Safe (Ash Wallet on Fuji) is the **admin**, with P1's curator wallet as its sole owner and a signature threshold of 1. P1 alone can add or remove curators and close submissions. **Each curator approves books alone**; the team still plans 4 curators. The other curator wallets are not needed to create the Safe. |
 | D4 | Zero cost. Fuji testnet, free tiers and free software only. |
 | D5 | Flags never hide a book. Enough flags mark it "under review", but it stays downloadable. *(Otherwise anyone with many wallets could censor the library.)* |
 | D6 | Scanner rejects never reach IPFS or the chain. |
@@ -64,7 +64,7 @@ This README is the single source of truth for the 24-hour hackathon. All 4 peopl
                          ┌───────────────────────────────────────────┐
   Reader (browser)       │ Avalanche Fuji C-Chain (chainId 43113)     │
   no wallet needed  ───► │  Alexandria.sol: submit / review / flag    │
-        │  read          │  admin = Safe 3-of-4 (Ash Wallet)          │
+        │  read          │  admin = Safe 1-of-1 (P1, Ash Wallet)      │
         │                └───────────────▲───────────────────────────┘
         │ download PDF                   │ submitBook (relayer wallet)
         ▼                                │
@@ -352,7 +352,7 @@ Nothing in 9.2 can begin until these are done. **⛔ marks a hard blocker.**
 | ✅ B1 | Read the hackathon rules. **Done** (see 9.0): AI tools allowed; new builds only, so code starts at H+0; Web3 track; repo must be public. | P4 | everything |
 | ⛔ B2 | Each person creates a **new, testnet-only** EVM wallet (Core or MetaMask) and adds Fuji (chainId `43113`, RPC `https://api.avax-test.network/ext/bc/C/rpc`). Also create a deployer wallet (P1) and a relayer wallet (P2). That makes 6 addresses; write them in 9.4. | all | B3, B4 |
 | ⛔ B3 | Get test AVAX for all 6 addresses. Try the Builder Hub faucet first, then the Core faucet, then the QuickNode faucet. **Some faucets require a mainnet balance or a coupon.** If all fail, ask the hackathon organisers or Avalanche developer relations for a coupon. | P1 | deploy, Safe, relayer |
-| ⛔ B4 | Create the 3-of-4 Safe on Fuji at `wallet.ash.center` with the 4 curator wallets as owners. *Fallback:* the deployer holds admin until the Safe exists, then transfers it before the demo. | P1 | admin handover |
+| ⛔ B4 | Create a 1-of-1 Safe on Fuji at `wallet.ash.center`. Add only P1's curator wallet as owner and set the signature threshold to **1**. Verify the network, sole owner and threshold before recording the Safe address; no teammate wallet or signature is required for this setup. *Fallback:* the deployer holds admin until the Safe exists, then transfers it before the demo. | P1 | admin handover |
 | ⛔ B5 | Create a free Filebase account, an IPFS bucket and an S3 access key. Store the key in a password manager and share it with P4. Never paste it into chat or git. | P2 | scanner pinning |
 | ⛔ B6 | Install the tools for your role (versions in [section 10](#10-global-constraints)):<br>• **All:** Git, Node 20 + pnpm 9, your AI agent.<br>• **P1:** Foundry (on Windows, use WSL2).<br>• **P2:** Python 3.11+, ClamAV, Calibre.<br>• **P4:** Kubo, Tor, Caddy, cloudflared.<br>• **P3:** Chrome, Playwright. | all | own workstream |
 | B8 | U-Bot is the u.bot assistant, not a scraper (8.3). P2 fills `ingest/candidates.csv` by hand. | P2 | seed books |
@@ -393,13 +393,13 @@ Nobody rests during H+0–H+2, H+17–H+24, or a gate.
 
 | Role | Person | Fuji address |
 |---|---|---|
-| Curator 1 / Safe owner | P1 | |
-| Curator 2 / Safe owner | P2 | |
-| Curator 3 / Safe owner | P3 | |
-| Curator 4 / Safe owner | P4 | |
+| Curator 1 / sole Safe owner | P1 | |
+| Curator 2 | P2 | |
+| Curator 3 | P3 | |
+| Curator 4 | P4 | |
 | Deployer | P1 | |
 | Relayer | P2 | |
-| Safe (3-of-4) | n/a | |
+| Safe (1-of-1) | P1 | |
 | Alexandria contract | n/a | (from `deployments/fuji.json`) |
 
 ## 10. Global constraints

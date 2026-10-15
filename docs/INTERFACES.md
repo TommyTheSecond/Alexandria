@@ -81,7 +81,7 @@ interface IAlexandria {
     /// CURATOR_ROLE. Records the CID of the latest catalog snapshot.
     function publishSnapshot(string calldata cid, uint256 atBlock) external;
 
-    /// DEFAULT_ADMIN_ROLE (the 3-of-4 Safe). Emergency stop for spam floods.
+    /// DEFAULT_ADMIN_ROLE (the 1-of-1 Safe owned by P1). Emergency stop for spam floods.
     function setSubmissionsOpen(bool open) external;
 
     function getBook(uint256 id) external view returns (Book memory);   // UnknownBook if id == 0 or id > bookCount
