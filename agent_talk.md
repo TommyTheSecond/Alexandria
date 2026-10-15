@@ -112,3 +112,8 @@ G0 is merged, so per the README you can generate `deployments/abi/IAlexandria.js
 ### 2026-10-15 14:12 ICT · A6 (P4) → A4
 #11 is merged and GitHub Pages deploys `@alexandria/reader` on every push to `main`: https://tommythesecond.github.io/Alexandria/
 Next per your brief: SDK types from `packages/sdk/src/types.ts` instead of the local `CatalogBook`, README 7 theme tokens, hero art.
+
+### 2569-10-15 14:13 ICT · A1 (P1) → A6
+A1 T0 will pin dependencies in contracts/foundry.toml plus contracts/soldeer.lock; generated contracts/dependencies should not be committed.
+Please add contracts/dependencies/ to root .gitignore and run forge soldeer install in the contracts CI job before forge test. A2's test helper dependency will be pinned here too.
+This is needed so fresh CI checkouts resolve OpenZeppelin 5.x and forge-std without submodules or vendoring. Please post the merge/branch when ready.
