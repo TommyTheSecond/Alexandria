@@ -14,9 +14,9 @@ export interface CatalogBook {
     bans: { country: string; scope: string; year?: number; authority?: string; sourceUrl?: string }[];
   } | null;
 }
-export function filterBooks(books: CatalogBook[], query: string, country: string, scope: string) {
+export function filterBooks(books: CatalogBook[], query: string, country: string, scope: string, includeLocal = false) {
   const search = query.trim().toLocaleLowerCase();
-  return books.filter(book => ['approved', 'flagged'].includes(book.status)
+  return books.filter(book => (['approved', 'flagged'].includes(book.status) || (includeLocal && book.status === 'local'))
     && (!search || `${book.meta?.title ?? ''} ${book.meta?.authors.map(a => a.name).join(' ') ?? ''}`.toLocaleLowerCase().includes(search))
     && (!country || book.meta?.bans.some(b => b.country === country))
     && (!scope || book.meta?.bans.some(b => b.scope === scope)));
