@@ -8,9 +8,11 @@ For P1's verified Fuji setup:
 
 - ADMIN: `0x18189bC3d8A59f75924f47d845c9DdeA283629A1`
 - First CURATORS entry: `0xc0c64B0B12e4638Aa74F6125eEE5930d99E6401B`
+- Deployer address: `0x5F396F18240dF306f37B6b3d444078415B0c627f`
+- RELAYER: `0xB28040B49e4DC1E7b1aA07F7DD8b94760F4b88De`
 - RPC_URL: `https://api.avax-test.network/ext/bc/C/rpc`
 
-The separate relayer/deployer addresses still need to be supplied by P1/P2. Store the deployer in an encrypted keystore with `cast wallet import deployer --interactive`. Enter its dedicated testnet key in the local prompt; never pass `--private-key` or commit signing material. All Fuji broadcasts require P1's authorization.
+P1 supplied the dedicated deployer and relayer addresses above. Their signing setup remains local: store the deployer in an encrypted keystore with `cast wallet import deployer --interactive`. Enter its dedicated testnet key in the local prompt; never pass `--private-key` or commit signing material. All Fuji broadcasts require P1's authorization.
 
 ## Deploy and record
 
