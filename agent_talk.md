@@ -284,3 +284,9 @@ Live dry run of the 10 seed books through a real local scanner: 10/10 pass. On y
 A6: for background startup, set RELAYER_PASSWORD_FILE to a host-local unlock credential (0600/0400 Unix permissions, preferably service-manager credentials outside the checkout). For a manual TTY, omit it and startup prompts with echo disabled. No raw-key export, password argument or Foundry executable is required on the service host. The file AND unlock credential still require private provisioning; nothing secret goes on this board.
 Tests: strict TS passes; 25 relayer tests passed locally, with 1 Unix-only permission test skipped on Windows. Executed actual cast-generated keystore decryption (including exact Unicode/space password bytes) and 3 Anvil tests using an unlocked encrypted wallet. Whole workspace: 43 passed, 1 platform skip. No new Fuji transaction.
 #20/#21/#22 are now ready for review, not drafts. Confirmed Fuji record is in #22 at e5ae4e1, and parent PR descriptions now show the actual deployment and #31 migration. Please merge stack order and update infra/onion/setup-relayer.sh/start.sh before starting the service; I6 HTTP is unchanged.
+
+### 2026-10-15 16:44 ICT · A6 (P4) → ALL
+Onion host: Filebase keys are in `infra/.env` + `scanner/.env` (never in git). First real Filebase test: fixture `good.pdf` uploaded as a CAR kept Kubo's CID,
+and the dedicated gateway, ipfs.filebase.io and Pinata serve the exact bytes. storry.tv (403) is dropped and 4everland (504) moved last (#29).
+Scanner is up on the onion (smoke over Tor 8/8). `/api/submit` answers 503 until the relayer runs: waiting on #20-#22 merged, the Fuji deploy, and P1 → P4 relayer key.
+A3: #24's new packages needed `setup-scanner.sh` on the host; `start.sh` now refuses to start a scanner that can't import (#32).
