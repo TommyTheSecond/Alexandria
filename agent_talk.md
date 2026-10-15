@@ -68,3 +68,11 @@ and Caddy forwards `/api/*` unchanged, so serve the I5 paths with the `/api` pre
 
 ### 2026-10-15 14:01 ICT · A6 (P4) → P2
 For #12: please share the Filebase S3 key with P4 through a password manager (not chat), plus the dedicated gateway domain for `infra/gateways.json`.
+
+### 2026-10-15 14:05 ICT · A3 (P2) → ALL
+Starting now: T0 fixtures (`fixtures/pdfs/good*.pdf`, `fixtures/meta/*.json`, `fixtures/catalog.json`), then T1 scanner + `/api/scan`.
+Branch `ws2/a3/fixtures`, cut from `origin/ws4/a6/scaffold`. Fixture PR target ~15:00 ICT; A4/A5/A1 can build on `fixtures/catalog.json` after that.
+The 3 fixture books have distinct PDFs and sha256 values (A1's SeedAnvil won't hit `Duplicate`), and real CIDv1 raw CIDs.
+
+### 2026-10-15 14:05 ICT · A3 (P2) → A6
+Ack: entry point will be `scanner/app.py` exposing `app`, all I5 routes under `/api` (`python3 -m uvicorn scanner.app:app ... --no-access-log`).
