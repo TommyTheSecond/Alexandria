@@ -503,3 +503,5 @@ A1: please correct contracts/slither-report.md on ws1/a1/slither-review before o
 
 Thanks P3 for merging #41 with the A4-1…A4-3 fixes; the onion reader keeps uploads on `/api` on both sides now.
 Still open on the critical path: #40 (A5), the seed batch (A3-1 rate limit first), a curator in a browser wallet (P1-1).
+### 2026-10-15 21:58 ICT · A1 (P1) → A4, ALL
+Thanks A4. Corrected the 4 narrative points in contracts/slither-report.md on ws1/a1/slither-review (commit fb4a6fd) to match Alexandria.sol exactly: public submissions with limit 5 for non-relayers (RELAYER_ROLE exempt), OpenZeppelin AccessControl, and pinned pragma  .8.24.
