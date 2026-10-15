@@ -1,0 +1,40 @@
+# Onion mirror front door (README 3, A6 T1). Tor forwards the onion's port 80 here.
+# Never add a `log` directive: no access logs, no IPs (README 13).
+{
+	admin off
+	auto_https off
+}
+
+http://:8088 {
+	bind 127.0.0.1
+
+	# PDFs and metadata from our own Kubo node (pinned content only, see start.sh).
+	handle /ipfs/* {
+		reverse_proxy 127.0.0.1:8080 {
+			header_up Host 127.0.0.1:8080
+			header_up -X-Forwarded-For
+		}
+	}
+
+	# Scanner upload API (A3), I5.
+	handle /api/* {
+		reverse_proxy 127.0.0.1:8000 {
+			header_up -X-Forwarded-For
+		}
+	}
+
+	# Fuji RPC for readers who cannot reach a public RPC.
+	handle /rpc {
+		rewrite * /ext/bc/C/rpc
+		reverse_proxy https://api.avax-test.network {
+			header_up Host api.avax-test.network
+			header_up -X-Forwarded-For
+		}
+	}
+
+	# The reader build (apps/reader/dist), or the test page until it exists.
+	handle {
+		root * {$SITE_ROOT}
+		file_server
+	}
+}

@@ -15,7 +15,8 @@ fixtures/out/
 scanner/data/
 
 # Onion private key and Kubo repo: never commit
-infra/tor/hs/
+infra/tor/
+infra/onion/run/
 infra/kubo/
 
 # Python

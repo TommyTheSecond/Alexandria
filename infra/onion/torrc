@@ -1,0 +1,8 @@
+# Run from the repo root (start.sh does). infra/tor/ is gitignored.
+# infra/tor/hs/ holds the onion's private key: it IS the address. Never commit or share it.
+DataDirectory infra/tor/data
+HiddenServiceDir infra/tor/hs
+HiddenServicePort 80 127.0.0.1:8088
+
+# Local SOCKS port so smoke.sh can test the onion end to end. Loopback only.
+SocksPort 127.0.0.1:9052
