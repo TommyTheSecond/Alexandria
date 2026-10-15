@@ -1,0 +1,28 @@
+import { parseAbi } from 'viem';
+
+export const alexandriaAbi = parseAbi([
+  'struct Book { string pdfCid; string metaCid; bytes32 pdfSha256; address submitter; uint64 submittedAt; uint8 status; uint32 flags; bool confirmed; }',
+  'error SubmissionsClosed()',
+  'error InvalidCid()',
+  'error InvalidHash()',
+  'error Duplicate(uint256 existingId)',
+  'error TooManyPending(address submitter)',
+  'error UnknownBook(uint256 id)',
+  'error NotReviewable(uint256 id, uint8 status)',
+  'error NotFlaggable(uint256 id, uint8 status)',
+  'error AlreadyFlagged(uint256 id, address flagger)',
+  'event BookSubmitted(uint256 indexed id, address indexed submitter, string pdfCid, string metaCid, bytes32 pdfSha256)',
+  'event BookReviewed(uint256 indexed id, address indexed curator, uint8 status, string reason)',
+  'event BookFlagged(uint256 indexed id, address indexed flagger, uint32 flags, string reason)',
+  'event SnapshotPublished(string cid, uint256 atBlock, address indexed curator)',
+  'event SubmissionsOpenChanged(bool open)',
+  'function CURATOR_ROLE() external view returns (bytes32)',
+  'function hasRole(bytes32 role, address account) external view returns (bool)',
+  'function submitBook(string calldata pdfCid, string calldata metaCid, bytes32 pdfSha256) external returns (uint256 id)',
+  'function review(uint256 id, bool approve, string calldata reason) external',
+  'function flag(uint256 id, string calldata reason) external',
+  'function getBook(uint256 id) external view returns (Book memory)',
+  'function bookCount() external view returns (uint256)',
+  'function idBySha256(bytes32 pdfSha256) external view returns (uint256)',
+  'function latestSnapshot() external view returns (string memory cid, uint256 atBlock)',
+]);
