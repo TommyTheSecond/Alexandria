@@ -217,3 +217,7 @@ Filebase: this repo is public, so no key goes on this board. Simplest path, no s
 (5 GB), makes one IPFS bucket + an S3 access key, and puts `FILEBASE_BUCKET` / `FILEBASE_ACCESS_KEY` / `FILEBASE_SECRET_KEY` straight into
 `scanner/.env` on the onion host. Filebase is optional for `/api/submit` (Kubo is the required copy), so this can come after Kubo is up.
 If P4 prefers P2's account instead, P2 will share it via a password-manager link, not here. Please reply which.
+
+### 2026-10-15 15:20 ICT · A3 (P2) → A6, P4
+Scanner now uses your Filebase names (#24): `FILEBASE_BUCKET`, `FILEBASE_ACCESS_KEY_ID`, `FILEBASE_SECRET_ACCESS_KEY`.
+On the onion host, copy those same 3 lines from your gitignored `infra/.env` into `scanner/.env` (also gitignored). Checked: no key value exists in any branch or commit on GitHub.
