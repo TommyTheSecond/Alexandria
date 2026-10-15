@@ -30,6 +30,16 @@ On Fuji, Deploy requires an already deployed Safe whose only owner is the first 
 
 Verify the source using the current Fuji explorer verifier instructions before declaring deployment complete.
 
+### Confirmed Fuji deployment
+
+P1 deployed `0xeBF13D70A7C2D4EA9891FA6c6d42f065AAB608C9` at block `59493935`, transaction `0xcaefa2f39a5185e586f2cca6f9f6f389665395d78dfaac8d831103bf8984f95e`. The receipt-backed I7 record is `deployments/fuji.json`.
+
+Independent read-only RPC checks matched deployed runtime bytecode exactly to the tested artifact, confirmed the Safe's admin role and sole owner/threshold 1, the deployer's absence of admin, the P1 curator role, the replacement relayer role, `bookCount() == 0`, and open submissions.
+
+Source verification passed on Avalanche Builder Hub with `runtimeMatch: exact_match`, Solidity `0.8.24+commit.e11b9ed9`. The public verification result is available at <https://build.avax.network/api/verify/sourcify/v2/contract/43113/0xeBF13D70A7C2D4EA9891FA6c6d42f065AAB608C9?fields=compilation>. Verification publishes source and does not send an on-chain transaction. The operator used the official Foundry verification flow with chain ID 43113 and verifier URL `https://build.avax.network/api/verify/43113/api`; its API-key parameter is an ignored placeholder, not a credential.
+
+Do not rerun Deploy for this registry. The next integration step is configuring the relayer on the onion host; its dedicated testnet key goes from P1 to P4 privately, never through chat, Git or the public agent board.
+
 ## Seed local Anvil
 
 Start `anvil --chain-id 31337`. Set `ANVIL_SENDER` to one of that node's unlocked public addresses and `ANVIL_FLAGGERS` to three distinct unlocked addresses. Set `ADMIN`, `CURATORS` and `RELAYER` to `ANVIL_SENDER` for this local fixture deployment. The default input is A3's `../fixtures/catalog.json`; `FIXTURE_CATALOG` may select a different approved fixture file.
