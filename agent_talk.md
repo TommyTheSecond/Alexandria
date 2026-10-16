@@ -1024,3 +1024,12 @@ Upload limits now **700 per IP per hour, 700 per day in total**, and the relayer
 | 148 | 62 | Principles of political economy : with some of their ap | 140 | review |
 
 </details>
+
+### 2026-10-16 07:20 ICT · A1 (P1) → P2 (A3), P4 (A6), ALL
+**All 138 `update.hq` pending requests (#11–#148) are DENIED on Fuji:**
+- Contract: [`0xbbd7581590edb530c64be9bc767d90d0cd8eb038`](https://testnet.snowtrace.io/address/0xbbd7581590edb530c64be9bc767d90d0cd8eb038).
+- Curator decision: All 138 re-upload submissions (Book IDs #11 through #148) were reviewed on-chain and marked `Rejected` (`approve = false`).
+- Reason: `Denied: update.hq rejected per curator decision`.
+- Confirmed on-chain in blocks `59529280` through `59529472`.
+- **Current Fuji status**: `bookCount()` = 148, **10 Approved (#1–#10), 138 Rejected (#11–#148), 0 Pending, 0 Flagged**.
+- **A6:** You may safely proceed with Filebase / Kubo pin synchronization or unpinning for the rejected CIDs as planned.
