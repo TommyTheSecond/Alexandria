@@ -44,6 +44,20 @@ async function s3(method, path, { query = {}, headers = {}, body } = {}) {
 
 const tag = (xml, name) => [...xml.matchAll(new RegExp(`<${name}>([^<]*)</${name}>`, 'g'))].map((m) => m[1]);
 
+// Only book copies (<cid>.car at the bucket root) are ever cleaned up. Everything in a folder is managed
+// elsewhere and must survive: site/ (IPFS copy of the website, deploy-ipfs.mjs), probe/ (fixture for
+// check-endpoints.mjs), snapshots/ (publish-snapshot.mjs keeps exactly one).
+export const PROTECTED_PREFIXES = ['site/', 'probe/', 'snapshots/'];
+
+/** The objects to delete: root-level CARs whose CID no live book references. */
+export function selectDeletions(objects, keepCids) {
+  return objects.filter((obj) => {
+    if (obj.key.includes('/')) return false; // any folder, including PROTECTED_PREFIXES
+    if (!obj.key.endsWith('.car')) return false;
+    return !keepCids.has(obj.key.slice(0, -'.car'.length));
+  });
+}
+
 export async function cleanupFilebase({ dryRun = false } = {}) {
   console.log(`Checking live registry on Fuji (${deployment.address})...`);
   const { createClient } = await import(new URL('packages/sdk/dist/index.js', 'file:///' + ROOT.replace(/\\/g, '/')));
@@ -101,13 +115,9 @@ export async function cleanupFilebase({ dryRun = false } = {}) {
 
   console.log(`Current Filebase objects: ${objects.length} (${(objects.reduce((a, b) => a + b.size, 0) / (1024 * 1024)).toFixed(2)} MB)`);
 
-  const toDelete = [];
-  for (const obj of objects) {
-    const cid = obj.key.replace(/^snapshots\//, '').replace(/\.car$/, '');
-    if (!keepCids.has(cid)) {
-      toDelete.push(obj);
-    }
-  }
+  const toDelete = selectDeletions(objects, keepCids);
+  const kept = objects.filter((o) => PROTECTED_PREFIXES.some((p) => o.key.startsWith(p))).length;
+  if (kept) console.log(`Kept ${kept} object(s) under ${PROTECTED_PREFIXES.join(', ')}`);
 
   if (toDelete.length === 0) {
     console.log('Filebase is clean! No unwanted or rejected objects found.');
@@ -136,7 +146,7 @@ export async function cleanupFilebase({ dryRun = false } = {}) {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  cleanupFilebase().catch((err) => {
+  cleanupFilebase({ dryRun: process.argv.includes('--dry-run') }).catch((err) => {
     console.error('Filebase cleanup error:', err);
     process.exit(1);
   });
