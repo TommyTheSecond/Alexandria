@@ -100,9 +100,13 @@ def service_from_env(data_dir: Path) -> tuple[Optional[SubmitService], LookupId]
                                             settings.get("FILEBASE_SECRET_ACCESS_KEY"))
     pinner = Pinner(KuboPinner(settings.get("KUBO_API_URL", "http://127.0.0.1:5001")), filebase)
     relay = RelayClient(settings.get("RELAYER_URL", "http://127.0.0.1:8787"), secret)
+    from .submit import ALLOW_REUPLOADS_DEFAULT
+    raw_reupload = settings.get("ALLOW_REUPLOADS")
+    allow_reuploads = ALLOW_REUPLOADS_DEFAULT if raw_reupload is None else raw_reupload.strip().lower() not in ("0", "false", "no")
     service = SubmitService(pinner=pinner, relay=relay, data_dir=data_dir, lookup_id=lookup,
                             near_dup=NearDupIndex.load(data_dir / "minhash.pkl"),
-                            bounty_check=bounty_check_from_env(settings.get, settings.REPO_ROOT))
+                            bounty_check=bounty_check_from_env(settings.get, settings.REPO_ROOT),
+                            allow_reuploads=allow_reuploads)
     return service, lookup
 
 

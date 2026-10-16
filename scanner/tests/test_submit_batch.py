@@ -118,3 +118,27 @@ def test_main_exit_code_and_results_file(tmp_path, monkeypatch, capsys):
     results = json.loads((tmp_path / "submit-results.json").read_text(encoding="utf-8"))
     assert [r["status"] for r in results] == [200, 422]
     assert "pdf.active" in capsys.readouterr().out
+
+
+def test_reupload_retries_on_409_when_enabled(tmp_path):
+    _book(tmp_path, "a-book")
+    seen = []
+    replies = iter([
+        httpx.Response(409, json={"code": "DUPLICATE", "existingId": 3}),
+        httpx.Response(200, json={"report": _report("pass"), "bookId": 10, "txHash": "0x" + "2" * 64,
+                                  "pdfCid": "bafkreic", "metaCid": "bafkreid"}),
+    ])
+    rows = submit_folder(tmp_path, client=_client(lambda r: next(replies), seen), api=API, allow_reuploads=True)
+    assert len(seen) == 2
+    assert b"% alexandria-reupload-" in seen[1].read()
+    assert rows[0].status == 200 and rows[0].book_id == 10
+
+
+def test_reupload_disabled_does_not_retry(tmp_path):
+    _book(tmp_path, "a-book")
+    seen = []
+    rows = submit_folder(tmp_path, client=_client(
+        lambda r: httpx.Response(409, json={"code": "DUPLICATE", "existingId": 3}), seen), api=API, allow_reuploads=False)
+    assert len(seen) == 1
+    assert rows[0].status == 409
+

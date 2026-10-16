@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
+import time
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -21,6 +23,8 @@ from .relay import DuplicateBook, RelayError
 
 log = logging.getLogger("alexandria.scanner")
 VIA = ("web", "ubot")
+# Toggle temporary re-upload support for testing phase (override via ALLOW_REUPLOADS=0 in scanner/.env).
+ALLOW_REUPLOADS_DEFAULT = True
 
 
 class PinnerLike(Protocol):
@@ -53,7 +57,7 @@ def _result(report: dict, book_id=None, tx_hash=None, pdf_cid=None, meta_cid=Non
 class SubmitService:
     def __init__(self, *, pinner: PinnerLike, relay: RelayLike, data_dir: Path, lookup_id: LookupId = None,
                  near_dup: Optional[NearDupIndex] = None, timeout: float = 60,
-                 bounty_check: Optional[BountyCheck] = None) -> None:
+                 bounty_check: Optional[BountyCheck] = None, allow_reuploads: bool = False) -> None:
         self.pinner = pinner
         self.relay = relay
         self.data_dir = Path(data_dir)
@@ -61,6 +65,7 @@ class SubmitService:
         self.near_dup = near_dup
         self.timeout = timeout
         self.bounty_check = bounty_check
+        self.allow_reuploads = allow_reuploads
 
     def _existing_id(self, sha256: str) -> int:
         if self.lookup_id is None:
@@ -82,7 +87,14 @@ class SubmitService:
             return SubmitResponse(400, {"code": "INVALID_INPUT", "detail": "via must be 'web' or 'ubot'"})
         existing = self._existing_id(sha256)
         if existing:
-            return SubmitResponse(409, {"code": "DUPLICATE", "existingId": existing})
+            if not self.allow_reuploads:
+                return SubmitResponse(409, {"code": "DUPLICATE", "existingId": existing})
+            stamp = f"\n% alexandria-reupload-{time.time_ns()}\n%%EOF\n".encode("ascii")
+            pdf = pdf + stamp
+            total_size = len(pdf)
+            if total_size > MAX_PDF_BYTES:
+                return SubmitResponse(413, {"code": "TOO_LARGE", "detail": f"limit is {MAX_PDF_BYTES} bytes"})
+            sha256 = "0x" + hashlib.sha256(pdf).hexdigest()
 
         outcome = scan_detailed(pdf, meta, lookup_id=self.lookup_id, near_dup=self.near_dup,
                                 timeout=self.timeout, sha256=sha256, total_size=total_size,
