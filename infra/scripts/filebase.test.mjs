@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { parseListObjects, usageSummary, filebaseConfig, bucketUsage, uploadCar, removeCids } from './filebase.mjs';
+import { parseListObjects, usageSummary, filebaseConfig, bucketUsage, uploadCar, removeCids, pruneKeys } from './filebase.mjs';
 
 const page = (truncated, token) => `<?xml version="1.0" encoding="UTF-8"?>
 <ListBucketResult><Name>b</Name><KeyCount>2</KeyCount><IsTruncated>${truncated}</IsTruncated>
@@ -101,4 +101,22 @@ test('removeCids deletes only the objects whose CID is in the set', async () => 
   s3.close();
   assert.deepEqual(deleted, ['a.pdf']);
   assert.deepEqual(s3.seen.filter((r) => r.method === 'DELETE').map((r) => r.url), ['/b/a.pdf']);
+});
+
+test('pruneKeys deletes everything under the prefix except the key to keep', async () => {
+  const listing = `<?xml version="1.0" encoding="UTF-8"?><ListBucketResult><IsTruncated>false</IsTruncated>
+<Contents><Key>snapshots/bafyold1.car</Key><Size>10</Size></Contents>
+<Contents><Key>snapshots/bafynew.car</Key><Size>10</Size></Contents>
+<Contents><Key>snapshots/bafyold2.car</Key><Size>10</Size></Contents></ListBucketResult>`;
+  const s3 = await fakeS3((req, res) => {
+    if (req.method === 'GET') return res.end(listing);
+    if (req.method === 'DELETE') { res.statusCode = 204; return res.end(); }
+    res.statusCode = 400; res.end();
+  });
+  const deleted = await pruneKeys(s3.cfg, 'snapshots/', 'snapshots/bafynew.car');
+  s3.close();
+  assert.deepEqual(deleted, ['snapshots/bafyold1.car', 'snapshots/bafyold2.car']);
+  assert.equal(new URL(s3.seen[0].url, 'http://x').searchParams.get('prefix'), 'snapshots/');
+  assert.deepEqual(s3.seen.filter((r) => r.method === 'DELETE').map((r) => r.url), ['/b/snapshots/bafyold1.car', '/b/snapshots/bafyold2.car']);
+  await assert.rejects(pruneKeys(s3.cfg, '', 'x'), /prefix/);
 });
