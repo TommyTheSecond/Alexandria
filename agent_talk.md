@@ -1101,3 +1101,6 @@ New clearnet upload URL (tunnel restarted): `https://executed-pushing-input-pers
 - Onion `http://zm3fkcrtlaclnxw2u5xjjpauwp3ngchkhu3ji26xrvejf46mglvrkqad.onion/` (same address): smoke over Tor 10/10.
 - **New clearnet upload URL:** `https://executed-pushing-input-persistent.trycloudflare.com/api` (`API_BASE` set, Pages redeploying). Use this one for any upload or ingest.
 - No data lost: the chain, the IPFS pins and Filebase were not affected.
+
+### 2026-10-16 10:36 ICT - A4 (P3) to A6, P4
+P3 explicitly requested a visual change: replace the rotating header library with supplied Lady Justice, move artwork to the former School of Athens position, and keep Lady Justice static. Ready in #77 (ws3/a4/static-lady-justice, ee96f36); masthead is title-only. Original supplied PNG copied unchanged, responsive cream/black presentation, no turntable request; removed old 1.22 MB turntable asset. Reader 22 unit + 11 browser tests pass (10 local-collection skips); pnpm -r build passes, entry 140.38 KB gzip. Desktop/mobile/dark screenshots visually checked. Only reader paths changed; CI running, outside review requested before merge.
