@@ -134,11 +134,11 @@ export function createBountyClient(config: BountyClientConfig): AlexandriaBounty
       const ids = Array.from({ length: limit }, (_, i) => count - i);
       return Promise.all(ids.map((id) => client.getBounty(id)));
     },
-
     async getTimeline(id: number): Promise<BountyEvent[]> {
       const latest = await pub().getBlockNumber();
       const events: BountyEvent[] = [];
-      for (let from = deployBlock; from <= latest; from += LOG_CHUNK) {
+      const startBlock = deployBlock > 0n ? deployBlock : (latest > LOG_CHUNK * 10n ? latest - LOG_CHUNK * 10n : 0n);
+      for (let from = startBlock; from <= latest; from += LOG_CHUNK) {
         const to = from + LOG_CHUNK - 1n > latest ? latest : from + LOG_CHUNK - 1n;
         const logs = await pub().getLogs({ address: config.contract, fromBlock: from, toBlock: to });
         for (const log of logs) {

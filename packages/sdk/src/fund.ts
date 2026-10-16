@@ -44,6 +44,80 @@ export function createFundClient(config: FundClientConfig): AlexandriaFundClient
 
   const deployBlockBigInt = config.deployBlock !== undefined ? BigInt(config.deployBlock) : 0n;
 
+  const LOG_CHUNK = 2048n;
+
+  async function queryFundEvents<T>(
+    eventName: 'Donated' | 'EpochClosed' | 'StorageSpent',
+    transform: (log: any) => T,
+    opts?: { limit?: number; fromBlock?: bigint }
+  ): Promise<T[]> {
+    const client = getPublicClient();
+    let latest: bigint | null = null;
+    try {
+      if (typeof client.getBlockNumber === 'function') {
+        const bn = await client.getBlockNumber();
+        if (typeof bn === 'bigint' && bn > 0n) {
+          latest = bn;
+        }
+      }
+    } catch {
+      latest = null;
+    }
+
+    const explicitFrom = opts?.fromBlock;
+    let from = explicitFrom !== undefined ? explicitFrom : deployBlockBigInt;
+
+    if (latest !== null) {
+      if (from === 0n && explicitFrom === undefined) {
+        from = latest > LOG_CHUNK * 10n ? latest - LOG_CHUNK * 10n : 0n;
+      }
+      if (from > latest) {
+        from = latest;
+      }
+
+      const events: T[] = [];
+      const limit = opts?.limit && opts.limit > 0 ? opts.limit : undefined;
+      let to = latest;
+
+      while (to >= from) {
+        const chunkFrom = to >= from + LOG_CHUNK ? to - LOG_CHUNK + 1n : from;
+        const logs = await client.getContractEvents({
+          address: config.contract,
+          abi: alexandriaFundAbi,
+          eventName,
+          fromBlock: chunkFrom,
+          toBlock: to,
+        });
+
+        const chunkEvents = logs.map(transform);
+        chunkEvents.reverse();
+        for (const ev of chunkEvents) {
+          events.push(ev);
+          if (limit && events.length >= limit) break;
+        }
+        if (limit && events.length >= limit) break;
+        if (chunkFrom <= from) break;
+        to = chunkFrom - 1n;
+      }
+
+      return limit ? events.slice(0, limit) : events;
+    }
+
+    const logs = await client.getContractEvents({
+      address: config.contract,
+      abi: alexandriaFundAbi,
+      eventName,
+      fromBlock: from,
+    });
+
+    const events: T[] = logs.map(transform);
+    events.reverse();
+    if (opts?.limit && opts.limit > 0) {
+      return events.slice(0, opts.limit);
+    }
+    return events;
+  }
+
   return {
     async getStats(): Promise<FundStats> {
       const client = getPublicClient();
@@ -89,84 +163,48 @@ export function createFundClient(config: FundClientConfig): AlexandriaFundClient
     },
 
     async getDonations(opts?: { limit?: number; fromBlock?: bigint }): Promise<DonatedEvent[]> {
-      const client = getPublicClient();
-      const from = opts?.fromBlock ?? deployBlockBigInt;
-
-      const logs = await client.getContractEvents({
-        address: config.contract,
-        abi: alexandriaFundAbi,
-        eventName: 'Donated',
-        fromBlock: from,
-      });
-
-      const events: DonatedEvent[] = logs.map((log) => ({
-        donor: (log.args as any).donor,
-        amount: (log.args as any).amount,
-        toOperators: (log.args as any).toOperators,
-        toStorage: (log.args as any).toStorage,
-        note: (log.args as any).note ?? '',
-        txHash: log.transactionHash as `0x${string}`,
-        blockNumber: log.blockNumber ?? 0n,
-      }));
-
-      events.reverse();
-      if (opts?.limit && opts.limit > 0) {
-        return events.slice(0, opts.limit);
-      }
-      return events;
+      return queryFundEvents(
+        'Donated',
+        (log) => ({
+          donor: (log.args as any).donor,
+          amount: (log.args as any).amount,
+          toOperators: (log.args as any).toOperators,
+          toStorage: (log.args as any).toStorage,
+          note: (log.args as any).note ?? '',
+          txHash: log.transactionHash as `0x${string}`,
+          blockNumber: log.blockNumber ?? 0n,
+        }),
+        opts
+      );
     },
 
     async getEpochs(opts?: { limit?: number; fromBlock?: bigint }): Promise<EpochClosedEvent[]> {
-      const client = getPublicClient();
-      const from = opts?.fromBlock ?? deployBlockBigInt;
-
-      const logs = await client.getContractEvents({
-        address: config.contract,
-        abi: alexandriaFundAbi,
-        eventName: 'EpochClosed',
-        fromBlock: from,
-      });
-
-      const events: EpochClosedEvent[] = logs.map((log) => ({
-        epoch: (log.args as any).epoch,
-        activeCount: (log.args as any).activeCount,
-        sharePerOperator: (log.args as any).sharePerOperator,
-        reportCid: (log.args as any).reportCid ?? '',
-        txHash: log.transactionHash as `0x${string}`,
-        blockNumber: log.blockNumber ?? 0n,
-      }));
-
-      events.reverse();
-      if (opts?.limit && opts.limit > 0) {
-        return events.slice(0, opts.limit);
-      }
-      return events;
+      return queryFundEvents(
+        'EpochClosed',
+        (log) => ({
+          epoch: (log.args as any).epoch,
+          activeCount: (log.args as any).activeCount,
+          sharePerOperator: (log.args as any).sharePerOperator,
+          reportCid: (log.args as any).reportCid ?? '',
+          txHash: log.transactionHash as `0x${string}`,
+          blockNumber: log.blockNumber ?? 0n,
+        }),
+        opts
+      );
     },
 
     async getStorageSpends(opts?: { limit?: number; fromBlock?: bigint }): Promise<StorageSpentEvent[]> {
-      const client = getPublicClient();
-      const from = opts?.fromBlock ?? deployBlockBigInt;
-
-      const logs = await client.getContractEvents({
-        address: config.contract,
-        abi: alexandriaFundAbi,
-        eventName: 'StorageSpent',
-        fromBlock: from,
-      });
-
-      const events: StorageSpentEvent[] = logs.map((log) => ({
-        to: (log.args as any).to,
-        amount: (log.args as any).amount,
-        memo: (log.args as any).memo ?? '',
-        txHash: log.transactionHash as `0x${string}`,
-        blockNumber: log.blockNumber ?? 0n,
-      }));
-
-      events.reverse();
-      if (opts?.limit && opts.limit > 0) {
-        return events.slice(0, opts.limit);
-      }
-      return events;
+      return queryFundEvents(
+        'StorageSpent',
+        (log) => ({
+          to: (log.args as any).to,
+          amount: (log.args as any).amount,
+          memo: (log.args as any).memo ?? '',
+          txHash: log.transactionHash as `0x${string}`,
+          blockNumber: log.blockNumber ?? 0n,
+        }),
+        opts
+      );
     },
 
     async connectFundWallet(walletProvider?: unknown): Promise<FundWalletClient> {
