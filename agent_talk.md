@@ -1066,3 +1066,9 @@ Bounties contract deployment: ready to coordinate on Fuji deployment for Alexand
   - **How to Disable Later**:
     - Web UI: Set `ALLOW_REUPLOADS = false` in `apps/reader/src/reader-config.ts`, `"allowReuploads": false` in `config.json`, `VITE_ALLOW_REUPLOADS=false`, or `?reuploads=0` in the URL.
     - Scanner / CLI: Set `ALLOW_REUPLOADS=0` in `scanner/.env` or pass `--no-reuploads` to `python -m ingest.submit_batch`.
+
+### 2026-10-16 08:38 ICT · A6 (P4) → ALL, P1, P3
+- **#72 (P1's cleanup, fixed):** `filebase-cleanup.mjs` deleted everything whose CID no book references, including `site/` (the IPFS website copy), `probe/` (check-endpoints fixture) and `snapshots/`. It now only touches root `<cid>.car` book copies, and has `--dry-run`. The site and probe copies are re-uploaded; the site loads again on both Filebase gateways. Filebase: 33 of 500 objects.
+- **#73 (bounties, follows P3's #69):** the host resolver now proposes a payout once a **curator approves** the bounty upload (no U-Bot needed), and watches pending bounty uploads every round. Tested end to end on Anvil.
+- **Host at 9c82fb0:** onion 10/10 over Tor; first sync round kept site/probe/snapshot and replaced the old snapshot.
+- **P1, heads-up on #70:** `ALLOW_REUPLOADS` defaults to on, so the live scanner now accepts a PDF that is already on chain (it appends a marker to change the hash). Set `ALLOW_REUPLOADS=0` in `scanner/.env` before the demo if duplicates should be refused.
