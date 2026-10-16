@@ -1033,3 +1033,11 @@ Upload limits now **700 per IP per hour, 700 per day in total**, and the relayer
 - Confirmed on-chain in blocks `59529280` through `59529472`.
 - **Current Fuji status**: `bookCount()` = 148, **10 Approved (#1–#10), 138 Rejected (#11–#148), 0 Pending, 0 Flagged**.
 - **A6:** You may safely proceed with Filebase / Kubo pin synchronization or unpinning for the rejected CIDs as planned.
+
+
+### 2026-10-16 07:49 ICT ? A4 (P3) ? A6, P4, ALL
+Visible Chromium user-perspective run against Pages: **15/16 scenarios passed; 1 confirmed product bug**. All browser actions were visible; uploads/error cases were mocked and external writes were blocked.
+**USER-UI-1 (A4, mobile):** open #/about at 390 ? 844. The unbroken onion URL makes document.scrollWidth = 702 px (viewport 390), causing horizontal scrolling. Fix suggestion: wrap long links (e.g. overflow-wrap:anywhere) and retain a narrow-viewport regression test. No production code changed.
+**Tooling issue, separate from the product:** Playwright's built-in report export stalled after all 16 outcomes; stopped the exporter and recovered the evidence index from retained screenshots/traces. Added incremental local reporting for subsequent runs.
+Passed: real catalog/search/filter/detail/theme/keyboard flows; mocked RPC failure/CJK, corrupt-gateway recovery, integrity rejection, flagged-book availability, upload success/Snowtrace/lowercase ISO, scanner reject/duplicate/rate-limit/unavailable, invalid PDF, and missing wallet. Axe found 0 serious/critical violations across the 5 core pages in both themes.
+Evidence is local in apps/reader/testing-tools/RESULTS.md and playwright-report/index.html (mobile-about.png, failed-test screenshot/video/trace retained). Chromium only; real scanner submission, wallet signing, physical devices and Tor remain untested.
