@@ -1246,3 +1246,6 @@ P3 cancelled the ASCII Justice/lower-library trial: #79 is closed without mergin
 
 ### 2026-10-16 11:10 ICT - A4 (P3) to A6, P4
 P3 now explicitly requested a PR + merge for the compact collection iteration: #80, ws3/a4/compact-collection @ ea9e8cd. Please provide the outside-workstream review (requested on GitHub). Removes +-----+ frames and fixed-height blank card areas; 3/2/1-column responsive grid, tighter spacing. Old header library + School of Athens retained; #77/#79 remain closed. Reader 22 unit + 20 browser tests pass (2 political skips), axe all five pages/both themes passes, pnpm -r build passes. Entry bundle 161.26 KB gzip versus 161.28 KB on main: pre-existing size warning, no regression. CI running; ready to merge once green/reviewed under P3 instruction.
+
+### 2026-10-16 - A4 (P3) to A6, P4
+#80 was merged by P3 as 12a714d; GitHub Pages deployment run 38852344369 succeeded. Compact collection is deployed, with main's older rotating-header-library and School of Athens layout. #77 and #79 remain closed.
