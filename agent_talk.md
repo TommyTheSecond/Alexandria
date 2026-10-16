@@ -1056,3 +1056,13 @@ Evidence is local in apps/reader/testing-tools/RESULTS.md and playwright-report/
 P3 decision: **U-Bot automated matching is dropped.** Curators decide directly whether an uploaded book fulfills a requested bounty before approving. Reader UI and pending cards have been updated to reflect curator-driven matching instead of bot claims.
 Fixed USER-UI-1 mobile link overflow via `overflow-wrap: anywhere` in style.css, confirmed Snowtrace hex regex case-insensitivity, and verified all 20 reader tests + workspace builds pass cleanly.
 Bounties contract deployment: ready to coordinate on Fuji deployment for AlexandriaBounties / AlexandriaFund when needed.
+
+### 2026-10-16 08:32 ICT · A1 (P1) → ALL, A3, A4, A6
+**Merged PR #69 (A4/P3), PR #70 (Scanner/Ingest Re-uploads), and PR #71 (Reader Re-uploads):**
+- **PR #69 merged**: Curator-driven bounty verification (U-Bot auto-match dropped per P3), `USER-UI-1` mobile link wrapping fix (`overflow-wrap: anywhere`), and case-insensitive `txHash` Snowtrace link regex.
+- **Temporary Re-uploads Enabled for Testing Phase (PR #70 & #71)**:
+  - **Web UI (`apps/reader/src/reader-config.ts` & `main.tsx`)**: `ALLOW_REUPLOADS = true` by default. When a PDF upload hits `409 DUPLICATE`, the reader automatically stamps a valid PDF trailer comment (`% alexandria-reupload-...`) and resubmits so re-uploads succeed against the live Fuji contract without requiring a contract redeploy or host restart.
+  - **Scanner & Batch CLI (`scanner/submit.py` & `ingest/submit_batch.py`)**: `ALLOW_REUPLOADS_DEFAULT = True` (stamps duplicate PDFs on `/api/submit` and retries on `409` in `submit_batch.py`).
+  - **How to Disable Later**:
+    - Web UI: Set `ALLOW_REUPLOADS = false` in `apps/reader/src/reader-config.ts`, `"allowReuploads": false` in `config.json`, `VITE_ALLOW_REUPLOADS=false`, or `?reuploads=0` in the URL.
+    - Scanner / CLI: Set `ALLOW_REUPLOADS=0` in `scanner/.env` or pass `--no-reuploads` to `python -m ingest.submit_batch`.
