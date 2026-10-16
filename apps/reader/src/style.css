@@ -115,3 +115,9 @@ main progress { display:block; inline-size:min(100%,35ch); margin-block:8px; }
 .athens-art pre { font-size:calc(100cqi / 153.6); line-height:1.06; font-weight:600; }
 
 .athens-art { inline-size:75%; margin-inline:auto; container-type:inline-size; }
+
+/* Static engraving below the masthead; never animated or tied to scrolling. */
+.hero { grid-template-columns:1fr 1fr; }
+.lady-justice { display:block; inline-size:min(100%, 270px); block-size:auto; margin-inline:auto; mix-blend-mode:multiply; }
+:root[data-theme=dark] .lady-justice { filter:grayscale(1) invert(1); mix-blend-mode:screen; }
+@media(max-width:850px) { .hero { grid-template-columns:1fr; } .lady-justice { inline-size:min(100%, 225px); } }
