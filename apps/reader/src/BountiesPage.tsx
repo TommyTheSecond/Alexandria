@@ -92,7 +92,7 @@ function BountyIndex({ client }: { client: AlexandriaBountyClient }) {
   return <section className="bounties">
     <h2>Book bounties</h2>
     <p>Put test AVAX on a banned public-domain book the library doesn't have yet. Whoever uploads it gets paid once
-      U-Bot has checked the upload is the right book, a curator has approved it, and a 10-minute dispute window has passed:
+      a curator verifies the upload is the requested book, approves it, and a 10-minute dispute window has passed:
       95 % to the uploader, 5 % to the library fund. If nobody delivers before the deadline, every funder gets their money back.</p>
     {error && <p role="status">{error}</p>}
     {!bounties && !error && <p role="status">Loading bounties…</p>}
@@ -219,7 +219,7 @@ function BountyDetail({ client, id, gateway, onAnswer }: { client: AlexandriaBou
     <p><strong>{status.label}</strong></p>
     <p>Reward: {bounty.state === 'paid' ? 'paid out' : formatAvax(bounty.amount)} · deadline {new Date(bounty.deadline * 1000).toLocaleString()} · posted by {shortAddress(bounty.requester)}</p>
     {bounty.bookId > 0 && <p>Proposed book: <a href={`#/book/${bounty.bookId}`}>#{bounty.bookId}</a> · payee {shortAddress(bounty.payee)}
-      {verdictUrl && <> · <a href={verdictUrl} target="_blank" rel="noopener noreferrer">U-Bot verdict and scan report</a></>}</p>}
+      {verdictUrl && <> · <a href={verdictUrl} target="_blank" rel="noopener noreferrer">Scan report & verification</a></>}</p>}
 
     {bounty.state === 'open' && !status.canRefund && <p><button type="button" onClick={() => onAnswer(bounty.id)}>I have this book: upload it for bounty #{bounty.id}</button></p>}
 
@@ -251,7 +251,7 @@ function describe(e: BountyEvent): string {
   switch (e.kind) {
     case 'created': return `Posted by ${who} with ${formatAvax(e.amount ?? 0n)}`;
     case 'funded': return `${who} added ${formatAvax(e.amount ?? 0n)}`;
-    case 'proposed': return `U-Bot matched book #${e.bookId}; payout to ${who} proposed, dispute window until ${new Date((e.executableAt ?? 0) * 1000).toLocaleTimeString()}`;
+    case 'proposed': return `Verified match for book #${e.bookId}; payout to ${who} proposed, dispute window until ${new Date((e.executableAt ?? 0) * 1000).toLocaleTimeString()}`;
     case 'payoutCancelled': return `Payout cancelled by ${who}${e.reason ? `: ${e.reason}` : ''}`;
     case 'paid': return `Paid ${formatAvax(e.amount ?? 0n)} to ${who}; ${formatAvax(e.fee ?? 0n)} ${e.feeSent ? 'to the library fund' : 'held for the library fund'}`;
     case 'cancelled': return `Bounty cancelled${e.reason ? `: ${e.reason}` : ''}`;

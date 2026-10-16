@@ -191,7 +191,7 @@ function App() {
     try {
       const result = await client.submit(file, upload);
       setScanReport(result.report);
-      if (result.report.verdict !== 'reject' && /^0x[0-9a-f]{64}$/.test(result.txHash ?? '')) {
+      if (result.report.verdict !== 'reject' && /^0x[0-9a-fA-F]{64}$/.test(result.txHash ?? '')) {
         setSubmissionTx(result.txHash);
       }
       const failed = result.report.checks?.filter(check => !check.passed).map(check => check.id).join(', ');

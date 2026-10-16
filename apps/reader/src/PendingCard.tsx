@@ -21,10 +21,7 @@ export function PendingCard({ item, report, reportUrl, busy, onDownload, onRevie
     {reportUrl(item.metaCid) && <p><a href={reportUrl(item.metaCid)} target="_blank" rel="noopener noreferrer">View metadata</a></p>}
     {reportUrl(item.meta?.scanReportCid) ? <p><a href={reportUrl(item.meta?.scanReportCid)} target="_blank" rel="noopener noreferrer">Open scan report</a></p>
       : <p>No scan report is attached. Scan this file manually before approval.</p>}
-    {verdict && <p className="bounty-verdict">Bounty <a href={`#/bounties/${verdict.bountyId}`}>#{verdict.bountyId}</a>: U-Bot says {verdict.match}
-      {verdict.match !== 'unsure' && ` (${Math.round(verdict.confidence * 100)} %)`}; cross-checks {verdict.crossChecks ? 'passed' : `failed${verdict.failed ? `: ${verdict.failed}` : ''}`}.
-      {verdict.auto ? ' Approving this book pays the bounty after the dispute window.' : ' No automatic payout: check the book yourself.'}
-      {verdict.evidence && <> Evidence: {verdict.evidence}</>}{verdict.error && <> ({verdict.error})</>}</p>}
+    {verdict && <p className="bounty-verdict">Answers Bounty <a href={`#/bounties/${verdict.bountyId}`}>#{verdict.bountyId}</a>: Curators decide if this book correctly matches the requested bounty before approval.{verdict.evidence && <> Details: {verdict.evidence}</>}</p>}
     {failed.length > 0 && <ul>{failed.map(check => <li key={check.id}>{check.id}: {check.detail}</li>)}</ul>}
     <button type="button" disabled={busy} onClick={onDownload}>Download verified PDF for review</button>
     <label>Review reason<input id={`reason-${item.id}`} maxLength={300} /></label>
