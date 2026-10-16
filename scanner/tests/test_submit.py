@@ -163,3 +163,26 @@ def test_non_object_meta_is_rejected_not_crashing(tmp_path, bad_meta):
     service, pinner, _ = _service(tmp_path)
     res = _submit(service, GOOD.read_bytes(), bad_meta)
     assert res.status == 422 and pinner.calls == []
+
+
+def test_allow_reuploads_stamps_pdf_and_succeeds(tmp_path):
+    orig = GOOD.read_bytes()
+    orig_sha = mf.sha256_hex(orig)
+    service, pinner, relay = _service(tmp_path, lookup_id=lambda sha: 7 if sha == orig_sha else 0, allow_reuploads=True)
+    res = _submit(service, orig, mf._good_input())
+    assert res.status == 200
+    assert res.body["bookId"] == 1
+    assert len(pinner.calls) == 3 and len(relay.calls) == 1
+    pinned_pdf = pinner.calls[1][1]
+    assert pinned_pdf != orig and pinned_pdf.startswith(orig)
+    assert b"% alexandria-reupload-" in pinned_pdf
+
+
+def test_allow_reuploads_disabled_returns_409(tmp_path):
+    orig = GOOD.read_bytes()
+    orig_sha = mf.sha256_hex(orig)
+    service, pinner, relay = _service(tmp_path, lookup_id=lambda sha: 7 if sha == orig_sha else 0, allow_reuploads=False)
+    res = _submit(service, orig, mf._good_input())
+    assert res.status == 409 and res.body == {"code": "DUPLICATE", "existingId": 7}
+    assert pinner.calls == [] and relay.calls == []
+

@@ -12,7 +12,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
+import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Optional
@@ -21,6 +23,15 @@ import httpx
 
 DEFAULT_API = "http://127.0.0.1:8000/api"
 TIMEOUT_S = 600  # big books: scan + three pins + one on-chain confirmation
+# Temporary test-phase toggle: set ALLOW_REUPLOADS = False (or env ALLOW_REUPLOADS=0 / --no-reuploads) to disable.
+ALLOW_REUPLOADS = True
+
+
+def _reuploads_default() -> bool:
+    raw = os.environ.get("ALLOW_REUPLOADS")
+    if raw is None:
+        return ALLOW_REUPLOADS
+    return raw.strip().lower() not in ("0", "false", "no")
 
 
 @dataclass
@@ -48,11 +59,18 @@ def _failed_checks(report: dict) -> str:
     return ", ".join(c["id"] for c in report.get("checks", []) if not c.get("passed"))
 
 
-def _send(client: httpx.Client, api: str, pdf: Path, meta_text: str, dry_run: bool) -> httpx.Response:
+def _send(client: httpx.Client, api: str, pdf: Path, meta_text: str, dry_run: bool,
+          *, allow_reuploads: bool = False) -> httpx.Response:
     endpoint = "scan" if dry_run else "submit"
-    return client.post(f"{api.rstrip('/')}/{endpoint}",
-                       files={"pdf": (pdf.name, pdf.read_bytes(), "application/pdf")},
-                       data={"meta": meta_text, "via": "ubot"})
+    url = f"{api.rstrip('/')}/{endpoint}"
+    raw_pdf = pdf.read_bytes()
+    response = client.post(url, files={"pdf": (pdf.name, raw_pdf, "application/pdf")},
+                           data={"meta": meta_text, "via": "ubot"})
+    if not dry_run and response.status_code == 409 and allow_reuploads:
+        stamped = raw_pdf + f"\n% alexandria-reupload-{time.time_ns()}\n%%EOF\n".encode("ascii")
+        response = client.post(url, files={"pdf": (pdf.name, stamped, "application/pdf")},
+                               data={"meta": meta_text, "via": "ubot"})
+    return response
 
 
 def _row_from_response(row: Row, response: httpx.Response, dry_run: bool) -> Row:
@@ -74,7 +92,10 @@ def _row_from_response(row: Row, response: httpx.Response, dry_run: bool) -> Row
     return row
 
 
-def submit_folder(folder: Path, *, client: httpx.Client, api: str = DEFAULT_API, dry_run: bool = False) -> list[Row]:
+def submit_folder(folder: Path, *, client: httpx.Client, api: str = DEFAULT_API, dry_run: bool = False,
+                  allow_reuploads: Optional[bool] = None) -> list[Row]:
+    if allow_reuploads is None:
+        allow_reuploads = _reuploads_default()
     rows: list[Row] = []
     stopped: Optional[str] = None
     for pdf in sorted(Path(folder).glob("*.pdf")):
@@ -94,7 +115,7 @@ def submit_folder(folder: Path, *, client: httpx.Client, api: str = DEFAULT_API,
             row.problems = f"not sent ({stopped})"
             continue
         try:
-            response = _send(client, api, pdf, meta_text, dry_run)
+            response = _send(client, api, pdf, meta_text, dry_run, allow_reuploads=allow_reuploads)
         except httpx.HTTPError as exc:
             row.problems = f"API unreachable: {type(exc).__name__}"
             stopped = "API unreachable"
@@ -119,9 +140,15 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("folder", type=Path, help="folder with <name>.pdf + <name>.json pairs")
     parser.add_argument("--api", default=DEFAULT_API, help=f"scanner API base (default {DEFAULT_API})")
     parser.add_argument("--dry-run", action="store_true", help="scan only (/api/scan); nothing stored or sent on-chain")
+    reupload_group = parser.add_mutually_exclusive_group()
+    reupload_group.add_argument("--allow-reuploads", dest="allow_reuploads", action="store_true",
+                                default=None, help="allow re-uploading duplicate PDFs (default during test phase)")
+    reupload_group.add_argument("--no-reuploads", dest="allow_reuploads", action="store_false",
+                                help="reject duplicate PDFs with 409")
     args = parser.parse_args(argv)
     with make_client() as client:
-        rows = submit_folder(args.folder, client=client, api=args.api, dry_run=args.dry_run)
+        rows = submit_folder(args.folder, client=client, api=args.api, dry_run=args.dry_run,
+                             allow_reuploads=args.allow_reuploads)
     print(format_table(rows))
     (args.folder / "submit-results.json").write_text(json.dumps([asdict(r) for r in rows], indent=2,
                                                                 ensure_ascii=False), encoding="utf-8")
@@ -132,3 +159,4 @@ def main(argv: Optional[list[str]] = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
