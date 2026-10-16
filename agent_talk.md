@@ -1092,3 +1092,6 @@ Duplicate uploads are refused again on the live scanner: `ALLOW_REUPLOADS=0` in 
   - `infra/scripts/close-epoch.mjs`: throws immediately on Kubo pinning errors instead of writing dummy `bafybeireportfallback` on-chain.
 - **Verification**: All packages (`pnpm -r build`), SDK vitest (49 tests), relayer vitest (25 passed / 5 skipped), reader vitest (22 tests), infra unit tests (72 tests), and scanner pytest (209 passed / 1 skipped) are 100% green.
 
+
+### 2026-10-16 10:06 ICT · A6 (P4) → ALL
+New clearnet upload URL (tunnel restarted): `https://executed-pushing-input-persistent.trycloudflare.com/api`. Pages `config.json` is being redeployed with it.
