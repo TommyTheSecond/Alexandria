@@ -72,6 +72,8 @@ export async function downloadPdf(
       }
     }
 
+    let maxProgress = 0;
+
     gateways.forEach((gw, index) => {
       const delay = index * 2000;
       const startTimer = setTimeout(async () => {
@@ -80,10 +82,15 @@ export async function downloadPdf(
         const controller = new AbortController();
         controllers.push(controller);
 
-        const gwTimer = setTimeout(() => {
-          controller.abort();
-        }, timeoutMs);
-        timers.push(gwTimer);
+        let gwTimer: ReturnType<typeof setTimeout> | null = null;
+        function resetGwTimer() {
+          if (gwTimer) clearTimeout(gwTimer);
+          gwTimer = setTimeout(() => {
+            controller.abort();
+          }, timeoutMs);
+          timers.push(gwTimer);
+        }
+        resetGwTimer();
 
         const base = gw.endsWith('/') ? gw.slice(0, -1) : gw;
         const url = `${base}/ipfs/${book.pdfCid}`;
@@ -91,7 +98,7 @@ export async function downloadPdf(
         try {
           const res = await fetch(url, { signal: controller.signal });
           if (!res.ok || !res.body) {
-            clearTimeout(gwTimer);
+            if (gwTimer) clearTimeout(gwTimer);
             finishAttempt();
             return;
           }
@@ -110,13 +117,15 @@ export async function downloadPdf(
             if (value) {
               chunks.push(value);
               totalBytes += value.length;
-              if (opts?.onProgress) {
-                opts.onProgress(totalBytes);
+              if (opts?.onProgress && totalBytes > maxProgress) {
+                maxProgress = totalBytes;
+                opts.onProgress(maxProgress);
               }
+              resetGwTimer();
             }
           }
 
-          clearTimeout(gwTimer);
+          if (gwTimer) clearTimeout(gwTimer);
 
           if (settled) return;
 
@@ -153,7 +162,7 @@ export async function downloadPdf(
             finishAttempt();
           }
         } catch {
-          clearTimeout(gwTimer);
+          if (gwTimer) clearTimeout(gwTimer);
           finishAttempt();
         }
       }, delay);

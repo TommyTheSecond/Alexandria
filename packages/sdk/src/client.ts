@@ -83,28 +83,32 @@ export function createClient(config: ClientConfig): AlexandriaClient {
 
   return {
     async getCatalog(opts?: { live?: boolean }): Promise<Catalog> {
-      let snapshotCatalog: Catalog | null = null;
-
-      // 1. Try snapshot URLs in order
-      if (config.snapshotUrls && config.snapshotUrls.length > 0) {
+      async function loadSnapshot(): Promise<Catalog | null> {
+        if (!config.snapshotUrls || config.snapshotUrls.length === 0) return null;
         for (const url of config.snapshotUrls) {
           try {
             const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
             if (res.ok) {
               const data = (await res.json()) as Catalog;
               if (data && Array.isArray(data.books)) {
-                snapshotCatalog = { ...data, source: 'snapshot' };
-                break;
+                return { ...data, source: 'snapshot' };
               }
             }
           } catch {
             // try next snapshot url
           }
         }
+        return null;
       }
 
-      // 2. Try live read if not explicitly disabled
-      if (opts?.live !== false && config.rpcUrls && config.rpcUrls.length > 0) {
+      if (opts?.live === false) {
+        const snap = await loadSnapshot();
+        if (snap) return snap;
+        throw new AlexandriaError('UNREACHABLE', 'Could not load catalog from snapshot');
+      }
+
+      // 1. Try live read if rpcUrls are configured
+      if (config.rpcUrls && config.rpcUrls.length > 0) {
         try {
           const client = getPublicClient();
           const blockNumber = await client.getBlockNumber();
@@ -169,9 +173,19 @@ export function createClient(config: ClientConfig): AlexandriaClient {
           }
 
           // Fetch metadata for approved/flagged books
+          let snapshotCatalog: Catalog | null = null;
           const booksWithMeta = await Promise.all(
             rawBooks.map(async (b) => {
-              const meta = await fetchMetadata(b.metaCid, config.gateways);
+              let meta = await fetchMetadata(b.metaCid, config.gateways);
+              if (!meta) {
+                if (!snapshotCatalog) {
+                  snapshotCatalog = await loadSnapshot();
+                }
+                const cached = snapshotCatalog?.books.find((sb) => sb.id === b.id && sb.metaCid === b.metaCid);
+                if (cached?.meta) {
+                  meta = cached.meta;
+                }
+              }
               return { ...b, meta };
             })
           );
@@ -186,10 +200,12 @@ export function createClient(config: ClientConfig): AlexandriaClient {
             books: booksWithMeta.sort((a, b) => a.id - b.id),
           };
         } catch {
-          // Live read failed
+          // Live read failed, fall back to snapshot
         }
       }
 
+      // 2. Fall back to snapshot
+      const snapshotCatalog = await loadSnapshot();
       if (snapshotCatalog) {
         return snapshotCatalog;
       }
