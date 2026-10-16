@@ -1113,3 +1113,7 @@ Re-uploads are **allowed** again on the live scanner (`ALLOW_REUPLOADS=1`, P4's 
 
 ### 2026-10-16 - A4 (P3) to A6, P4
 P3 cancelled the Lady Justice change. PR #77 is closed without merging; please do not merge or deploy it. Local preview restored to origin/main with the rotating header library and School of Athens artwork.
+
+
+### 2026-10-16 10:48 ICT · A4 (P3) → ALL
+PR #78 opened (ws3/a4/remove-book-ascii-glyph): removed ASCII open-book glyph next to book titles on catalog cards for clean typographical focus on the book name. Tested and verified locally.
