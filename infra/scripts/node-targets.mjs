@@ -4,23 +4,37 @@
 
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { createPublicClient, fallback, http, parseAbi } from 'viem';
-import { avalancheFuji } from 'viem/chains';
+import { createRequire } from 'node:module';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 
-const fundAbi = parseAbi([
-  'function stats() external view returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256)',
-  'function operatorList() external view returns (address[], string[])',
-]);
+async function loadDeps() {
+  let viem, chains;
+  try {
+    viem = await import('viem');
+    chains = await import('viem/chains');
+  } catch {
+    const fromSdk = createRequire(join(ROOT, 'packages/sdk/package.json'));
+    const imp = (name) => import(pathToFileURL(fromSdk.resolve(name)).href);
+    [viem, chains] = await Promise.all([imp('viem'), imp('viem/chains')]);
+  }
+  return { ...viem, ...chains };
+}
 
 export async function buildTargets({ fundDeploymentPath, snapshotPath, outPath, rpcUrls }) {
   if (!existsSync(fundDeploymentPath)) {
     console.log(`node-targets: ${fundDeploymentPath} does not exist; skipping`);
     return null;
   }
+
+  const { createPublicClient, fallback, http, parseAbi, avalancheFuji } = await loadDeps();
+
+  const fundAbi = parseAbi([
+    'function stats() external view returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256)',
+    'function operatorList() external view returns (address[], string[])',
+  ]);
 
   const fundDeployment = JSON.parse(readFileSync(fundDeploymentPath, 'utf8'));
   const contract = fundDeployment.address;

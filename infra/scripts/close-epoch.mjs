@@ -5,23 +5,41 @@
 
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, statSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { createPublicClient, createWalletClient, fallback, http, parseAbi } from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
-import { avalancheFuji } from 'viem/chains';
-import { Wallet } from 'ethers';
+import { createRequire } from 'node:module';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { kuboClient } from './kubo.mjs';
 import { filebaseConfig, uploadCar } from './filebase.mjs';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 
-const fundAbi = parseAbi([
-  'function stats() external view returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256)',
-  'function closeEpoch(address[] calldata active, string calldata reportCid) external',
-]);
+async function loadDeps() {
+  let viem, accounts, chains, ethers;
+  try {
+    viem = await import('viem');
+    accounts = await import('viem/accounts');
+    chains = await import('viem/chains');
+    ethers = await import('ethers');
+  } catch {
+    const fromSdk = createRequire(join(ROOT, 'packages/sdk/package.json'));
+    const fromRelayer = createRequire(join(ROOT, 'relayer/package.json'));
+    const imp = (req, name) => import(pathToFileURL(req.resolve(name)).href);
+    [viem, accounts, chains, ethers] = await Promise.all([
+      imp(fromSdk, 'viem'),
+      imp(fromSdk, 'viem/accounts'),
+      imp(fromSdk, 'viem/chains'),
+      imp(fromRelayer, 'ethers'),
+    ]);
+  }
+  return {
+    ...viem,
+    ...accounts,
+    ...chains,
+    Wallet: ethers.Wallet || ethers.default?.Wallet || ethers,
+  };
+}
 
-async function unlockHostSigner() {
+async function unlockHostSigner(Wallet) {
   // 1. Direct private key (e.g. Anvil / local tests / CI)
   if (process.env.HOST_SIGNER_KEY) {
     const raw = process.env.HOST_SIGNER_KEY.trim();
@@ -58,6 +76,13 @@ export async function closeEpochJob({
     console.log(`close-epoch: ${fundDeploymentPath} does not exist; skipping`);
     return null;
   }
+
+  const { createPublicClient, createWalletClient, fallback, http, parseAbi, privateKeyToAccount, avalancheFuji, Wallet } = await loadDeps();
+
+  const fundAbi = parseAbi([
+    'function stats() external view returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256)',
+    'function closeEpoch(address[] calldata active, string calldata reportCid) external',
+  ]);
 
   const fundDeployment = JSON.parse(readFileSync(fundDeploymentPath, 'utf8'));
   const contract = fundDeployment.address;
@@ -128,12 +153,11 @@ export async function closeEpochJob({
       console.log(`close-epoch: Filebase upload skipped: ${e.message}`);
     }
   } catch (err) {
-    console.warn(`close-epoch: Kubo pinning unavailable (${err.message}); fallback CID`);
-    reportCid = 'bafybeireportfallback';
+    throw new Error(`close-epoch: Kubo pinning failed (${err.message}); aborting epoch close`);
   }
 
   // Sign closeEpoch on-chain
-  const privateKey = await unlockHostSigner();
+  const privateKey = await unlockHostSigner(Wallet);
   const account = privateKeyToAccount(privateKey);
 
   const walletClient = createWalletClient({
