@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveReaderConfig, sortPendingByScore } from './reader-config';
+import { ALLOW_REUPLOADS, buildReuploadPdf, isReuploadAllowed, resolveReaderConfig, sortPendingByScore } from './reader-config';
 
 const endpoints = {
   rpcs: { clearnet: ['https://rpc.example'], onion: ['/rpc'] },
@@ -36,6 +36,31 @@ it('puts low-scoring pending books first and keeps missing reports visible', () 
   expect(sortPendingByScore(books, { 1: 90, 2: 50 })).toEqual([books[2], books[1], books[0]]);
 });
 it('keeps onion uploads local even when runtime configuration contains a tunnel', () => {
- const resolved = resolveReaderConfig('abc.onion', {apiBase:'https://scanner.example/api'}, endpoints);
- expect(resolved.client.apiBase).toBe('/api');
+  const resolved = resolveReaderConfig('abc.onion', { apiBase: 'https://scanner.example/api' }, endpoints);
+  expect(resolved.client.apiBase).toBe('/api');
 });
+
+describe('temporary reupload toggle', () => {
+  it('enables reuploads by default in test phase and allows disabling via query, runtime config, or env', () => {
+    expect(ALLOW_REUPLOADS).toBe(true);
+    expect(isReuploadAllowed()).toBe(true);
+    expect(isReuploadAllowed('?reuploads=0')).toBe(false);
+    expect(isReuploadAllowed('?reuploads=false')).toBe(false);
+    expect(isReuploadAllowed('?reuploads=1', false)).toBe(true);
+    expect(isReuploadAllowed('', false)).toBe(false);
+    expect(isReuploadAllowed('', undefined, 'false')).toBe(false);
+    expect(isReuploadAllowed('', undefined, '0')).toBe(false);
+  });
+
+  it('builds a valid stamped PDF file for reuploads while preserving header and filename', async () => {
+    const orig = new File(['%PDF-1.4\nbody\n%%EOF\n'], 'book.pdf', { type: 'application/pdf' });
+    const stamped = buildReuploadPdf(orig, 'test-stamp');
+    expect(stamped.name).toBe('book.pdf');
+    expect(stamped.type).toBe('application/pdf');
+    const text = await stamped.text();
+    expect(text.startsWith('%PDF-1.4\nbody\n%%EOF\n')).toBe(true);
+    expect(text).toContain('% alexandria-reupload-test-stamp');
+    expect(text.endsWith('%%EOF\n')).toBe(true);
+  });
+});
+
