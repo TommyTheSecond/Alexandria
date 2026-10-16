@@ -115,3 +115,20 @@ main progress { display:block; inline-size:min(100%,35ch); margin-block:8px; }
 .athens-art pre { font-size:calc(100cqi / 153.6); line-height:1.06; font-weight:600; }
 
 .athens-art { inline-size:75%; margin-inline:auto; container-type:inline-size; }
+
+/* Compact catalog: readable book details without decorative card frames. */
+.collection { padding-block:24px 12px; }
+.collection>p { margin-block:6px 14px; }
+.filters { gap:16px; margin-block-end:16px; }
+.filters label { margin-block:4px; }
+.filters input,.filters select { padding-block:7px; }
+.book-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:0 24px; }
+.book-card { display:flex; flex-direction:column; border-block-start:1px solid var(--rule); padding-block:14px; }
+.card-top { padding-block:0; gap:8px; }
+.card-body { min-block-size:0; gap:0; align-items:flex-start; padding-block:8px 4px; }
+.card-body h3 { font-size:18px; line-height:1.35; margin-block:0 4px; }
+.card-body p { font-size:13px; line-height:1.5; }
+.book-countries { margin-block:5px; line-height:1.5; }
+.card-bottom { padding-block:5px 0; margin-block-start:auto; gap:8px; }
+@media(max-width:1000px) { .book-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:620px) { .book-grid { grid-template-columns:1fr; } .book-card { padding-block:12px; } }
