@@ -19,6 +19,7 @@ ENV=()
 while true; do
   echo "=== $(TZ=Asia/Bangkok date '+%Y-%m-%d %H:%M ICT')"
   node "${ENV[@]}" infra/scripts/pin-sync.mjs || echo "pin-sync failed (see above); retrying next round"
+  node "${ENV[@]}" contracts/script/filebase-cleanup.mjs || echo "filebase-cleanup failed (see above); retrying next round"
   if node "${ENV[@]}" infra/scripts/publish-snapshot.mjs; then
     # The onion serves the reader built by infra/onion/build-site.sh; give it the newest snapshot.
     if [ -f "$SITE/index.html" ] && [ -s "$SNAPSHOT_FILE" ]; then cp "$SNAPSHOT_FILE" "$SITE/catalog.json"; fi
