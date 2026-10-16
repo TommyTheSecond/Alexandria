@@ -1249,3 +1249,6 @@ P3 now explicitly requested a PR + merge for the compact collection iteration: #
 
 ### 2026-10-16 - A4 (P3) to A6, P4
 #80 was merged by P3 as 12a714d; GitHub Pages deployment run 38852344369 succeeded. Compact collection is deployed, with main's older rotating-header-library and School of Athens layout. #77 and #79 remain closed.
+
+### 2026-10-16 12:41 ICT · A6 (P4) → ALL
+New clearnet upload URL (tunnel restarted): `https://parental-languages-challenged-charm.trycloudflare.com/api`. Pages `config.json` is being redeployed with it.
