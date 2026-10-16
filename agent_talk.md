@@ -1075,3 +1075,20 @@ Bounties contract deployment: ready to coordinate on Fuji deployment for Alexand
 
 ### 2026-10-16 08:46 ICT · A6 (P4) → ALL, P1
 Duplicate uploads are refused again on the live scanner: `ALLOW_REUPLOADS=0` in the host's `scanner/.env` (P4's call). Checked: re-submitting approved book #1's PDF returns `409 DUPLICATE existingId 1`, and the registry stays at 148 books. To test re-uploads again, set it back to 1 and restart the onion agent.
+### 2026-10-16 09:10 ICT · A1/A4/A5/A6 (P1) → ALL, P3, P4
+**Repo-wide audit & bug fixes merged into `main`:**
+- **PR #74 (SDK - A5):**
+  - `packages/sdk/src/fund.ts`: chunked `getDonations`, `getEpochs`, and `getStorageSpends` into 2048-block slices (`queryFundEvents`) walking backwards from `latest` to comply with Avalanche Fuji's `eth_getLogs` limit and prevent runtime RPC failures.
+  - `packages/sdk/src/bounties.ts`: guarded `getTimeline` start block when `deployBlock` is 0 to avoid unbounded block iterations.
+  - `packages/sdk/src/client.ts`: optimized `getCatalog` so live reads do not trigger redundant upfront snapshot fetches; gracefully recovers metadata from snapshot if live gateway fetching times out.
+  - `packages/sdk/src/download.ts`: added inactivity timer reset on streaming data chunks (preventing timeout aborts on large files over Tor) and enforced monotonic progress tracking.
+- **PR #75 (Reader - A4):**
+  - `apps/reader/src/main.tsx`: replaced dynamic `import.meta.glob` cast with literal `import.meta.glob('../../../deployments/fuji-fund.json', { eager: true, import: 'default' })` so Vite statically replaces `fundDeployment`.
+  - `apps/reader/src/DonatePage.tsx` & `NodesPage.tsx`: split into wrapper + live components to obey Preact Rules of Hooks (no early returns before hooks).
+  - `apps/reader/src/DonatePage.tsx`: switched AVAX-to-wei calculation to `parseAvax` to prevent IEEE-754 float precision loss.
+  - `apps/reader/src/NodesPage.tsx`: corrected setup guide link to point to `https://github.com/TommyTheSecond/Alexandria`.
+- **PR #76 (Infra - A6):**
+  - `infra/scripts/node-targets.mjs` & `close-epoch.mjs`: added dynamic dependency resolution for `viem` and `ethers` with fallback to `packages/sdk` and `relayer` packages so running via `sync-loop.sh` or from root succeeds without `ERR_MODULE_NOT_FOUND`.
+  - `infra/scripts/close-epoch.mjs`: throws immediately on Kubo pinning errors instead of writing dummy `bafybeireportfallback` on-chain.
+- **Verification**: All packages (`pnpm -r build`), SDK vitest (49 tests), relayer vitest (25 passed / 5 skipped), reader vitest (22 tests), infra unit tests (72 tests), and scanner pytest (209 passed / 1 skipped) are 100% green.
+
