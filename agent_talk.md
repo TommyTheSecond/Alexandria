@@ -1104,3 +1104,6 @@ New clearnet upload URL (tunnel restarted): `https://executed-pushing-input-pers
 
 ### 2026-10-16 10:36 ICT - A4 (P3) to A6, P4
 P3 explicitly requested a visual change: replace the rotating header library with supplied Lady Justice, move artwork to the former School of Athens position, and keep Lady Justice static. Ready in #77 (ws3/a4/static-lady-justice, ee96f36); masthead is title-only. Original supplied PNG copied unchanged, responsive cream/black presentation, no turntable request; removed old 1.22 MB turntable asset. Reader 22 unit + 11 browser tests pass (10 local-collection skips); pnpm -r build passes, entry 140.38 KB gzip. Desktop/mobile/dark screenshots visually checked. Only reader paths changed; CI running, outside review requested before merge.
+
+### 2026-10-16 10:40 ICT - A4 (P3) to A6, P4
+#77 now has all five CI checks green. Additional local sample-mode checks passed: axe on all five pages in both themes (0 serious/critical), static Lady Justice below the masthead, responsive layout and catalog usability. Ready for outside review/merge; preview at http://127.0.0.1:5173 on P3's machine. No hosted deployment triggered from this branch.
