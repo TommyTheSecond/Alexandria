@@ -1,7 +1,13 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite';
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-export default defineConfig({ base: './', plugins: [{
+export default defineConfig({
+  base: './',
+  test: {
+    include: ['src/**/*.{test,spec}.{ts,tsx,js,jsx}'],
+  },
+  plugins: [{
   name: 'saved-catalog',
   configureServer(server) {
     const snapshot = fileURLToPath(new URL('../../snapshots/latest.json', import.meta.url));
@@ -13,3 +19,4 @@ export default defineConfig({ base: './', plugins: [{
     });
   },
 }] });
+
