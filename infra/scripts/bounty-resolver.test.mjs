@@ -43,7 +43,7 @@ test('proposes when the scanner says auto and the bounty is open', async () => {
 
 test('does not propose without an automatic match or when the bounty cannot take it', async () => {
   const cases = [
-    [{ [CID(1)]: bountyMeta(1, 9), [CID(9)]: autoReport(1, false) }, [openBounty], [], 'no automatic match'],
+    [{ [CID(1)]: bountyMeta(1, 9), [CID(9)]: autoReport(1, false) }, [openBounty], [], 'waiting for a curator'],
     [{ [CID(1)]: bountyMeta(1, 9), [CID(9)]: autoReport(1) }, [{ ...openBounty, state: 'proposed', bookId: 1, executableAt: 5000 }], [], 'proposed'],
     [{ [CID(1)]: bountyMeta(1, 9), [CID(9)]: autoReport(1) }, [{ ...openBounty, deadline: 500 }], [], 'deadline'],
     [{ [CID(1)]: bountyMeta(1, 9), [CID(9)]: autoReport(1) }, [{ ...openBounty, createdAt: 300 }], [], 'older'],
@@ -100,4 +100,42 @@ test('payout addresses are normalised, so a mistyped checksum still works', asyn
     ipfs: { [CID(1)]: { ...bountyMeta(1, 9), contributor: mixed }, [CID(9)]: autoReport(1) } });
   const plan = await planActions({ ...w, now: 1000 });
   assert.equal(plan.proposals[0].payee, mixed.toLowerCase());
+});
+
+test('a curator-approved bounty upload is proposed without any AI verdict', async () => {
+  const w = world({ books: [book(1, { status: 2 })], bounties: [openBounty],
+    ipfs: { [CID(1)]: bountyMeta(1, 9) } }); // the scan report isn't even reachable
+  const plan = await planActions({ ...w, now: 1000 });
+  assert.deepEqual(plan.proposals, [{ bountyId: 1, bookId: 1, payee: PAYEE, verdictCid: CID(9) }]);
+  assert.deepEqual(plan.watching, []);
+});
+
+test('a pending bounty upload is watched, then proposed once a curator approves it', async () => {
+  const books = [book(1, { status: 1 })];
+  const w = world({ books, bounties: [openBounty], ipfs: { [CID(1)]: bountyMeta(1, 9), [CID(9)]: autoReport(1, false) } });
+  const first = await planActions({ ...w, now: 1000 });
+  assert.deepEqual(first.proposals, []);
+  assert.equal(first.nextBookId, 1);
+  assert.deepEqual(first.watching.map((c) => c.bookId), [1]);
+  books[0] = book(1, { status: 2 }); // the curator approves
+  const second = await planActions({ ...w, now: 1000, lastBookId: first.nextBookId, watching: first.watching });
+  assert.deepEqual(second.proposals.map((p) => [p.bountyId, p.bookId]), [[1, 1]]);
+  assert.deepEqual(second.watching, []);
+});
+
+test('a rejected bounty upload is dropped from the watch list', async () => {
+  const w = world({ books: [book(1, { status: 3 })], bounties: [openBounty], ipfs: {} });
+  const watching = [{ bookId: 1, bountyId: 1, payee: PAYEE, verdictCid: CID(9), auto: false }];
+  const plan = await planActions({ ...w, now: 1000, lastBookId: 1, watching });
+  assert.deepEqual(plan.proposals, []);
+  assert.deepEqual(plan.watching, []);
+  assert.ok(plan.notes.some((n) => n.includes('rejected')));
+});
+
+test('a second approved upload for the same bounty keeps being watched', async () => {
+  const w = world({ books: [book(1, { status: 2 }), book(2, { status: 2 })], bounties: [openBounty],
+    ipfs: { [CID(1)]: bountyMeta(1, 8), [CID(2)]: bountyMeta(1, 9) } });
+  const plan = await planActions({ ...w, now: 1000 });
+  assert.deepEqual(plan.proposals.map((p) => p.bookId), [1]);
+  assert.deepEqual(plan.watching.map((c) => c.bookId), [2]);
 });
