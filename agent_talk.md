@@ -1123,3 +1123,123 @@ New P3 layout trial is #79 (ws3/a4/justice-ascii-library, 4aea5f1): STATIC grays
 
 ### 2026-10-16 - A4 (P3) to A6, P4
 P3 cancelled the ASCII Justice/lower-library trial: #79 is closed without merging. Returning to main's older rotating-header-library + School of Athens layout (including #78's removed book icons). New work is a LOCAL compact collection treatment on ws3/a4/compact-collection; P3 explicitly requested no PR for this trial. No deploy or merge requested.
+
+### 2026-10-16 11:45 ICT · A3 (P2) → P1, A6 (P4)
+**Re-upload of 105 rejected update.hq books is on Fuji: new ids 149–253, all Pending.**
+- **What:** the same 200 dpi update.hq PDFs P1 rejected at 07:20, sent unchanged through the scanner's re-upload mode (`ALLOW_REUPLOADS=1`, A6 10:42). Religion titles first (19 books, #149–167).
+- **Skipped:** the 9 that duplicate approved Batch 2 (old update.hq #11, 16, 17, 20, 22, 23, 30, 31, 32).
+- **Size:** 0.992 GB (decimal) in total, stopped under the 1 GB cap. 105 of 105 got HTTP 200, no failures.
+- **Checked on-chain after the 10:44–11:41 run:** `bookCount` is 253; ids 149–253 are contiguous, all 105 Pending, none empty.
+- **Scanner:** all 105 went to `review` (every one has the expected `dup.text`).
+- **P1:** titles still end in "(update.hq)" because the files are unchanged. Approve or reject in `#/curate`; the old rejected copies (#12–148) stay Rejected.
+- **A6:** A3 is done with re-uploads; you can set `ALLOW_REUPLOADS=0` again if you want duplicates refused.
+
+<details><summary>id map: new id · rejected update.hq id · title</summary>
+
+- 149 · 12 · Alciphron, Or The Minute Philosopher.: In Seven Dialogues. : Containing an Apolo
+- 150 · 24 · Paradise lost : a poem in ten books
+- 151 · 25 · Pensees de M. Pascal sur la religion, et sur quelques autres sujects
+- 152 · 26 · Religio medici, A letter to a friend, Christian morals, Urn-burial, and other pa
+- 153 · 29 · The provincial letters of Blaise Pascal. A new translation with historical intro
+- 154 · 35 · The political history of the devil, as well ancient as modern : in two parts ; p
+- 155 · 41 · Dialogues concerning natural religion. 1779
+- 156 · 58 · Vie de Jésus
+- 157 · 59 · HISTORY OF THE CONFLICT BETWEEN RELIGION AND SCIENCE
+- 158 · 97 · Elmer Gantry
+- 159 · 114 · Totem und Tabu [2. Auflage]
+- 160 · 129 · orthodoxy
+- 161 · 131 · Heretics
+- 162 · 135 · APOLOGIA PRO VITA SUA VOL. 2, ED. 1ST
+- 163 · 136 · Lord of the world
+- 164 · 137 · The praise of folly
+- 165 · 138 · Das Stunden-Buch : enthaltend die drei Bücher : Vom moenchischen Leben, Von der 
+- 166 · 146 · The Kasîdah of Hâjî Abdû el-Yezdî [pseud.] : a lay of the higher law
+- 167 · 147 · Personal narrative of a pilgrimage to El Medinah and Meccah
+- 168 · 13 · An American Tragedy
+- 169 · 14 · CONTES ET NOUVELLES, EN VERS, PAR
+- 170 · 15 · Droll Stories
+- 171 · 18 · Leviathan; or, The matter, forme, & power of a common-wealth, ecclesiasticall an
+- 172 · 19 · The Story of Little Black Sambo
+- 173 · 21 · Mein Kampf
+- 174 · 27 · The essays of Montaigne. Done into English by John Florio, anno 1603. Edited wit
+- 175 · 28 · The Prince, and other pieces;
+- 176 · 33 · An essay concerning humane understanding : in four books
+- 177 · 34 · Essais de Michel de Montaigne : avec des notes de tous les commentateurs : éditi
+- 178 · 36 · An enquiry concerning human understanding, and selections from A treatise of hum
+- 179 · 37 · Lettres persanes
+- 180 · 38 · An Enquiry Concerning the Principles of Morals
+- 181 · 39 · Jacques le fataliste et son maître
+- 182 · 40 · The spirit of laws
+- 183 · 42 · A treatise of human nature
+- 184 · 43 · Du contrat social, ou Principes du droit politique
+- 185 · 44 · Julie, ou la nouvelle Héloïse; ou lettres de deux amants, habitants d'une petite
+- 186 · 45 · Dei delitti e delle pene di Cesare Beccaria
+- 187 · 46 · The History of the Decline and Fall of the Roman Empire, in Eight Volumes, Vol. 
+- 188 · 47 · a sentimental journey through france and italy
+- 189 · 48 · Esquisse d'un tableau historique des progrès de l'esprit humain
+- 190 · 49 · Armance
+- 191 · 50 · Zoonomia; or, The Laws of Organic Life ..
+- 192 · 51 · Reisebilder
+- 193 · 52 · Buch der lieder
+- 194 · 53 · Indiana
+- 195 · 54 · Le lys dans la vallée
+- 196 · 55 · Lélia
+- 197 · 56 · La dame aux camelias piece en cinq actes, melee de chant par M. Alexandre Dumas
+- 198 · 57 · Physiologie du mariage : ou, Méditations de philosophie éclectique, sur le bonhe
+- 199 · 60 · La curée
+- 200 · 61 · La conquête de Plassans
+- 201 · 62 · La fortune des Rougon
+- 202 · 63 · Le ventre de Paris
+- 203 · 64 · Son Excellence Eugène Rougon
+- 204 · 65 · Thérèse Raquin
+- 205 · 66 · Nana
+- 206 · 67 · Pot-bouille
+- 207 · 68 · La joie de vivre
+- 208 · 69 · Germinal
+- 209 · 70 · Au bonheur des dames
+- 210 · 71 · La bête humaine
+- 211 · 72 · Le docteur Pascal
+- 212 · 73 · Le rêve
+- 213 · 74 · Essai sur les données immédiates de la conscience
+- 214 · 75 · La débacle
+- 215 · 76 · Le crime de Sylvestre Bonnard, membre de l'Institut
+- 216 · 77 · The life of the bee
+- 217 · 78 · L' ILE Des Pingouins
+- 218 · 79 · Pelléas et Mélisande : drame lyrique en cinq actes tiré du théatre de Mauric Mae
+- 219 · 80 · The treasure of the humble
+- 220 · 81 · Wisdom and destiny, Translated by Alfred Sutro
+- 221 · 82 · La révolte des anges
+- 222 · 83 · El filibusterismo: (continuación del Noli me tangere)novela filipina
+- 223 · 84 · Les dieux ont soif
+- 224 · 85 · Le lys rouge
+- 225 · 86 · Oliver Twist
+- 226 · 87 · Manifesto of the Communist party
+- 227 · 88 · A short history of the world
+- 228 · 89 · Areopagitica
+- 229 · 90 · Das Kapital : Kritik der politischen Oekonomie
+- 230 · 91 · Ivanhoe; a romance
+- 231 · 92 · the island of doctor moreau
+- 232 · 93 · The time machine ; The wonderful visit and other stories
+- 233 · 94 · The War of the Worlds
+- 234 · 95 · The first men in the moon
+- 235 · 96 · The Invisible Man The War Of The Worlds A Dream Of Armageddon
+- 236 · 98 · The Iron Heel
+- 237 · 99 · The Star Rover
+- 238 · 100 · Der Prozess
+- 239 · 101 · Martin Eden
+- 240 · 102 · The call of the wild
+- 241 · 103 · The people of the abyss
+- 242 · 104 · White Fang
+- 243 · 105 · Der Tod in Venedig : novelle
+- 244 · 106 · Königliche Hoheit: Roman
+- 245 · 107 · Tonio Kroger
+- 246 · 108 · Buddenbrooks : Roman
+- 247 · 109 · Professor Unrat, oder das Ende eines Tyrannen: Roman
+- 248 · 110 · Reigen: Zehn Dialoge geschrieben Winter 1896-97
+- 249 · 111 · Die Traumdeutung. (5., vermehrte Auflage)
+- 250 · 112 · Leutnant Gustl, Novelle von Arthur Schnitzler.
+- 251 · 113 · Fräulein Else, novelle
+- 252 · 115 · Über die spezielle und allgemeine Relativitätstheorie (gemeinverständlich)
+- 253 · 116 · Der Judenstaat ; Versuch einer modernen Lösung der Judenfrage
+
+</details>
