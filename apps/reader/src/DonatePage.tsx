@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'preact/hooks';
 import { createFundClient, type FundStats, type DonatedEvent, AlexandriaError } from '@alexandria/sdk';
 import QRCode from 'qrcode';
+import { parseAvax } from './bounty-ui';
 
 interface DonatePageProps {
   fundAddress?: `0x${string}`;
@@ -8,8 +9,8 @@ interface DonatePageProps {
   rpcUrls: string[];
 }
 
-export function DonatePage({ fundAddress, deployBlock, rpcUrls }: DonatePageProps) {
-  if (!fundAddress) {
+export function DonatePage(props: DonatePageProps) {
+  if (!props.fundAddress) {
     return (
       <section className="donate-page">
         <h2>Donate to Alexandria</h2>
@@ -17,7 +18,10 @@ export function DonatePage({ fundAddress, deployBlock, rpcUrls }: DonatePageProp
       </section>
     );
   }
+  return <DonatePageLive {...props} fundAddress={props.fundAddress} />;
+}
 
+function DonatePageLive({ fundAddress, deployBlock, rpcUrls }: DonatePageProps & { fundAddress: `0x${string}` }) {
   const [client] = useState(() =>
     createFundClient({
       contract: fundAddress,
@@ -79,8 +83,8 @@ export function DonatePage({ fundAddress, deployBlock, rpcUrls }: DonatePageProp
     setStatusMsg('');
     setTxHash(null);
 
-    const val = parseFloat(amountStr);
-    if (isNaN(val) || val < 0.001) {
+    const amountWei = parseAvax(amountStr);
+    if (!amountWei || amountWei < 1000000000000000n) {
       setStatusMsg('Minimum donation is 0.001 AVAX.');
       return;
     }
@@ -96,7 +100,6 @@ export function DonatePage({ fundAddress, deployBlock, rpcUrls }: DonatePageProp
 
     try {
       const wallet = await client.connectFundWallet();
-      const amountWei = BigInt(Math.floor(val * 1e18));
       const hash = await wallet.donate(amountWei, note);
 
       setTxHash(hash);

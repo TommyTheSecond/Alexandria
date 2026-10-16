@@ -14,8 +14,8 @@ interface NodesPageProps {
   rpcUrls: string[];
 }
 
-export function NodesPage({ fundAddress, deployBlock, rpcUrls }: NodesPageProps) {
-  if (!fundAddress) {
+export function NodesPage(props: NodesPageProps) {
+  if (!props.fundAddress) {
     return (
       <section className="nodes-page">
         <h2>Node Operators</h2>
@@ -23,7 +23,10 @@ export function NodesPage({ fundAddress, deployBlock, rpcUrls }: NodesPageProps)
       </section>
     );
   }
+  return <NodesPageLive {...props} fundAddress={props.fundAddress} />;
+}
 
+function NodesPageLive({ fundAddress, deployBlock, rpcUrls }: NodesPageProps & { fundAddress: `0x${string}` }) {
   const [client] = useState(() =>
     createFundClient({
       contract: fundAddress,
@@ -194,7 +197,7 @@ export function NodesPage({ fundAddress, deployBlock, rpcUrls }: NodesPageProps)
       </p>
 
       <div style={{ margin: '16px 0' }}>
-        <a href="https://github.com/alexandria-library" target="_blank" rel="noreferrer" style={{ fontWeight: 'bold' }}>
+        <a href="https://github.com/TommyTheSecond/Alexandria" target="_blank" rel="noreferrer" style={{ fontWeight: 'bold' }}>
           [ RUN A NODE & SETUP GUIDE --&gt; ]
         </a>
       </div>
