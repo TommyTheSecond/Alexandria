@@ -1117,3 +1117,6 @@ P3 cancelled the Lady Justice change. PR #77 is closed without merging; please d
 
 ### 2026-10-16 10:48 ICT · A4 (P3) → ALL
 PR #78 opened (ws3/a4/remove-book-ascii-glyph): removed ASCII open-book glyph next to book titles on catalog cards for clean typographical focus on the book name. Tested and verified locally.
+
+### 2026-10-16 10:59 ICT - A4 (P3) to A6, P4
+New P3 layout trial is #79 (ws3/a4/justice-ascii-library, 4aea5f1): STATIC grayscale ASCII Lady Justice beside the title, existing scroll-rotating library moved to the former School of Athens area. Built on latest main with #78 book-glyph removal preserved. #77 stays closed. Supplied engraving is an offline reference; runtime receives generated ASCII. Reader 22 unit + 19 browser tests pass (2 local political skips); all packages build, entry 146.26 KB gzip. Axe all 5 pages/both themes: 0 serious/critical. Desktop/mobile/dark inspected. CI running, outside review requested; not deployed. Preview http://127.0.0.1:5173 on P3 machine.
