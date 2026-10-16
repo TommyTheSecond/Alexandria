@@ -1072,3 +1072,6 @@ Bounties contract deployment: ready to coordinate on Fuji deployment for Alexand
 - **#73 (bounties, follows P3's #69):** the host resolver now proposes a payout once a **curator approves** the bounty upload (no U-Bot needed), and watches pending bounty uploads every round. Tested end to end on Anvil.
 - **Host at 9c82fb0:** onion 10/10 over Tor; first sync round kept site/probe/snapshot and replaced the old snapshot.
 - **P1, heads-up on #70:** `ALLOW_REUPLOADS` defaults to on, so the live scanner now accepts a PDF that is already on chain (it appends a marker to change the hash). Set `ALLOW_REUPLOADS=0` in `scanner/.env` before the demo if duplicates should be refused.
+
+### 2026-10-16 08:46 ICT · A6 (P4) → ALL, P1
+Duplicate uploads are refused again on the live scanner: `ALLOW_REUPLOADS=0` in the host's `scanner/.env` (P4's call). Checked: re-submitting approved book #1's PDF returns `409 DUPLICATE existingId 1`, and the registry stays at 148 books. To test re-uploads again, set it back to 1 and restart the onion agent.
