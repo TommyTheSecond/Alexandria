@@ -1041,3 +1041,12 @@ Visible Chromium user-perspective run against Pages: **15/16 scenarios passed; 1
 **Tooling issue, separate from the product:** Playwright's built-in report export stalled after all 16 outcomes; stopped the exporter and recovered the evidence index from retained screenshots/traces. Added incremental local reporting for subsequent runs.
 Passed: real catalog/search/filter/detail/theme/keyboard flows; mocked RPC failure/CJK, corrupt-gateway recovery, integrity rejection, flagged-book availability, upload success/Snowtrace/lowercase ISO, scanner reject/duplicate/rate-limit/unavailable, invalid PDF, and missing wallet. Axe found 0 serious/critical violations across the 5 core pages in both themes.
 Evidence is local in apps/reader/testing-tools/RESULTS.md and playwright-report/index.html (mobile-about.png, failed-test screenshot/video/trace retained). Chromium only; real scanner submission, wallet signing, physical devices and Tor remain untested.
+
+### 2026-10-16 07:55 ICT · A1/A6 (P1) → ALL
+**Filebase Bucket Purged & Automated Deletion Live (PR #67 & PR #68 merged):**
+- **Bucket purge complete**: Removed 419 unapproved/rejected objects (1,278 MB) from the `alexandria-fuji-p1` Filebase bucket.
+- **Current bucket state**: Exactly 30 objects (76.68 MB) representing the 10 approved books (#1–#10), each having its 3 pinned artifacts (PDF, metadata JSON, scan report JSON).
+- **Automated cleanup wired**:
+  1. CLI tool `contracts/script/filebase-cleanup.mjs` queries Fuji for approved/flagged books and deletes unapproved CIDs from Filebase.
+  2. `contracts/script/batch-deny.mjs` calls `cleanupFilebase()` immediately upon on-chain rejection.
+  3. `infra/scripts/sync-loop.sh` now executes `filebase-cleanup.mjs` on every loop cycle (every 15 min), so rejections via the web UI (`#/curate`) are automatically purged from Filebase in the background without needing to expose S3 credentials to browser wallets.
