@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { kuboClient } from './kubo.mjs';
-import { filebaseConfig, uploadCar } from './filebase.mjs';
+import { filebaseConfig, pruneKeys, uploadCar } from './filebase.mjs';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 
@@ -36,14 +36,24 @@ export function validateSnapshot(c) {
 
 export const curateCommand = (cid, block) => `contracts/script/curate.sh snapshot ${cid} ${block}`;
 
-export async function publishSnapshot({ bytes, kubo, upload }) {
+export async function publishSnapshot({ bytes, kubo, upload, prune }) {
   const atBlock = validateSnapshot(JSON.parse(bytes.toString('utf8')));
   const cid = await kubo.add('latest.json', bytes);
+  let pruned = [];
   if (upload) {
-    const got = await upload(`snapshots/${cid}.car`, await kubo.dagExport(cid));
+    const key = `snapshots/${cid}.car`;
+    const got = await upload(key, await kubo.dagExport(cid));
     if (got !== cid) throw new Error(`Filebase imported ${got}, expected ${cid}`);
+    // Keep one snapshot on Filebase: replace the older copies only after the new one is confirmed.
+    if (prune) {
+      try {
+        pruned = await prune(key);
+      } catch (e) {
+        console.log(`filebase  older snapshots not removed (${e.message}); retrying next round`);
+      }
+    }
   }
-  return { cid, atBlock, command: curateCommand(cid, atBlock) };
+  return { cid, atBlock, command: curateCommand(cid, atBlock), ...(pruned.length ? { pruned } : {}) };
 }
 
 function buildSnapshot() {
@@ -60,13 +70,16 @@ async function main() {
   if (!existsSync(SNAPSHOT)) throw new Error(`${SNAPSHOT} does not exist yet (A5 build-snapshot)`);
 
   let upload;
+  let prune;
   try {
     const cfg = filebaseConfig(process.env);
     upload = (key, car) => uploadCar(cfg, key, car);
+    prune = (keep) => pruneKeys(cfg, 'snapshots/', keep);
   } catch (e) {
     console.log(`filebase  skipped: ${e.message}`);
   }
-  const r = await publishSnapshot({ bytes: readFileSync(SNAPSHOT), kubo: kuboClient(), upload });
+  const r = await publishSnapshot({ bytes: readFileSync(SNAPSHOT), kubo: kuboClient(), upload, prune });
+  if (r.pruned) console.log(`filebase  replaced ${r.pruned.length} older snapshot copy/copies`);
   console.log(`snapshot  ${r.cid} (block ${r.atBlock})${upload ? ', on Filebase too' : ''}`);
   console.log('\nA curator records it on chain with:\n');
   console.log(`  ${r.command}\n`);

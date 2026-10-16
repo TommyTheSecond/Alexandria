@@ -60,3 +60,25 @@ test('the host can keep its snapshot outside the committed file', () => {
   assert.equal(host, target);
   assert.deepEqual(buildArgs(host).slice(-2), ['--out', target]);
 });
+
+test('replaces older snapshot copies on Filebase only after the new one is confirmed', async () => {
+  const k = await startFakeKubo({ addCid: 'bafysnap' });
+  const calls = [];
+  const r = await publishSnapshot({
+    bytes: Buffer.from(JSON.stringify(snap())),
+    kubo: kuboClient(k.url),
+    upload: async (key) => { calls.push(['upload', key]); return 'bafysnap'; },
+    prune: async (keep) => { calls.push(['prune', keep]); return ['snapshots/bafyold.car']; },
+  });
+  assert.deepEqual(calls, [['upload', 'snapshots/bafysnap.car'], ['prune', 'snapshots/bafysnap.car']]);
+  assert.deepEqual(r.pruned, ['snapshots/bafyold.car']);
+  // A mismatched upload never prunes; a failing prune never fails the publish.
+  calls.length = 0;
+  await assert.rejects(publishSnapshot({ bytes: Buffer.from(JSON.stringify(snap())), kubo: kuboClient(k.url),
+    upload: async () => 'bafyother', prune: async (keep) => { calls.push(keep); return []; } }), /bafyother/);
+  assert.deepEqual(calls, []);
+  const ok = await publishSnapshot({ bytes: Buffer.from(JSON.stringify(snap())), kubo: kuboClient(k.url),
+    upload: async () => 'bafysnap', prune: async () => { throw new Error('HTTP 503'); } });
+  assert.equal(ok.cid, 'bafysnap');
+  k.close();
+});

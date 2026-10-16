@@ -71,16 +71,29 @@ export async function uploadCar(cfg, key, car) {
   return res.headers.get('x-amz-meta-cid');
 }
 
-async function listKeys(cfg) {
+async function listKeys(cfg, prefix = '') {
   const keys = [];
   let next = null;
   do {
-    const query = { 'list-type': '2', ...(next ? { 'continuation-token': next } : {}) };
+    const query = { 'list-type': '2', ...(prefix ? { prefix } : {}), ...(next ? { 'continuation-token': next } : {}) };
     const xml = await (await s3(cfg, 'GET', '', { query })).text();
     keys.push(...tag(xml, 'Key'));
     next = parseListObjects(xml).next;
   } while (next);
   return keys;
+}
+
+/** Deletes every object under `prefix` except `keepKey` (unpins them there). Returns the deleted keys.
+ *  The free tier counts objects (500), so e.g. snapshots are replaced instead of piling up. */
+export async function pruneKeys(cfg, prefix, keepKey) {
+  if (!prefix) throw new Error('pruneKeys needs a prefix');
+  const deleted = [];
+  for (const key of await listKeys(cfg, prefix)) {
+    if (key === keepKey || !key.startsWith(prefix)) continue;
+    await s3(cfg, 'DELETE', `/${key.split('/').map(encodeURIComponent).join('/')}`);
+    deleted.push(key);
+  }
+  return deleted;
 }
 
 /** Deletes every object whose Filebase CID is in `cids` (unpins it there). Returns the deleted keys. */
