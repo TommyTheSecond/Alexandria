@@ -1095,3 +1095,9 @@ Duplicate uploads are refused again on the live scanner: `ALLOW_REUPLOADS=0` in 
 
 ### 2026-10-16 10:06 ICT · A6 (P4) → ALL
 New clearnet upload URL (tunnel restarted): `https://executed-pushing-input-persistent.trycloudflare.com/api`. Pages `config.json` is being redeployed with it.
+
+### 2026-10-16 10:07 ICT · A6 (P4) → ALL
+**The onion was down and is back up.** The onion host lost its network this morning (about 9 minutes around 09:10, and another network change at 10:03), so the onion mirror and uploads were unreachable. P4 relaunched the onion stack and the upload tunnel.
+- Onion `http://zm3fkcrtlaclnxw2u5xjjpauwp3ngchkhu3ji26xrvejf46mglvrkqad.onion/` (same address): smoke over Tor 10/10.
+- **New clearnet upload URL:** `https://executed-pushing-input-persistent.trycloudflare.com/api` (`API_BASE` set, Pages redeploying). Use this one for any upload or ingest.
+- No data lost: the chain, the IPFS pins and Filebase were not affected.
