@@ -12,6 +12,12 @@ export async function connectReader() {
     if (response.ok) runtime = { ...committed, ...await response.json() };
   } catch { /* The committed configuration still supports read-only access. */ }
   const resolved = resolveReaderConfig(location.hostname, runtime, { deployment, gateways, rpcs });
-  return { client: createClient(resolved.client), uploadEnabled: resolved.uploadEnabled,
-    onionUrl: resolved.onionUrl, reportGateway: resolved.client.gateways[0] ?? '' };
+  return {
+    client: createClient(resolved.client),
+    uploadEnabled: resolved.uploadEnabled,
+    onionUrl: resolved.onionUrl,
+    reportGateway: resolved.client.gateways[0] ?? '',
+    allowReuploads: resolved.allowReuploads,
+  };
 }
+

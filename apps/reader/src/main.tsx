@@ -7,7 +7,7 @@ import { HeaderArt } from './HeaderArt';
 import { AthensArt } from './AthensArt';
 import { AlexandriaError, type AlexandriaClient, type Book, type BookMetaInput, type ScanReport, type WalletActions } from '@alexandria/sdk';
 import { connectReader } from './reader-client';
-import { sortPendingByScore } from './reader-config';
+import { ALLOW_REUPLOADS, buildReuploadPdf, isReuploadAllowed, sortPendingByScore } from './reader-config';
 import { PendingCard } from './PendingCard';
 import { DonatePage } from './DonatePage';
 import { NodesPage } from './NodesPage';
@@ -66,6 +66,7 @@ function App() {
   const [bountyPrefill, setBountyPrefill] = useState<number | null>(null);
   const [client, setClient] = useState<AlexandriaClient | null>(null);
   const [uploadEnabled, setUploadEnabled] = useState(false);
+  const [runtimeAllowReuploads, setRuntimeAllowReuploads] = useState<boolean | undefined>(undefined);
   const [onionUrl, setOnionUrl] = useState('');
   const [reportGateway, setReportGateway] = useState('');
   const [progress, setProgress] = useState(0);
@@ -97,6 +98,7 @@ function App() {
         if (!active) return;
         setClient(connection.client);
         setUploadEnabled(connection.uploadEnabled);
+        setRuntimeAllowReuploads(connection.allowReuploads);
         setOnionUrl(connection.onionUrl);
         setReportGateway(connection.reportGateway);
         liveClient = connection.client;
@@ -189,7 +191,26 @@ function App() {
     const upload: BookMetaInput = bountyId ? { ...meta, ...{ bountyId, contributor } } : meta;
     setBusy(true); setScanReport(null); setDuplicateId(null); setMessage('Scanning and submitting PDF…');
     try {
-      const result = await client.submit(file, upload);
+      let result;
+      try {
+        result = await client.submit(file, upload);
+      } catch (firstErr) {
+        const canReupload = isReuploadAllowed(
+          typeof location !== 'undefined' ? location.search : '',
+          runtimeAllowReuploads,
+          typeof import.meta !== 'undefined' ? (import.meta as any).env?.VITE_ALLOW_REUPLOADS : undefined,
+        );
+        if (canReupload && firstErr instanceof AlexandriaError && firstErr.code === 'DUPLICATE') {
+          const reuploadFile = buildReuploadPdf(file);
+          if (reuploadFile.size <= 31457280) {
+            result = await client.submit(reuploadFile, upload);
+          } else {
+            throw firstErr;
+          }
+        } else {
+          throw firstErr;
+        }
+      }
       setScanReport(result.report);
       if (result.report.verdict !== 'reject' && /^0x[0-9a-fA-F]{64}$/.test(result.txHash ?? '')) {
         setSubmissionTx(result.txHash);
