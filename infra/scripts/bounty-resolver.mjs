@@ -2,8 +2,9 @@
 // Bounty payouts on the onion host (I9, plan D4-4). Runs from the sync loop, only when the bounty contract is deployed.
 //   node --env-file=infra/.env infra/scripts/bounty-resolver.mjs             propose + execute
 //   node infra/scripts/bounty-resolver.mjs --dry-run                         print what it would do, send nothing
-// 1. Propose: for each new registry book whose metadata names a bounty, read its scan report; if the scanner's
-//    bounty.match check says `auto` (U-Bot match + cross-checks) and the bounty is open, sign proposePayout.
+// 1. Propose: for each registry book whose metadata names an open bounty, sign proposePayout once a curator has
+//    approved the book (curators verify the match), or as soon as the scanner's bounty.match says `auto` (U-Bot).
+//    Bounty uploads still waiting for a curator are re-checked every round (state file `watching`).
 // 2. Execute: for each proposed bounty whose dispute window is over and whose book a curator approved, executePayout.
 // Signs with the host signer (same wallet as the fund's attester): HOST_SIGNER_KEY, or the keystore at
 // HOST_KEYSTORE (default ~/.alexandria/host-signer.json) with HOST_PASSWORD_FILE (default ~/.alexandria/host-signer.pwd).
@@ -17,6 +18,7 @@ const CID = /^baf[a-z2-7]{20,97}$/;
 const ADDRESS = /^0x[0-9a-fA-F]{40}$/;
 const STATES = ['none', 'open', 'proposed', 'paid', 'cancelled'];
 const APPROVED = 2; // IAlexandria.Status.Approved
+const REJECTED = 3; // IAlexandria.Status.Rejected
 
 /** The bounty.match verdict for `bountyId` in a scan report, or null. */
 export function verdictFor(report, bountyId) {
@@ -32,16 +34,21 @@ export function verdictFor(report, bountyId) {
 
 /**
  * Decides what to do; no chain writes. `chain` and `fetchJson` are injected so this is testable.
- * Returns { proposals: [{bountyId, bookId, payee, verdictCid}], executions: [bountyId], nextBookId, notes: [..] }.
+ * A bounty upload is proposed once a curator has approved its book (the curator is the verifier), or earlier
+ * if the scanner's bounty.match says `auto` (U-Bot match + cross-checks). Uploads still waiting for a curator
+ * stay in `watching` and are checked again every round.
+ * Returns { proposals: [{bountyId, bookId, payee, verdictCid}], executions: [bountyId], nextBookId, watching, notes }.
  */
-export async function planActions({ chain, fetchJson, now, lastBookId = 0 }) {
+export async function planActions({ chain, fetchJson, now, lastBookId = 0, watching = [] }) {
   const notes = [];
   const proposals = [];
   const executions = [];
   const bookCount = await chain.bookCount();
   let nextBookId = lastBookId;
   const claimed = new Set(); // one proposal per bounty per round
+  const candidates = watching.filter((w) => Number.isSafeInteger(w?.bookId) && w.bookId <= lastBookId);
 
+  // 1. New books: find bounty uploads.
   for (let bookId = lastBookId + 1; bookId <= bookCount; bookId++) {
     const book = await chain.getBook(bookId);
     let meta;
@@ -57,29 +64,41 @@ export async function planActions({ chain, fetchJson, now, lastBookId = 0 }) {
     const label = `book #${bookId} → bounty #${bountyId}`;
     if (!ADDRESS.test(String(meta.contributor ?? ''))) { notes.push(`${label}: no payout address; skipped`); continue; }
     if (!CID.test(String(meta.scanReportCid ?? ''))) { notes.push(`${label}: no scan report; skipped`); continue; }
-    let report;
+    let auto = false;
     try {
-      report = await fetchJson(meta.scanReportCid);
-    } catch {
-      notes.push(`${label}: scan report not reachable; the curator can propose by hand`);
-      continue;
-    }
-    const verdict = verdictFor(report, bountyId);
-    if (!verdict?.auto) { notes.push(`${label}: no automatic match (${verdict ? `${verdict.match}, cross-checks ${verdict.crossChecks}` : 'no verdict'})`); continue; }
-    let bounty;
-    try {
-      bounty = await chain.getBounty(bountyId);
-    } catch {
-      notes.push(`${label}: bounty not found`);
-      continue;
-    }
-    if (bounty.state !== 'open' || claimed.has(bountyId)) { notes.push(`${label}: bounty is ${bounty.state}; skipped`); continue; }
-    if (now >= bounty.deadline) { notes.push(`${label}: bounty deadline passed`); continue; }
-    if (book.submittedAt < bounty.createdAt) { notes.push(`${label}: book is older than the bounty`); continue; }
-    if (await chain.bookUsed(bookId)) { notes.push(`${label}: book already paid another bounty`); continue; }
-    claimed.add(bountyId);
+      auto = verdictFor(await fetchJson(meta.scanReportCid), bountyId)?.auto === true;
+    } catch { /* no AI verdict needed: the curator's approval decides */ }
     // Lower-case: the address was typed by the uploader; a mixed-case one with a bad checksum would be rejected.
-    proposals.push({ bountyId, bookId, payee: meta.contributor.toLowerCase(), verdictCid: meta.scanReportCid });
+    candidates.push({ bookId, bountyId, payee: meta.contributor.toLowerCase(), verdictCid: meta.scanReportCid, auto });
+  }
+
+  // 2. Every bounty upload we know about: propose, keep watching, or drop.
+  const stillWatching = [];
+  for (const c of candidates) {
+    const label = `book #${c.bookId} → bounty #${c.bountyId}`;
+    try {
+      const book = await chain.getBook(c.bookId);
+      if (book.status === REJECTED) { notes.push(`${label}: book rejected by a curator; dropped`); continue; }
+      let bounty;
+      try {
+        bounty = await chain.getBounty(c.bountyId);
+      } catch {
+        notes.push(`${label}: bounty not found; dropped`);
+        continue;
+      }
+      if (bounty.state === 'paid' || bounty.state === 'cancelled') { notes.push(`${label}: bounty is ${bounty.state}; dropped`); continue; }
+      if (now >= bounty.deadline) { notes.push(`${label}: bounty deadline passed; dropped`); continue; }
+      if (book.submittedAt < bounty.createdAt) { notes.push(`${label}: book is older than the bounty; dropped`); continue; }
+      if (await chain.bookUsed(c.bookId)) { notes.push(`${label}: book already paid another bounty; dropped`); continue; }
+      const ready = book.status === APPROVED || c.auto;
+      if (!ready) { notes.push(`${label}: waiting for a curator to approve the book`); stillWatching.push(c); continue; }
+      if (bounty.state !== 'open' || claimed.has(c.bountyId)) { notes.push(`${label}: bounty is ${bounty.state}; watching`); stillWatching.push(c); continue; }
+      claimed.add(c.bountyId);
+      proposals.push({ bountyId: c.bountyId, bookId: c.bookId, payee: c.payee, verdictCid: c.verdictCid });
+    } catch (error) {
+      notes.push(`${label}: could not be read (${error?.message ?? 'error'}); retrying next round`);
+      stillWatching.push(c);
+    }
   }
 
   const bountyCount = await chain.bountyCount();
@@ -94,7 +113,7 @@ export async function planActions({ chain, fetchJson, now, lastBookId = 0 }) {
       notes.push(`bounty #${id}: could not be read (${error?.message ?? 'error'}); retrying next round`);
     }
   }
-  return { proposals, executions, nextBookId, notes };
+  return { proposals, executions, nextBookId, watching: stillWatching, notes };
 }
 
 // ---------- wiring (real chain, real gateways) ----------
@@ -157,7 +176,7 @@ async function main() {
   const bountiesDeployment = load(bountiesPath);
   const registryAddress = bountiesDeployment.registry ?? load(join(ROOT, 'deployments/fuji.json')).address;
   const statePath = process.env.BOUNTY_RESOLVER_STATE ?? join(ROOT, 'infra/onion/run/bounty-resolver.json');
-  const state = existsSync(statePath) ? load(statePath) : { lastBookId: 0 };
+  const state = existsSync(statePath) ? load(statePath) : { lastBookId: 0, watching: [] };
   const rpcUrls = process.env.BOUNTY_RPC_URL ? [process.env.BOUNTY_RPC_URL] : load(join(ROOT, 'infra/rpcs.json')).clearnet;
   // Our own Kubo node first (it pinned every upload), then the public gateways. BOUNTY_GATEWAYS overrides (tests).
   const gateways = process.env.BOUNTY_GATEWAYS
@@ -189,7 +208,8 @@ async function main() {
   // Chain time can lag on a quiet chain; the contract enforces the window anyway (simulate fails early, retried).
   const block = await pub.getBlock();
   const now = Math.max(Number(block.timestamp), Math.floor(Date.now() / 1000));
-  const plan = await planActions({ chain, fetchJson: gatewayFetcher(gateways), now, lastBookId: state.lastBookId ?? 0 });
+  const plan = await planActions({ chain, fetchJson: gatewayFetcher(gateways), now, lastBookId: state.lastBookId ?? 0,
+    watching: Array.isArray(state.watching) ? state.watching : [] });
   for (const note of plan.notes) console.log(`bounty    ${note}`);
   if (!plan.proposals.length && !plan.executions.length) {
     console.log(`bounty    nothing to propose or execute (checked books up to #${plan.nextBookId})`);
@@ -216,17 +236,17 @@ async function main() {
     }
   }
 
-  let nextBookId = plan.nextBookId;
+  const watchingNext = [...plan.watching];
   for (const p of plan.proposals) {
     const sent = await send('proposePayout', [BigInt(p.bountyId), BigInt(p.bookId), p.payee, p.verdictCid],
       `propose bounty #${p.bountyId} → book #${p.bookId}, pay ${p.payee}`);
-    if (!sent) nextBookId = Math.min(nextBookId, p.bookId - 1); // look at this book again next round
+    if (!sent) watchingNext.push({ ...p, auto: false }); // look at this book again next round
   }
   for (const id of plan.executions) await send('executePayout', [BigInt(id)], `execute bounty #${id}`);
 
   if (!dryRun) {
     mkdirSync(dirname(statePath), { recursive: true });
-    writeFileSync(statePath, JSON.stringify({ lastBookId: nextBookId, updatedAt: new Date().toISOString() }, null, 2) + '\n');
+    writeFileSync(statePath, JSON.stringify({ lastBookId: plan.nextBookId, watching: watchingNext, updatedAt: new Date().toISOString() }, null, 2) + '\n');
   }
 }
 
