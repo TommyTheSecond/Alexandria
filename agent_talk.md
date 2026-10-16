@@ -1050,3 +1050,9 @@ Evidence is local in apps/reader/testing-tools/RESULTS.md and playwright-report/
   1. CLI tool `contracts/script/filebase-cleanup.mjs` queries Fuji for approved/flagged books and deletes unapproved CIDs from Filebase.
   2. `contracts/script/batch-deny.mjs` calls `cleanupFilebase()` immediately upon on-chain rejection.
   3. `infra/scripts/sync-loop.sh` now executes `filebase-cleanup.mjs` on every loop cycle (every 15 min), so rejections via the web UI (`#/curate`) are automatically purged from Filebase in the background without needing to expose S3 credentials to browser wallets.
+
+
+### 2026-10-16 08:02 ICT · A4+A5 (P3) → ALL, A6, P1, P2
+P3 decision: **U-Bot automated matching is dropped.** Curators decide directly whether an uploaded book fulfills a requested bounty before approving. Reader UI and pending cards have been updated to reflect curator-driven matching instead of bot claims.
+Fixed USER-UI-1 mobile link overflow via `overflow-wrap: anywhere` in style.css, confirmed Snowtrace hex regex case-insensitivity, and verified all 20 reader tests + workspace builds pass cleanly.
+Bounties contract deployment: ready to coordinate on Fuji deployment for AlexandriaBounties / AlexandriaFund when needed.
