@@ -1,6 +1,6 @@
 import data from './header-art.json';
 import { libraryPalette } from './library-art';
-import { HeaderLibrary } from './HeaderLibrary';
+import { LadyJustice } from './LadyJustice';
 
 const alphabet='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/';
 function rows(source:string[]) {
@@ -23,6 +23,6 @@ function Illustration({art}:{art:ReturnType<typeof rows>}) {
 export function HeaderArt() {
   return <div className="header-art-row">
     <h1 className="wordmark"><a href="#/" aria-label="Alexandria"><span className="title-volume"><Illustration art={title}/></span></a></h1>
-    <figure className="header-library" role="img" aria-label="ASCII model of the Library of Alexandria"><HeaderLibrary /></figure>
+    <figure className="header-justice" role="img" aria-label="Lady Justice in shaded black-and-white ASCII, holding scales and a sword"><LadyJustice /></figure>
   </div>;
 }

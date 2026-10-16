@@ -97,7 +97,7 @@ main progress { display:block; inline-size:min(100%,35ch); margin-block:8px; }
 .book-symbol { font-size:11px; line-height:1.3; color:var(--ink-soft); }
 @media (max-width:540px) { .card-body { gap:18px; } .book-symbol { font-size:9px; } }
 
-/* Shaded, extruded letter volume beside the library model, on one line. */
+/* Shaded, extruded letter volume and static artwork share the masthead. */
 .header-art-row { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-block:22px 18px; }
 .header-art-row .wordmark { flex:1; min-inline-size:0; margin:0; container-type:inline-size; text-align:start; }
 .header-art-row .wordmark a { display:block; }
@@ -115,3 +115,10 @@ main progress { display:block; inline-size:min(100%,35ch); margin-block:8px; }
 .athens-art pre { font-size:calc(100cqi / 153.6); line-height:1.06; font-weight:600; }
 
 .athens-art { inline-size:75%; margin-inline:auto; container-type:inline-size; }
+
+/* Static Lady Justice beside the title; the rotating library lives in the hero. */
+.header-justice { flex:0 0 clamp(52px,10vw,112px); margin:0; min-inline-size:0; container-type:inline-size; }
+.header-justice pre { font-size:calc(100cqi / 57.6); line-height:1.06; font-weight:600; filter:grayscale(1) brightness(.6); }
+:root[data-theme=dark] .header-justice pre { filter:grayscale(1); }
+.library-figure canvas { display:block; inline-size:100%; block-size:auto; filter:grayscale(1); }
+.library-figure [hidden] { display:none; }

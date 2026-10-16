@@ -45,10 +45,10 @@ test('all pages have no serious accessibility violations in either theme', async
   }
 });
 
-test('shaded title and library model share one line on desktop and mobile', async ({ page }) => {
+test('shaded title and static Lady Justice share one line on desktop and mobile', async ({ page }) => {
   await page.goto('/?samples=1#/');
   await expect(page.getByRole('heading', { name:'Alexandria', exact:true })).toBeVisible();
-  const portrait=page.getByRole('img', {name:/ASCII model of the Library of Alexandria/});
+  const portrait=page.getByRole('img', {name:'Lady Justice in shaded black-and-white ASCII, holding scales and a sword'});
   await expect(portrait).toBeVisible();
   for(const width of [1280,375]) {
     await page.setViewportSize({width,height:800});

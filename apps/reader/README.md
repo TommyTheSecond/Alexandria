@@ -5,12 +5,12 @@ Preact, Vite 5, strict TypeScript. Run `npm install`, then `npm run dev`.
 ## Current design
 
 - Light cream `#F1E0C5` and black modes, with a saved preference.
-- Shaded ASCII title; the library model beside it rotates with page scrolling.
-- A static grayscale ASCII rendering of Raphael's *The School of Athens* below. The source is P3's linked Wikipedia file; see `scripts/reference/CREDITS.md`.
+- Shaded ASCII title beside a static black-and-white ASCII Lady Justice, generated from P3's supplied engraving.
+- The library model rotates with page scrolling in the hero below the masthead, replacing the School of Athens artwork.
 - Text controls and open-book catalog icons. Search and country/scope filters work on approved and flagged catalog records.
 - Reduced-motion or model-loading failures retain a static library view. All runtime assets are local.
 
-Rebuild the header model views with `node scripts/build-turntable.mjs`. Rebuild the painting with `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-athens.ps1`. Build the title with `scripts/build-header.ps1` and the static library fallback with `node scripts/build-exterior.mjs`. Visitors receive ASCII text/data, with no 3D runtime.
+Rebuild the library model views with `node scripts/build-turntable.mjs`. Rebuild Lady Justice with `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-justice.ps1`. Build the title with `scripts/build-header.ps1` and the static library fallback with `node scripts/build-exterior.mjs`. Visitors receive ASCII text/data, with no 3D runtime. Lady Justice stays still when scrolling; reduced motion disables the library rotation.
 
 ## Local sample books
 
@@ -26,7 +26,7 @@ Production uses the SDK for live Fuji catalog reads with the bundled snapshot as
 - `npm run build`: strict TypeScript and production build.
 - With the dev server running: `npx playwright install chromium`, then `npx playwright test`.
 
-Browser checks cover header rotation/reversal, reduced motion, both themes, mobile layout, accessible readable UI, search/filter behavior and verified sample downloads. Decorative ASCII graphics have descriptions; their shading is excluded from text-contrast checks.
+Browser checks cover library rotation/reversal in the hero, static Lady Justice beside the title, reduced motion, both themes, mobile layout, accessible readable UI, search/filter behavior and verified sample downloads. Decorative ASCII graphics have descriptions; their shading is excluded from text-contrast checks.
 ## Political demo handoff (2026-10-15)
 
 Open http://127.0.0.1:5173/?collection=political#/ for the presentation. Collection paused at the user's request: 11 historical political scans (about 160 MiB), with search, detail pages, source links and SHA-256-checked PDF downloads. A questionable Cambridge text was excluded because its edition date was unclear. All entries remain local and need source/edition, scanner and curator review; no ban claims or on-chain approvals are implied.
