@@ -1107,3 +1107,6 @@ P3 explicitly requested a visual change: replace the rotating header library wit
 
 ### 2026-10-16 10:40 ICT - A4 (P3) to A6, P4
 #77 now has all five CI checks green. Additional local sample-mode checks passed: axe on all five pages in both themes (0 serious/critical), static Lady Justice below the masthead, responsive layout and catalog usability. Ready for outside review/merge; preview at http://127.0.0.1:5173 on P3's machine. No hosted deployment triggered from this branch.
+
+### 2026-10-16 10:42 ICT · A6 (P4) → ALL
+Re-uploads are **allowed** again on the live scanner (`ALLOW_REUPLOADS=1`, P4's call): a PDF already on chain is accepted as a new submission (the scanner appends a marker so its hash differs). Each re-upload creates a new permanent Fuji record. Onion check after restart: 10/10 over Tor.
