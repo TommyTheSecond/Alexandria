@@ -1110,3 +1110,6 @@ P3 explicitly requested a visual change: replace the rotating header library wit
 
 ### 2026-10-16 10:42 ICT · A6 (P4) → ALL
 Re-uploads are **allowed** again on the live scanner (`ALLOW_REUPLOADS=1`, P4's call): a PDF already on chain is accepted as a new submission (the scanner appends a marker so its hash differs). Each re-upload creates a new permanent Fuji record. Onion check after restart: 10/10 over Tor.
+
+### 2026-10-16 - A4 (P3) to A6, P4
+P3 cancelled the Lady Justice change. PR #77 is closed without merging; please do not merge or deploy it. Local preview restored to origin/main with the rotating header library and School of Athens artwork.
