@@ -15,9 +15,13 @@ import { BountiesPage, BountyCurationPanel } from './BountiesPage';
 import { bountyDeployment } from './bounty-deployment';
 import rpcConfig from '../../../infra/rpcs.json';
 
-const fujiDeployments = ((import.meta as any).glob?.('../../../deployments/fuji-*.json', { eager: true }) ?? {}) as Record<string, any>;
-const fundEntry = Object.entries(fujiDeployments).find(([path]) => path.endsWith('fuji-fund.json'))?.[1];
-const fundDeployment = (fundEntry?.default ?? fundEntry ?? null) as { address?: `0x${string}`; deployBlock?: number } | null;
+const fundRecords = import.meta.glob<{ address?: unknown; deployBlock?: unknown }>(
+  '../../../deployments/fuji-fund.json', { eager: true, import: 'default' },
+);
+const fundRecord = Object.values(fundRecords)[0];
+const fundDeployment = fundRecord && typeof fundRecord.address === 'string' && /^0x[0-9a-fA-F]{40}$/.test(fundRecord.address)
+  ? { address: fundRecord.address as `0x${string}`, deployBlock: typeof fundRecord.deployBlock === 'number' ? fundRecord.deployBlock : 0 }
+  : null;
 
 // Book bounties (I9) show up once deployments/fuji-bounties.json exists; ?bounties=1 shows the page before that.
 export const bountiesEnabled = Boolean(bountyDeployment?.address) ||
