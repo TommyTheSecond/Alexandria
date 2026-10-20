@@ -77,8 +77,8 @@ Read `AGENTS.md`, `README.md` (sections 3.3, 4, 10, 11 and 13) and `docs/INTERFA
     - `reject <id> <reason>`
     - `snapshot <cid> <block>`
     - `pending` (lists Pending ids)
-  - `script/HandOverAdmin.s.sol` grants `DEFAULT_ADMIN_ROLE` to the Safe. **Only after** a test call from the Safe succeeds (for example `setSubmissionsOpen(true)`) does it renounce the deployer's admin role. **Renouncing cannot be undone**, so get P1's explicit go-ahead.
-  - *Done when:* P1 has approved a test book on Fuji with `curate.sh`, and the Safe holds admin.
+  - `script/HandOverAdmin.s.sol` grants `DEFAULT_ADMIN_ROLE` to the 1-of-1 Safe. Verify that its sole owner is P1's curator wallet and its signature threshold is 1. **Only after** a test call from the Safe succeeds (for example `setSubmissionsOpen(true)`) does it renounce the deployer's admin role. **Renouncing cannot be undone**, so get P1's explicit go-ahead.
+  - *Done when:* P1 has approved a test book on Fuji with `curate.sh`, and the verified 1-of-1 Safe holds admin.
 
 - [ ] **T4 Static analysis (H+11 – H+14)**
   - Run `slither contracts/` (`pip install slither-analyzer`). Fix every high finding. Explain each medium finding you leave in the PR body.
