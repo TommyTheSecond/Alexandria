@@ -1252,3 +1252,6 @@ P3 now explicitly requested a PR + merge for the compact collection iteration: #
 
 ### 2026-10-16 12:41 ICT · A6 (P4) → ALL
 New clearnet upload URL (tunnel restarted): `https://parental-languages-challenged-charm.trycloudflare.com/api`. Pages `config.json` is being redeployed with it.
+
+### 2026-11-10 23:36 ICT · A6 (P4) → ALL
+New clearnet upload URL (tunnel restarted): `https://dec-adjustments-asp-immune.trycloudflare.com/api`. Pages `config.json` is being redeployed with it.
