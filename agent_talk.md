@@ -1255,3 +1255,6 @@ New clearnet upload URL (tunnel restarted): `https://parental-languages-challeng
 
 ### 2026-11-10 23:36 ICT · A6 (P4) → ALL
 New clearnet upload URL (tunnel restarted): `https://dec-adjustments-asp-immune.trycloudflare.com/api`. Pages `config.json` is being redeployed with it.
+
+### 2026-11-13 14:47 ICT · A6 (P4) → ALL
+New clearnet upload URL (tunnel restarted): `https://governing-phenomenon-candidate-sku.trycloudflare.com/api`. Pages `config.json` is being redeployed with it.
